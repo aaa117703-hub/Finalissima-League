@@ -728,3 +728,204 @@ button {
 .text-center  { text-align: center; }
 
 .hidden       { display: none !important; }
+/* =========================================================
+   13. LANDING + SPA VIEW
+   ========================================================= */
+
+/* Landing - افتراضياً ظاهر */
+.landing-view {
+    display: block;
+}
+
+/* SPA - افتراضياً مخفي */
+.spa-view {
+    display: none;
+}
+
+/* SPA يظهر عند فتح تاب */
+.spa-view.show {
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+/* Landing يختفي عند فتح تاب */
+.landing-view:not(.show) {
+    display: block;
+}
+
+.landing-view.hide {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================================
+   14. ROUND BAR
+   ========================================================= */
+
+.round-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px 0;
+    margin-bottom: 14px;
+}
+
+.nav-arrow {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #FFFFFF;
+    border: 1.5px solid var(--border-light);
+    color: var(--maroon);
+    font-size: 22px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-arrow:hover {
+    background: var(--gold-light);
+    border-color: var(--gold);
+    transform: scale(1.05);
+}
+
+.nav-arrow:active {
+    transform: scale(0.95);
+}
+
+/* =========================================================
+   15. TABS
+   ========================================================= */
+
+.tabs {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    background: #FFFFFF;
+    border: 1.5px solid var(--border-light);
+    border-radius: 50px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    justify-content: center;
+}
+
+.tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    padding: 8px 18px;
+    border-radius: 40px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background: linear-gradient(135deg, var(--maroon) 0%, var(--maroon-dark) 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(139, 26, 47, 0.3);
+}
+
+/* =========================================================
+   16. TAB PANES
+   ========================================================= */
+
+.tab-content {
+    min-height: 200px;
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+    animation: fadeIn 0.25s ease;
+}
+
+/* =========================================================
+   17. STATS TABS
+   ========================================================= */
+
+.stats-tabs {
+    display: flex;
+    gap: 6px;
+    padding: 6px;
+    background: #FFFFFF;
+    border: 1.5px solid var(--border-light);
+    border-radius: 12px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.stats-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.stats-tab {
+    padding: 6px 14px;
+    border-radius: 8px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.stats-tab.active {
+    background: var(--gold);
+    color: var(--maroon-deep);
+}
+
+/* =========================================================
+   18. BACK BAR
+   ========================================================= */
+
+.back-bar {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.back-btn {
+    padding: 10px 24px;
+    background: transparent;
+    border: 1.5px solid var(--border-light);
+    border-radius: 50px;
+    color: var(--maroon);
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 900;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+    background: var(--maroon);
+    color: #FFFFFF;
+    border-color: var(--maroon);
+}
