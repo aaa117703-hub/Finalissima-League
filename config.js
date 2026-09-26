@@ -4,7 +4,7 @@
 
 const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
-const WORKER_URL = 'https://finalissima-api.YOUR_USERNAME.workers.dev';
+const WORKER_URL = 'https://finalissima-api.aaa117703.workers.dev';
 const MANAGERS_WORKER_URL = WORKER_URL;
 const LEAGUE_ID = '810632';
 
