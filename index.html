@@ -1,387 +1,118 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Finalissima League Chat</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Finalissima League Chat</title>
 
-<meta name="color-scheme" content="only light">
+    <meta name="color-scheme" content="only light">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-<style>
-/* =========================================================
-   FINALISSIMA LANDING — Qatar 2022 Colors
-========================================================= */
-
-:root {
-    /* Qatar 2022 Colors */
-    --maroon:       #8B1A2F;
-    --maroon-dark:  #6B0F1F;
-    --maroon-deep:  #2D0A0F;
-    --gold:         #C8A95F;
-    --gold-light:   #E5D4A5;
-    --gold-dark:    #8B7340;
-    --sand:         #F5E6D3;
-    --cream:        #FAF6F0;
-    --white:        #FFFFFF;
-    
-    /* Gradients */
-    --gradient-maroon: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
-    --gradient-gold:   linear-gradient(135deg, #C8A95F 0%, #8B7340 100%);
-    --gradient-hero:   linear-gradient(135deg, #2D0A0F 0%, #8B1A2F 50%, #C8A95F 100%);
-    
-    /* Neutrals */
-    --text-primary:   #1F1F1F;
-    --text-secondary: #666666;
-    --text-muted:     #999999;
-    --border-light:   #E8DED0;
-    
-    /* Radii */
-    --radius-sm:  8px;
-    --radius-md:  12px;
-    --radius-lg:  16px;
-    --radius-xl:  24px;
-    --radius-pill: 50px;
-    
-    /* Shadows */
-    --shadow-sm:   0 2px 8px rgba(139, 26, 47, 0.08);
-    --shadow-md:   0 4px 16px rgba(139, 26, 47, 0.12);
-    --shadow-lg:   0 8px 32px rgba(139, 26, 47, 0.18);
-    --shadow-gold: 0 6px 20px rgba(200, 169, 95, 0.35);
-    --shadow-maroon: 0 6px 20px rgba(139, 26, 47, 0.3);
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-html {
-    scroll-behavior: smooth;
-}
-
-body {
-    background: var(--cream);
-    background-image: 
-        radial-gradient(circle at 100% 0%, rgba(200, 169, 95, 0.08) 0%, transparent 50%),
-        radial-gradient(circle at 0% 100%, rgba(139, 26, 47, 0.08) 0%, transparent 50%);
-    background-attachment: fixed;
-    color: var(--text-primary);
-    font-family: 'Cairo', 'Inter', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-}
-
-/* =========================================================
-   CONTAINER
-========================================================= */
-
-.container {
-    max-width: 500px;
-    margin: 0 auto;
-    padding: 24px 20px 40px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-.header {
-    text-align: center;
-    padding: 20px 0 30px;
-    position: relative;
-}
-
-.header::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 4px;
-    background: var(--gradient-gold);
-    border-radius: var(--radius-pill);
-}
-
-.trophy-icon {
-    font-size: 64px;
-    line-height: 1;
-    margin: 20px 0 14px;
-    display: block;
-    filter: drop-shadow(0 6px 20px rgba(200, 169, 95, 0.5));
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); }
-}
-
-.title {
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--maroon);
-    letter-spacing: -0.5px;
-    line-height: 1.2;
-    margin-bottom: 8px;
-}
-
-.title span {
-    background: var(--gradient-gold);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-
-.subtitle {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text-secondary);
-    letter-spacing: 0.5px;
-    margin-top: 6px;
-}
-
-/* =========================================================
-   CARDS GRID (2x2)
-========================================================= */
-
-.cards-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
-    margin-bottom: 28px;
-}
-
-.card {
-    background: var(--white);
-    border: 1.5px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    padding: 22px 16px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    text-decoration: none;
-    color: inherit;
-    box-shadow: var(--shadow-sm);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 130px;
-}
-
-.card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: var(--gradient-gold);
-    opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
-.card:hover {
-    border-color: var(--gold);
-    box-shadow: var(--shadow-gold);
-    transform: translateY(-4px);
-}
-
-.card:hover::before {
-    opacity: 1;
-}
-
-.card:active {
-    transform: translateY(-2px) scale(0.98);
-}
-
-.card-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, rgba(139, 26, 47, 0.08) 0%, rgba(200, 169, 95, 0.12) 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 26px;
-    margin-bottom: 12px;
-    transition: all 0.25s ease;
-}
-
-.card:hover .card-icon {
-    background: var(--gradient-gold);
-    color: var(--white);
-    transform: scale(1.1);
-}
-
-.card-title {
-    font-size: 14px;
-    font-weight: 900;
-    color: var(--maroon);
-    letter-spacing: 0.3px;
-    margin-bottom: 4px;
-}
-
-.card-sub {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 0.5px;
-}
-
-/* =========================================================
-   CTA BUTTON
-========================================================= */
-
-.cta-section {
-    margin-top: auto;
-    padding-top: 20px;
-}
-
-.cta-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%;
-    padding: 18px 24px;
-    background: var(--gradient-gold);
-    color: var(--maroon-deep);
-    border: none;
-    border-radius: var(--radius-md);
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 900;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    text-decoration: none;
-    box-shadow: var(--shadow-gold);
-    transition: all 0.25s ease;
-}
-
-.cta-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(200, 169, 95, 0.5);
-}
-
-.cta-btn:active {
-    transform: translateY(0) scale(0.98);
-}
-
-.cta-btn svg {
-    width: 20px;
-    height: 20px;
-    transition: transform 0.25s ease;
-}
-
-.cta-btn:hover svg {
-    transform: translateX(-4px);
-}
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.footer {
-    text-align: center;
-    padding: 20px 0 10px;
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.footer strong {
-    color: var(--maroon);
-    font-weight: 900;
-}
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media (max-width: 360px) {
-    .title { font-size: 24px; }
-    .trophy-icon { font-size: 54px; }
-    .card { min-height: 120px; padding: 18px 12px; }
-    .card-icon { width: 46px; height: 46px; font-size: 22px; }
-    .card-title { font-size: 13px; }
-}
-</style>
-
+    <link rel="stylesheet" href="theme.css">
 </head>
 <body>
 
-<div class="container">
+    <div class="container">
 
-    <!-- Header -->
-    <header class="header">
-        <span class="trophy-icon">🏆</span>
-        <h1 class="title">
-            FINALISSIMA<br>
-            <span>LEAGUE CHAT</span>
-        </h1>
-        <p class="subtitle">Fantasy Football • 20 Nations</p>
-    </header>
+        <!-- HEADER -->
+        <header class="header">
+            <h1 class="title">FINALISSIMA<br><span>LEAGUE CHAT</span></h1>
+            <p class="subtitle">Fantasy Football - 20 Nations</p>
+        </header>
 
-    <!-- Cards Grid (2x2) -->
-    <div class="cards-grid">
+        <!-- ROUND SELECTOR -->
+        <section class="round-bar">
+            <button class="nav-arrow" id="prevRound">&#8249;</button>
+            <select id="roundSelector" class="round-selector">
+                <option value="1">Round 1</option>
+            </select>
+            <button class="nav-arrow" id="nextRound">&#8250;</button>
+        </section>
 
-        <a class="card" href="?page=fixtures">
-            <div class="card-icon">⚽</div>
-            <div class="card-title">المواجهات</div>
-            <div class="card-sub">Fixtures</div>
-        </a>
+        <!-- TABS -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="fixtures">Fixtures</button>
+            <button class="tab-btn" data-tab="standings">Standings</button>
+            <button class="tab-btn" data-tab="totw">TOTW</button>
+            <button class="tab-btn" data-tab="stats">Stats</button>
+        </nav>
 
-        <a class="card" href="?page=standings">
-            <div class="card-icon">📊</div>
-            <div class="card-title">الترتيب</div>
-            <div class="card-sub">Standings</div>
-        </a>
+        <!-- TAB CONTENT -->
+        <main class="tab-content">
 
-        <a class="card" href="?page=totw">
-            <div class="card-icon">👥</div>
-            <div class="card-title">التشكيلة</div>
-            <div class="card-sub">Team of the Week</div>
-        </a>
+            <!-- FIXTURES -->
+            <section class="tab-pane active" id="tab-fixtures">
+                <div id="fixturesContainer"></div>
+            </section>
 
-        <a class="card" href="?page=stats">
-            <div class="card-icon">📈</div>
-            <div class="card-title">الإحصائيات</div>
-            <div class="card-sub">Statistics</div>
-        </a>
+            <!-- STANDINGS -->
+            <section class="tab-pane" id="tab-standings">
+                <div id="standingsContainer"></div>
+            </section>
+
+            <!-- TOTW -->
+            <section class="tab-pane" id="tab-totw">
+                <div id="totwContainer"></div>
+            </section>
+
+            <!-- STATS -->
+            <section class="tab-pane" id="tab-stats">
+                <div class="stats-tabs">
+                    <button class="stats-tab active" data-stats="overview">Overview</button>
+                    <button class="stats-tab" data-stats="charts">Charts</button>
+                    <button class="stats-tab" data-stats="clubs">Clubs</button>
+                    <button class="stats-tab" data-stats="search">Search</button>
+                </div>
+                <div id="statsContainer"></div>
+            </section>
+
+        </main>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p>Made by <strong>Aqeel Al Rowai</strong> - Finalissima</p>
+        </footer>
 
     </div>
 
-    <!-- CTA Button -->
-    <div class="cta-section">
-        <a class="cta-btn" href="?page=fixtures">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                <polyline points="15 18 9 12 15 6"/>
-            </svg>
-            ابدأ المشاهدة الآن
-        </a>
+    <!-- TOAST -->
+    <div class="toast" id="toast">
+        <div id="toastContent"></div>
     </div>
 
-    <!-- Footer -->
-    <div class="footer">
-        Powered by <strong>TELEGRAM GOAT</strong>
+    <!-- MAINTENANCE OVERLAY -->
+    <div id="sectionMaintenance" class="maintenance-overlay">
+        <div class="maint-box">
+            <h2>MAINTENANCE</h2>
+            <p>This section is currently locked.</p>
+        </div>
     </div>
 
-</div>
+    <!-- SETTINGS MODAL -->
+    <div class="settings-modal" id="settingsModal">
+        <div class="settings-box">
+            <div class="settings-header">
+                <span>SETTINGS</span>
+                <button class="close-btn" id="closeSettings">×</button>
+            </div>
+            <div class="settings-body" id="settingsBody"></div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="js/teams.js"></script>
+    <script src="js/matchweeks.js"></script>
+    <script src="js/players-teams.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/fixtures.js"></script>
+    <script src="js/standings.js"></script>
+    <script src="js/totw.js"></script>
+    <script src="js/stats.js"></script>
 
 </body>
 </html>
