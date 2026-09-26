@@ -17,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // =========================================================
-// 1. LANDING — البطاقات الرئيسية
+// 1. LANDING
 // =========================================================
 
 function initLandingCards() {
@@ -32,21 +32,18 @@ function initLandingCards() {
 }
 
 function openSPA(tabName) {
-    // أخف Landing
     const landing = document.getElementById('landingView');
-    if (landing) landing.classList.remove('show');
+    if (landing) landing.classList.add('hide');
 
-    // أظهر SPA
     const spa = document.getElementById('spaView');
     if (spa) spa.classList.add('show');
 
-    // فعّل التاب المطلوب
     if (tabName) switchTab(tabName);
 }
 
 function closeSPA() {
     const landing = document.getElementById('landingView');
-    if (landing) landing.classList.add('show');
+    if (landing) landing.classList.remove('hide');
 
     const spa = document.getElementById('spaView');
     if (spa) spa.classList.remove('show');
@@ -105,7 +102,6 @@ function switchTab(tabName) {
     const target = document.getElementById('tab-' + tabName);
     if (target) target.classList.add('active');
 
-    // إخفاء Round Bar في تابات لا تحتاجها
     const roundBar = document.getElementById('roundBar');
     if (roundBar) {
         if (tabName === 'fixtures' || tabName === 'totw') {
@@ -226,7 +222,7 @@ function initBackButton() {
 }
 
 // =========================================================
-// 8. Helper
+// 8. HELPER
 // =========================================================
 
 function getCurrentRoundMatches() {
@@ -234,8 +230,13 @@ function getCurrentRoundMatches() {
     return matchweeks[currentRound] || [];
 }
 
+// =========================================================
+// 9. EXPOSE
+// =========================================================
+
 window.openSPA = openSPA;
 window.closeSPA = closeSPA;
 window.switchTab = switchTab;
 window.reloadActiveTab = reloadActiveTab;
+window.syncRoundUI = syncRoundUI;
 window.getCurrentRoundMatches = getCurrentRoundMatches;
