@@ -6,7 +6,7 @@ const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
 const WORKER_URL = 'https://finalissima-api.YOUR_USERNAME.workers.dev';
 const MANAGERS_WORKER_URL = WORKER_URL;
-const LEAGUE_ID = 'YOUR_LEAGUE_ID';
+const LEAGUE_ID = '810632';
 
 window.sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
