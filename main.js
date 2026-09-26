@@ -1,39 +1,65 @@
 // =========================================================
-// main.js — Finalissima League
-// مدير الموقع الرئيسي
-// =========================================================
-
-// =========================================================
-// 1. تهيئة الموقع
+// main.js — Finalissima League (Landing + SPA)
 // =========================================================
 
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('[Main] Finalissima League starting...');
+    console.log('[Main] Finalissima starting...');
 
+    initLandingCards();
     initRoundSelector();
     initTabs();
     initStatsTabs();
     initRoundNav();
     initSettings();
+    initBackButton();
 
-    // فعّل التاب الأول
-    switchTab(activeTab || 'fixtures');
-
-    // تحديث عنوان الجولة
-    updateRoundTitle();
-
-    console.log('[Main] Ready. Round:', currentRound, '| Tab:', activeTab);
+    console.log('[Main] Ready. Round:', currentRound);
 });
 
 // =========================================================
-// 2. Round Selector (اختيار الجولة)
+// 1. LANDING — البطاقات الرئيسية
+// =========================================================
+
+function initLandingCards() {
+    const cards = document.querySelectorAll('[data-goto]');
+    cards.forEach(function(card) {
+        card.addEventListener('click', function() {
+            const tab = this.getAttribute('data-goto');
+            if (!tab) return;
+            openSPA(tab);
+        });
+    });
+}
+
+function openSPA(tabName) {
+    // أخف Landing
+    const landing = document.getElementById('landingView');
+    if (landing) landing.classList.remove('show');
+
+    // أظهر SPA
+    const spa = document.getElementById('spaView');
+    if (spa) spa.classList.add('show');
+
+    // فعّل التاب المطلوب
+    if (tabName) switchTab(tabName);
+}
+
+function closeSPA() {
+    const landing = document.getElementById('landingView');
+    if (landing) landing.classList.add('show');
+
+    const spa = document.getElementById('spaView');
+    if (spa) spa.classList.remove('show');
+}
+
+// =========================================================
+// 2. ROUND SELECTOR
 // =========================================================
 
 function initRoundSelector() {
     const selector = document.getElementById('roundSelector');
     if (!selector) return;
 
-    // املأ الخيارات 1-38
     selector.innerHTML = '';
     for (let i = 1; i <= 38; i++) {
         const opt = document.createElement('option');
@@ -42,22 +68,19 @@ function initRoundSelector() {
         selector.appendChild(opt);
     }
 
-    // حدّد الجولة الحالية
     selector.value = currentRound;
 
-    // عند التغيير
     selector.addEventListener('change', function() {
         const newRound = parseInt(this.value, 10);
         if (isNaN(newRound) || newRound < 1 || newRound > 38) return;
         currentRound = newRound;
         localStorage.setItem('fin_last_round', String(currentRound));
-        updateRoundTitle();
         reloadActiveTab();
     });
 }
 
 // =========================================================
-// 3. Tabs (التبويبات الرئيسية)
+// 3. TABS
 // =========================================================
 
 function initTabs() {
@@ -71,19 +94,26 @@ function initTabs() {
 }
 
 function switchTab(tabName) {
-    // أزل active من كل التابات
     document.querySelectorAll('.tab-btn').forEach(function(b) {
         b.classList.toggle('active', b.getAttribute('data-tab') === tabName);
     });
 
-    // أخف كل الأقسام
     document.querySelectorAll('.tab-pane').forEach(function(p) {
         p.classList.remove('active');
     });
 
-    // أظهر القسم المطلوب
     const target = document.getElementById('tab-' + tabName);
     if (target) target.classList.add('active');
+
+    // إخفاء Round Bar في تابات لا تحتاجها
+    const roundBar = document.getElementById('roundBar');
+    if (roundBar) {
+        if (tabName === 'fixtures' || tabName === 'totw') {
+            roundBar.style.display = 'flex';
+        } else {
+            roundBar.style.display = 'none';
+        }
+    }
 
     activeTab = tabName;
     reloadActiveTab();
@@ -107,7 +137,7 @@ function reloadActiveTab() {
 }
 
 // =========================================================
-// 4. Stats Tabs (التبويبات الفرعية داخل Stats)
+// 4. STATS TABS
 // =========================================================
 
 function initStatsTabs() {
@@ -129,7 +159,7 @@ function initStatsTabs() {
 }
 
 // =========================================================
-// 5. Round Navigation (Prev/Next)
+// 5. ROUND NAVIGATION
 // =========================================================
 
 function initRoundNav() {
@@ -160,23 +190,16 @@ function initRoundNav() {
 function syncRoundUI() {
     const selector = document.getElementById('roundSelector');
     if (selector) selector.value = currentRound;
-    updateRoundTitle();
     reloadActiveTab();
 }
 
-function updateRoundTitle() {
-    const title = document.getElementById('roundTitle');
-    if (title) title.textContent = 'MATCHWEEK ' + currentRound;
-}
-
 // =========================================================
-// 6. Settings Modal
+// 6. SETTINGS MODAL
 // =========================================================
 
 function initSettings() {
     const modal = document.getElementById('settingsModal');
     const closeBtn = document.getElementById('closeSettings');
-    const openBtn = document.getElementById('btnSettings');
 
     if (closeBtn) {
         closeBtn.addEventListener('click', function() {
@@ -184,13 +207,6 @@ function initSettings() {
         });
     }
 
-    if (openBtn) {
-        openBtn.addEventListener('click', function() {
-            if (modal) modal.classList.add('show');
-        });
-    }
-
-    // إغلاق عند النقر خارج الصندوق
     if (modal) {
         modal.addEventListener('click', function(e) {
             if (e.target === modal) modal.classList.remove('show');
@@ -199,25 +215,18 @@ function initSettings() {
 }
 
 // =========================================================
-// 7. Helper: تحويل كود المنتخب لاسم
+// 7. BACK BUTTON
 // =========================================================
 
-function getTeamName(code) {
-    if (typeof teamsMap !== 'undefined' && teamsMap[code]) {
-        return teamsMap[code].name;
+function initBackButton() {
+    const btn = document.getElementById('backBtn');
+    if (btn) {
+        btn.addEventListener('click', closeSPA);
     }
-    return code;
-}
-
-function getTeamFlag(code) {
-    if (typeof teamsMap !== 'undefined' && teamsMap[code]) {
-        return teamsMap[code].flag || '';
-    }
-    return '';
 }
 
 // =========================================================
-// 8. Helper: جلب مباريات الجولة
+// 8. Helper
 // =========================================================
 
 function getCurrentRoundMatches() {
@@ -225,13 +234,8 @@ function getCurrentRoundMatches() {
     return matchweeks[currentRound] || [];
 }
 
-// =========================================================
-// 9. Expose Globals
-// =========================================================
-
+window.openSPA = openSPA;
+window.closeSPA = closeSPA;
 window.switchTab = switchTab;
 window.reloadActiveTab = reloadActiveTab;
-window.syncRoundUI = syncRoundUI;
-window.getTeamName = getTeamName;
-window.getTeamFlag = getTeamFlag;
 window.getCurrentRoundMatches = getCurrentRoundMatches;
