@@ -23,53 +23,96 @@
             <p class="subtitle">Fantasy Football - 20 Nations</p>
         </header>
 
-        <!-- ROUND SELECTOR -->
-        <section class="round-bar">
-            <button class="nav-arrow" id="prevRound">&#8249;</button>
-            <select id="roundSelector" class="round-selector">
-                <option value="1">Round 1</option>
-            </select>
-            <button class="nav-arrow" id="nextRound">&#8250;</button>
+        <!-- =========================== -->
+        <!-- LANDING VIEW                 -->
+        <!-- =========================== -->
+        <section class="landing-view" id="landingView">
+
+            <div class="cards-grid">
+
+                <div class="card" data-goto="fixtures">
+                    <div class="card-title">المواجهات</div>
+                    <div class="card-sub">Fixtures</div>
+                </div>
+
+                <div class="card" data-goto="standings">
+                    <div class="card-title">الترتيب</div>
+                    <div class="card-sub">Standings</div>
+                </div>
+
+                <div class="card" data-goto="totw">
+                    <div class="card-title">التشكيلة</div>
+                    <div class="card-sub">Team of the Week</div>
+                </div>
+
+                <div class="card" data-goto="stats">
+                    <div class="card-title">الإحصائيات</div>
+                    <div class="card-sub">Statistics</div>
+                </div>
+
+            </div>
+
         </section>
 
-        <!-- TABS -->
-        <nav class="tabs">
-            <button class="tab-btn active" data-tab="fixtures">Fixtures</button>
-            <button class="tab-btn" data-tab="standings">Standings</button>
-            <button class="tab-btn" data-tab="totw">TOTW</button>
-            <button class="tab-btn" data-tab="stats">Stats</button>
-        </nav>
+        <!-- =========================== -->
+        <!-- SPA VIEW                     -->
+        <!-- =========================== -->
+        <section class="spa-view" id="spaView">
 
-        <!-- TAB CONTENT -->
-        <main class="tab-content">
+            <!-- ROUND BAR -->
+            <div class="round-bar" id="roundBar">
+                <button class="nav-arrow" id="prevRound">&#8249;</button>
+                <select id="roundSelector" class="round-selector">
+                    <option value="1">Round 1</option>
+                </select>
+                <button class="nav-arrow" id="nextRound">&#8250;</button>
+            </div>
 
-            <!-- FIXTURES -->
-            <section class="tab-pane active" id="tab-fixtures">
-                <div id="fixturesContainer"></div>
-            </section>
+            <!-- TABS -->
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="fixtures">Fixtures</button>
+                <button class="tab-btn" data-tab="standings">Standings</button>
+                <button class="tab-btn" data-tab="totw">TOTW</button>
+                <button class="tab-btn" data-tab="stats">Stats</button>
+            </nav>
 
-            <!-- STANDINGS -->
-            <section class="tab-pane" id="tab-standings">
-                <div id="standingsContainer"></div>
-            </section>
+            <!-- TAB CONTENT -->
+            <main class="tab-content">
 
-            <!-- TOTW -->
-            <section class="tab-pane" id="tab-totw">
-                <div id="totwContainer"></div>
-            </section>
+                <!-- FIXTURES -->
+                <section class="tab-pane active" id="tab-fixtures">
+                    <div id="fixturesContainer"></div>
+                </section>
 
-            <!-- STATS -->
-            <section class="tab-pane" id="tab-stats">
-                <div class="stats-tabs">
-                    <button class="stats-tab active" data-stats="overview">Overview</button>
-                    <button class="stats-tab" data-stats="charts">Charts</button>
-                    <button class="stats-tab" data-stats="clubs">Clubs</button>
-                    <button class="stats-tab" data-stats="search">Search</button>
-                </div>
-                <div id="statsContainer"></div>
-            </section>
+                <!-- STANDINGS -->
+                <section class="tab-pane" id="tab-standings">
+                    <div id="standingsContainer"></div>
+                </section>
 
-        </main>
+                <!-- TOTW -->
+                <section class="tab-pane" id="tab-totw">
+                    <div id="totwContainer"></div>
+                </section>
+
+                <!-- STATS -->
+                <section class="tab-pane" id="tab-stats">
+                    <div class="stats-tabs">
+                        <button class="stats-tab active" data-stats="overview">Overview</button>
+                        <button class="stats-tab" data-stats="charts">Charts</button>
+                        <button class="stats-tab" data-stats="clubs">Clubs</button>
+                        <button class="stats-tab" data-stats="search">Search</button>
+                    </div>
+                    <div id="statsContainer"></div>
+                </section>
+
+            </main>
+
+            <!-- BACK BUTTON -->
+            <div class="back-bar">
+                <button class="back-btn" id="backBtn">&#8249; رجوع للرئيسية</button>
+            </div>
+
+        </section>
 
         <!-- FOOTER -->
         <footer class="footer">
