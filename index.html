@@ -1,161 +1,870 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Finalissima League Chat</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Finalissima League Chat</title>
 
-    <meta name="color-scheme" content="only light">
+<meta name="color-scheme" content="only light">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script>
+document.addEventListener('dblclick', function(e) { e.preventDefault(); }, { passive: false });
+let _lastTouchEnd = 0;
+document.addEventListener('touchend', function(e) {
+    const now = Date.now();
+    if (now - _lastTouchEnd <= 300) { e.preventDefault(); }
+    _lastTouchEnd = now;
+}, false);
+</script>
 
-    <link rel="stylesheet" href="theme.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style>
+/* =========================================================
+   BASE + RESET + LAYOUT فقط
+   (الألوان كلها في theme.css)
+========================================================= */
+
+@font-face{
+    font-family:'SultanCustom';
+    src:url('./Sultan.ttf') format('truetype');
+}
+@font-face{
+    font-family:'EnglishCustom';
+    src:url('./english-font.ttf') format('truetype');
+}
+
+:root{
+    --font-ar:'Cairo','Tajawal',sans-serif;
+    --font-en:'EnglishCustom','Cairo',sans-serif;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:var(--font-en);
+}
+
+html{
+    touch-action:manipulation;
+    color-scheme:only light;
+}
+
+body{
+    width:100%;
+    max-width:768px;
+    margin:0 auto;
+    padding:0 0 90px;
+    overflow-x:hidden;
+    touch-action:manipulation;
+}
+
+/* ========== ERROR BOX ========== */
+#errorBox{
+    display:none;
+    position:fixed;
+    top:0;left:0;right:0;
+    padding:12px 16px;
+    font-size:13px;
+    font-weight:700;
+    z-index:99999;
+    max-height:40vh;
+    overflow-y:auto;
+    border-bottom:3px solid #fff;
+    direction:ltr;
+    text-align:left;
+    font-family:monospace;
+}
+#errorBox.show{display:block}
+#errorBox .err-line{padding:6px 0;border-bottom:1px solid rgba(255,255,255,.3);}
+#errorBox .err-line:last-child{border-bottom:none}
+#errorBox .err-close{
+    position:absolute;top:6px;right:10px;
+    border:none;
+    border-radius:50%;width:26px;height:26px;
+    font-weight:900;font-size:16px;cursor:pointer;
+}
+
+/* ========== TOAST ========== */
+#toast{
+    position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+    padding:12px 28px;border-radius:30px;
+    font-weight:900;font-size:15px;
+    z-index:999;opacity:0;
+    transition:opacity .4s ease;pointer-events:none;
+    display:flex;align-items:center;gap:10px;max-width:92%;text-align:center;
+}
+#toast.show{opacity:1}
+
+.toast-spinner{
+    display:inline-block;width:18px;height:18px;
+    border-radius:50%;
+    animation:spin .6s linear infinite;
+}
+@keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+
+/* ========== DOWNLOAD BUTTON ========== */
+.download-wrapper{position:relative;display:inline-block;}
+
+.download-btn{
+    display:flex;align-items:center;justify-content:center;
+    width:44px;height:38px;
+    padding:0;
+    border-radius:12px;
+    cursor:pointer;outline:none;
+    transition:transform .2s ease, box-shadow .2s ease;
+    font-family:inherit;
+}
+.download-btn:hover{transform:scale(1.06);}
+.download-btn:active{transform:scale(0.94);}
+.download-btn svg{width:18px;height:18px;display:block;}
+.download-btn svg path,
+.download-btn svg line,
+.download-btn svg polyline{
+    stroke:#fff;stroke-width:2.5;
+    stroke-linecap:round;stroke-linejoin:round;fill:none;
+}
+
+/* ========== SETTINGS BUTTON ========== */
+.settings-btn-inline{
+    display:flex;align-items:center;justify-content:center;
+    width:44px;height:38px;
+    padding:0;
+    border-radius:12px;
+    font-size:20px;line-height:1;cursor:pointer;outline:none;
+    transition:transform .2s ease, box-shadow .2s ease, background .2s ease;
+    font-family:inherit;
+}
+.settings-btn-inline:hover{transform:scale(1.06) rotate(20deg);}
+.settings-btn-inline:active{transform:scale(0.94) rotate(0deg);}
+
+/* ========== DOWNLOAD MENU ========== */
+.download-menu{
+    position:absolute;top:calc(100% + 8px);right:0;min-width:160px;
+    border-radius:14px;padding:6px;z-index:9999;
+    opacity:0;pointer-events:none;transform:translateY(-8px);
+    transition:opacity .25s ease, transform .25s ease;
+}
+.download-menu.show{opacity:1;pointer-events:auto;transform:translateY(0);}
+.download-menu-item{
+    display:flex;align-items:center;gap:8px;padding:9px 12px;
+    font-size:12px;font-weight:800;border-radius:8px;cursor:pointer;
+    transition:background .2s ease;font-family:inherit;border:none;
+    background:transparent;width:100%;text-align:left;letter-spacing:0.3px;
+}
+.download-menu-item .q-label{flex:1;text-align:left;}
+.download-menu-item .q-scale{font-weight:900;font-size:11px;flex-shrink:0;}
+
+/* ========== HIDDEN EDIT BTN ========== */
+#hiddenEditBtn,#hiddenEditBtn2{
+    display:block;width:100%;padding:8px 10px;margin:8px 0 0 0;
+    background:transparent;border:none;color:rgba(31,31,31,0.15);
+    font-size:10px;font-weight:400;letter-spacing:0.5px;cursor:pointer;
+    text-align:center;transition:color .3s ease;
+    user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;outline:none;
+}
+
+/* ========== CAROUSEL ========== */
+.carousel-wrapper{width:100%;margin:10px auto 0;padding:0 8px;}
+.carousel{
+    position:relative;width:100%;overflow:hidden;
+    border-radius:20px;
+    touch-action:pan-y;cursor:pointer;
+}
+.carousel-track{position:relative;width:100%;height:auto;}
+.carousel-slide{position:relative;inset:0;width:100%;display:none;opacity:0;transition:opacity .7s ease;}
+.carousel-slide.active{display:block;opacity:1;}
+.carousel-slide img{width:100%;height:auto;display:block;object-fit:contain;}
+
+.carousel-dots{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px;}
+.carousel-dot{
+    width:8px;height:8px;border-radius:50%;border:none;
+    cursor:pointer;padding:0;transition:.25s;
+}
+.carousel-dot.active{
+    width:22px;border-radius:10px;
+}
+
+/* ========== ROUND SELECTOR ========== */
+.round-selector-row{
+    display:flex;justify-content:center;align-items:center;gap:8px;
+    margin:10px 0 2px;padding:0 8px;
+}
+.round-select-pill{
+    border-radius:20px;padding:8px 32px 8px 16px;font-size:13px;font-weight:800;
+    min-width:130px;text-align:center;outline:none;cursor:pointer;
+    appearance:none;-webkit-appearance:none;height:38px;
+    background-repeat:no-repeat;background-position:right 12px center;
+}
+
+/* ========== HEADER / NAV ========== */
+.header{padding:8px 0;text-align:center;}
+.round-nav-container{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;}
+.round-indicator{
+    font-size:20px;font-weight:900;letter-spacing:1px;
+    cursor:pointer;user-select:none;-webkit-touch-callout:none;text-align:center;
+    padding:6px 16px;border-radius:8px;border:2px dashed transparent;
+}
+.nav-arrow-btn{
+    width:38px;height:38px;border-radius:50%;cursor:pointer;
+    font-size:20px;font-weight:bold;display:flex;
+    align-items:center;justify-content:center;flex-shrink:0;
+    transition:transform .15s ease;
+}
+.nav-arrow-btn:active{transform:scale(0.94);}
+
+.main-container{width:100%;max-width:768px;margin:0 auto;padding:0 6px;}
+
+/* ========== EDIT PANEL ========== */
+.edit-panel{
+    display:flex;gap:10px;margin-bottom:12px;padding:12px;
+    border-radius:16px;
+    justify-content:center;flex-wrap:wrap;
+}
+.edit-action-btn{
+    font-weight:900;font-size:14px;padding:14px 18px;border-radius:12px;
+    border:none;cursor:pointer;flex:1 1 auto;min-width:110px;color:#fff;
+    display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.5px;
+    font-family:inherit;
+}
+
+/* =========================================================
+   FIXTURES TAB
+========================================================= */
+
+#captureFixtures{
+    padding:0;background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    border-radius:16px;border:3px solid #fff;overflow:hidden;
+}
+.fixtures-header-box{
+    background:linear-gradient(135deg, #4A0A15 0%, #2D0A0F 100%);
+    padding:14px 10px;text-align:center;
+}
+.fixtures-header-title{font-size:20px;font-weight:900;color:#fff;letter-spacing:1.5px;text-transform:uppercase;}
+
+#fixturesList{background:#fff;padding:10px 12px;}
+.fixture-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:12px 0;border-bottom:1px solid #f0f0f0;gap:6px;min-height:54px;
+}
+.fixture-row:last-child{border-bottom:none}
+.team-box{
+    display:flex;align-items:center;flex:1 1 0;min-width:0;
+    font-size:13px;font-weight:700;color:#1a1a2e;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;
+}
+.team-box.home{justify-content:flex-end;text-align:right;}
+.team-box.away{justify-content:flex-start;text-align:left;}
+.team-box>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.match-score-center{
+    display:flex;align-items:center;justify-content:center;gap:5px;
+    flex:0 0 auto;width:180px;min-width:180px;padding:8px 40px;border-radius:0;
+    background:linear-gradient(90deg, #ffffff 0%, #8B1A2F 50%, #ffffff 100%);
+}
+
+.logo-20{
+    display:inline-block;width:20px;height:20px;min-width:20px;min-height:20px;
+    max-width:20px;max-height:20px;flex-shrink:0;position:relative;overflow:hidden;
+}
+.logo-20 img{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    max-width:100%;max-height:100%;object-fit:contain;display:block;
+}
+.logo-24{
+    display:inline-block;width:26px;height:26px;min-width:26px;min-height:26px;
+    max-width:26px;max-height:26px;flex-shrink:0;position:relative;
+    overflow:hidden;margin:0 6px;
+}
+.logo-24 img{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    max-width:100%;max-height:100%;object-fit:contain;display:block;
+}
+
+.score-display{
+    color:#fff;font-size:15px;font-weight:900;
+    text-shadow:0 1px 3px rgba(0,0,0,.5);position:relative;z-index:2;
+}
+.score-input{
+    width:38px;height:26px;text-align:center;background:#fff;
+    color:#8B1A2F;border:1px solid #C8A95F;border-radius:4px;
+    outline:none;padding:0;font-size:14px;
+}
+.vs-text{
+    font-weight:900;color:#fff;font-size:13px;opacity:.9;
+    text-shadow:0 1px 3px rgba(0,0,0,.5);position:relative;z-index:2;
+}
+
+/* =========================================================
+   STANDINGS TAB
+========================================================= */
+
+#captureStandings{
+    background:#fff;border-radius:16px;overflow:hidden;
+    border:3px solid #fff;width:100%;position:relative;
+}
+#captureStandings::before{
+    content:'';position:absolute;top:0;left:0;bottom:0;width:48px;
+    background:linear-gradient(180deg, #C8A95F 0%, #8B7340 50%, #4A0A15 100%);z-index:1;
+}
+#captureStandings::after{
+    content:'';position:absolute;top:0;left:0;bottom:0;width:48px;z-index:2;
+    background:url('./finalissima-logo.png') center 16px / 30px 30px no-repeat;
+}
+.standings-content-area{
+    background:#fff;width:100%;padding:10px 10px 10px 58px;
+    position:relative;z-index:3;
+}
+table{width:100%;border-collapse:collapse;text-align:center;color:#333;table-layout:fixed;}
+th{
+    color:#8B1A2F;padding:10px 4px;font-weight:900;
+    border-bottom:2px solid #8B1A2F;font-size:12px;text-transform:uppercase;
+}
+td{
+    padding:0 4px;font-weight:800;background:transparent;
+    border-bottom:1px solid #f0f0f0;height:44px;max-height:44px;overflow:hidden;
+}
+tr{background:#ffffff;}
+tr:last-child td{border-bottom:none}
+tr.green-line td{border-bottom:3px solid #C8A95F!important}
+tr.red-line td{border-bottom:3px solid #8B1A2F!important}
+
+tr.pos-1{background:linear-gradient(90deg, rgba(200, 169, 95, 0.40) 0%, rgba(200, 169, 95, 0.15) 50%, #ffffff 100%);}
+tr.pos-2{background:linear-gradient(90deg, rgba(200, 169, 95, 0.28) 0%, rgba(200, 169, 95, 0.10) 50%, #ffffff 100%);}
+tr.pos-3{background:linear-gradient(90deg, rgba(200, 169, 95, 0.16) 0%, rgba(200, 169, 95, 0.05) 50%, #ffffff 100%);}
+tr.pos-18{background:linear-gradient(90deg, rgba(139, 26, 47, 0.16) 0%, rgba(139, 26, 47, 0.05) 50%, #ffffff 100%);}
+tr.pos-19{background:linear-gradient(90deg, rgba(139, 26, 47, 0.28) 0%, rgba(139, 26, 47, 0.10) 50%, #ffffff 100%);}
+tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139, 26, 47, 0.15) 50%, #ffffff 100%);}
+
+.team-cell{
+    display:flex;align-items:center;gap:6px;font-size:14px;text-transform:uppercase;
+    color:#1a1a1a;padding:0 8px 0 0;white-space:nowrap;font-weight:700;
+}
+.pos-container{display:inline-flex;align-items:center;justify-content:center;gap:5px;}
+.pos-indicator-img{
+    width:22px;height:22px;min-width:22px;min-height:22px;
+    max-width:22px;max-height:22px;object-fit:contain;
+}
+.pos-number{font-size:14px;font-weight:900;min-width:18px;text-align:center;}
+.stat-number{font-size:14px;font-weight:900;}
+
+.form-cell{display:flex;align-items:center;justify-content:center;gap:2px;font-weight:900;font-size:12px;}
+.form-letter{display:inline-block;width:14px;text-align:center;font-weight:900;font-size:12px;}
+.form-W{color:#8B7340;}
+.form-D{color:#9e9e9e;}
+.form-L{color:#8B1A2F;}
+
+.col-pos{width:11%}
+.col-club{width:38%}
+.col-gf{width:16%}
+.col-pts{width:14%}
+.col-form{width:21%}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+/* =========================================================
+   SETTINGS MODAL
+========================================================= */
+
+.settings-modal{
+    display:none;
+    position:fixed;inset:0;
+    z-index:99998;
+    align-items:center;justify-content:center;
+    padding:12px;
+}
+.settings-modal.show{display:flex;}
+
+.settings-modal-box{
+    width:100%;max-width:100%;
+    height:92vh;
+    border-radius:20px;
+    overflow:hidden;
+    animation:settingsIn .25s ease;
+    direction:rtl;
+    display:flex;flex-direction:column;
+}
+@keyframes settingsIn{
+    from{opacity:0;transform:scale(.95) translateY(20px);}
+    to{opacity:1;transform:scale(1) translateY(0);}
+}
+
+.settings-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;
+    font-size:16px;font-weight:900;letter-spacing:1.2px;
+    flex-shrink:0;
+}
+.settings-close{
+    width:32px;height:32px;border-radius:50%;
+    border:none;font-size:15px;font-weight:900;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    padding:0;transition:background .2s ease;font-family:inherit;
+}
+
+.settings-body{
+    padding:16px;
+    display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    flex:1;
+}
+
+.settings-item{
+    display:flex;align-items:center;gap:12px;
+    padding:16px 18px;
+    border-radius:14px;
+    font-size:14px;font-weight:800;letter-spacing:.3px;
+    cursor:pointer;text-align:right;
+    transition:all .2s ease;
+    font-family:inherit;
+}
+.settings-item .si-icon{
+    font-size:22px;width:32px;text-align:center;flex-shrink:0;
+}
+.settings-item .si-label{flex:1;text-align:right;}
+
+.settings-hint{
+    font-size:12px;text-align:center;
+    padding:10px 4px;letter-spacing:.3px;line-height:1.7;
+}
+
+.settings-embed{
+    width:100%;padding:0;margin:0;
+    border-radius:14px;overflow:hidden;
+}
+
+.locks-grid{display:flex;flex-direction:column;gap:10px;}
+
+.lock-item{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px 16px;
+    border-radius:12px;
+    font-size:13px;font-weight:800;
+}
+.lock-item-label{display:flex;align-items:center;gap:10px;flex:1;}
+.lock-item-icon{font-size:20px;width:28px;text-align:center;}
+
+.lock-item-btn{
+    padding:9px 16px;
+    border:none;border-radius:10px;
+    font-size:12px;font-weight:900;letter-spacing:.5px;
+    cursor:pointer;font-family:inherit;
+    transition:transform .2s ease;
+    min-width:100px;
+}
+.lock-item-btn:active:not(:disabled){transform:scale(.95);}
+.lock-item-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.maint-all-btn,
+.maint-open-btn{
+    padding:15px 18px;
+    border:none;border-radius:14px;
+    font-size:14px;font-weight:900;letter-spacing:1px;
+    cursor:pointer;font-family:inherit;
+    transition:transform .2s ease;
+    margin-top:6px;
+}
+.maint-all-btn:active,
+.maint-open-btn:active{transform:scale(.97);}
+
+/* =========================================================
+   MAINTENANCE SCREEN
+========================================================= */
+
+#sectionMaintenance{
+    display:none;
+    position:fixed;inset:0;
+    z-index:99997;
+    align-items:center;justify-content:center;
+    padding:20px;
+}
+#sectionMaintenance.show{display:flex;}
+#sectionMaintenance .maint-box{
+    border-radius:22px;
+    padding:44px 32px;
+    text-align:center;
+    max-width:400px;width:100%;
+}
+#sectionMaintenance h2{font-size:24px;font-weight:900;margin-bottom:14px;letter-spacing:1px;}
+#sectionMaintenance p{font-size:14px;line-height:1.8;margin-bottom:6px;}
+#sectionMaintenance .maint-team{
+    font-size:13px;font-weight:900;
+    letter-spacing:4px;
+    padding-top:18px;margin-top:20px;
+}
+
+#backfillDebug{
+    display:none;
+    position:fixed;top:0;left:0;right:0;
+    background:#000;color:#0f0;
+    padding:10px;
+    font-family:monospace;font-size:11px;
+    z-index:999999;
+    text-align:center;font-weight:bold;
+}
+</style>
+
+<link rel="stylesheet" href="mobile.css">
+<link rel="stylesheet" href="totw.css?v=30">
+<link rel="stylesheet" href="stats.css?v=9">
+<link rel="stylesheet" href="charts.css?v=1">
+<link rel="stylesheet" href="clubs.css?v=7">
+<link rel="stylesheet" href="trends.css?v=6">
+<link rel="stylesheet" href="fpl-database.css?v=1">
+<link rel="stylesheet" href="manager-squad.css?v=1">
+<link rel="stylesheet" href="manager-hub.css?v4">
+<link rel="stylesheet" href="theme.css?v=8">
+
 </head>
+
 <body>
 
-    <div class="container">
+<div id="backfillDebug"></div>
 
-        <!-- HEADER -->
-        <header class="header">
-            <h1 class="title">FINALISSIMA<br><span>LEAGUE CHAT</span></h1>
-            <p class="subtitle">Fantasy Football - 20 Nations</p>
-        </header>
+<div id="errorBox">
+    <button class="err-close" onclick="document.getElementById('errorBox').classList.remove('show')">X</button>
+    <div id="errorContent"></div>
+</div>
 
-        <!-- =========================== -->
-        <!-- LANDING VIEW                 -->
-        <!-- =========================== -->
-        <section class="landing-view" id="landingView">
+<div id="toast">
+    <span id="toastContent">Saving...</span>
+</div>
 
-            <div class="cards-grid">
+<!-- Settings Modal -->
+<div id="settingsModal" class="settings-modal">
+    <div class="settings-modal-box">
+        <div class="settings-header">
+            <span>⚙️ الإعدادات</span>
+            <button class="settings-close" onclick="closeSettingsModal()">✕</button>
+        </div>
+        <div class="settings-body" id="settingsBody"></div>
+    </div>
+</div>
 
-                <div class="card" data-goto="fixtures">
-                    <div class="card-title">المواجهات</div>
-                    <div class="card-sub">Fixtures</div>
-                </div>
+<div class="carousel-wrapper">
+    <div class="carousel" id="carousel">
+        <div class="carousel-track" id="carouselTrack"></div>
+    </div>
+    <div class="carousel-dots" id="carouselDots"></div>
+</div>
 
-                <div class="card" data-goto="standings">
-                    <div class="card-title">الترتيب</div>
-                    <div class="card-sub">Standings</div>
-                </div>
+<div class="round-selector-row">
+    <select id="roundSelect" class="round-select-pill" onchange="selectRound(this.value)"></select>
 
-                <div class="card" data-goto="totw">
-                    <div class="card-title">التشكيلة</div>
-                    <div class="card-sub">Team of the Week</div>
-                </div>
+    <div class="download-wrapper" id="downloadWrapper">
+        <button class="download-btn" onclick="toggleDownloadMenu(event)" title="تحميل">
+            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 3v12"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="5" y1="21" x2="19" y2="21"/>
+            </svg>
+        </button>
 
-                <div class="card" data-goto="stats">
-                    <div class="card-title">الإحصائيات</div>
-                    <div class="card-sub">Statistics</div>
-                </div>
+        <div class="download-menu" id="downloadMenu">
+            <button class="download-menu-item" onclick="downloadAsImage(2)">
+                <span class="q-label">Standard</span>
+                <span class="q-scale">2x</span>
+            </button>
+            <button class="download-menu-item" onclick="downloadAsImage(3)">
+                <span class="q-label">High</span>
+                <span class="q-scale">3x</span>
+            </button>
+            <button class="download-menu-item" onclick="downloadAsImage(4)">
+                <span class="q-label">Ultra</span>
+                <span class="q-scale">4x</span>
+            </button>
+        </div>
+    </div>
 
+    <button id="settingsBtn" class="settings-btn-inline" onclick="openSettingsWithPin()" title="الإعدادات">⚙️</button>
+</div>
+
+<div class="header">
+    <div class="round-nav-container">
+        <button class="nav-arrow-btn" onclick="changeRound(1)">›</button>
+        <div class="round-indicator" id="currentRoundTitle" ondblclick="unlockSecretPanel()">MATCHWEEK 1</div>
+        <button class="nav-arrow-btn" onclick="changeRound(-1)">‹</button>
+    </div>
+</div>
+
+<div class="main-container">
+
+    <div id="fixturesTab" class="tab-content active">
+
+        <div id="editPanel" class="edit-panel" style="display:none;">
+            <button class="edit-action-btn save-round-btn" id="saveRoundBtn" onclick="saveCurrentRound()">Save</button>
+            <button class="edit-action-btn clear-round-btn" id="clearRoundBtn" onclick="clearCurrentRound()">Clear</button>
+            <button class="edit-action-btn download-action-btn" onclick="downloadAsImage(3)">Download</button>
+        </div>
+
+        <div id="captureFixtures" class="export-area">
+            <div class="fixtures-header-box">
+                <div class="fixtures-header-title" id="fixturesBannerTitle">MATCHWEEK 1</div>
             </div>
+            <div id="fixturesList"></div>
+        </div>
 
-        </section>
+        <button id="hiddenEditBtn" class="hidden-edit-btn">Aqeel Al Rowai</button>
+    </div>
 
-        <!-- =========================== -->
-        <!-- SPA VIEW                     -->
-        <!-- =========================== -->
-        <section class="spa-view" id="spaView">
-
-            <!-- ROUND BAR -->
-            <div class="round-bar" id="roundBar">
-                <button class="nav-arrow" id="prevRound">&#8249;</button>
-                <select id="roundSelector" class="round-selector">
-                    <option value="1">Round 1</option>
-                </select>
-                <button class="nav-arrow" id="nextRound">&#8250;</button>
+    <div id="standingsTab" class="tab-content">
+        <div id="captureStandings" class="export-area">
+            <div class="standings-content-area">
+                <table>
+                    <colgroup>
+                        <col class="col-pos">
+                        <col class="col-club">
+                        <col class="col-gf">
+                        <col class="col-pts">
+                        <col class="col-form">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th style="text-align:right;padding-right:10px;">Nation</th>
+                            <th>GF</th>
+                            <th>Pts</th>
+                            <th>Form</th>
+                        </tr>
+                    </thead>
+                    <tbody id="standingsBody"></tbody>
+                </table>
             </div>
+        </div>
 
-            <!-- TABS -->
-            <nav class="tabs">
-                <button class="tab-btn active" data-tab="fixtures">Fixtures</button>
-                <button class="tab-btn" data-tab="standings">Standings</button>
-                <button class="tab-btn" data-tab="totw">TOTW</button>
-                <button class="tab-btn" data-tab="stats">Stats</button>
-            </nav>
+        <button id="hiddenEditBtn2" class="hidden-edit-btn">Aqeel Al Rowai</button>
+    </div>
 
-            <!-- TAB CONTENT -->
-            <main class="tab-content">
+    <div id="totwTab" class="tab-content">
 
-                <!-- FIXTURES -->
-                <section class="tab-pane active" id="tab-fixtures">
-                    <div id="fixturesContainer"></div>
-                </section>
+        <div class="totw-tabs">
+            <button id="totwSquadBtn" class="totw-tab-btn active" onclick="switchTOTWView('squad')">Squad</button>
+            <button id="totwListBtn" class="totw-tab-btn" onclick="switchTOTWView('list')">List</button>
+        </div>
 
-                <!-- STANDINGS -->
-                <section class="tab-pane" id="tab-standings">
-                    <div id="standingsContainer"></div>
-                </section>
+        <div id="totwLoadingBox" class="totw-loading">
+            <div class="spinner"></div>
+            <div>Loading Team of the Week...</div>
+        </div>
 
-                <!-- TOTW -->
-                <section class="tab-pane" id="tab-totw">
-                    <div id="totwContainer"></div>
-                </section>
+        <div id="totwPitchWrapper" class="totw-pitch-wrapper" style="display:none;">
+            <div class="totw-pitch" id="totwPitchToSave">
+                <div class="totw-pitch-title">
+                    <span>Team of the Week</span>
+                    <span class="gw-label" id="totwGwLabel">GW--</span>
+                </div>
+                <div class="totw-players" id="totwPlayers"></div>
+            </div>
+        </div>
 
-                <!-- STATS -->
-                <section class="tab-pane" id="tab-stats">
-                    <div class="stats-tabs">
-                        <button class="stats-tab active" data-stats="overview">Overview</button>
-                        <button class="stats-tab" data-stats="charts">Charts</button>
-                        <button class="stats-tab" data-stats="clubs">Clubs</button>
-                        <button class="stats-tab" data-stats="search">Search</button>
+        <div id="totwListWrapper" class="totw-list-view" style="display:none;"></div>
+
+        <div id="totwErrorBox" class="totw-error" style="display:none;"></div>
+
+    </div>
+
+    <div id="statsTab" class="tab-content">
+
+        <div class="stats-tabs">
+            <button class="stats-tab-btn active" data-tab="overview" onclick="switchStatsTab('overview')">Overview</button>
+            <button class="stats-tab-btn" data-tab="charts" onclick="switchStatsTab('charts')">Charts</button>
+            <button class="stats-tab-btn" data-tab="clubs" onclick="switchStatsTab('clubs')">Nations</button>
+            <button class="stats-tab-btn" data-tab="search" onclick="switchStatsTab('search')">Search</button>
+            <button class="stats-tab-btn" data-tab="records" onclick="switchStatsTab('records')">Records</button>
+            <button class="stats-tab-btn" data-tab="managers" style="display:none;" onclick="switchStatsTab('managers')">Managers</button>
+        </div>
+
+        <div id="statsLoading" class="stats-loading">
+            <div class="spinner"></div>
+            <div>Loading Statistics...</div>
+        </div>
+
+        <div id="statsContent" style="display:none;">
+
+            <div id="statsView-overview" class="stats-view active">
+                <div class="stats-kpi-grid">
+                    <div class="stats-kpi-card">
+                        <div class="stats-kpi-value" id="kpiManagers">0</div>
+                        <div class="stats-kpi-label">Managers</div>
                     </div>
-                    <div id="statsContainer"></div>
-                </section>
+                    <div class="stats-kpi-card">
+                        <div class="stats-kpi-value" id="kpiAvg">0</div>
+                        <div class="stats-kpi-label">Avg GW</div>
+                    </div>
+                    <div class="stats-kpi-card">
+                        <div class="stats-kpi-value" id="kpiHigh">0</div>
+                        <div class="stats-kpi-label">Highest GW</div>
+                    </div>
+                    <div class="stats-kpi-card">
+                        <div class="stats-kpi-value" id="kpiHighestTotal">0</div>
+                        <div class="stats-kpi-label">Top Total</div>
+                    </div>
+                </div>
 
-            </main>
+                <div class="stats-section" style="display:none;">
+                    <div class="stats-section-title">Top 10 — This Gameweek</div>
+                    <div id="statsTopEvent"></div>
+                </div>
 
-            <!-- BACK BUTTON -->
-            <div class="back-bar">
-                <button class="back-btn" id="backBtn">&#8249; رجوع للرئيسية</button>
+                <div class="stats-section">
+                    <div class="stats-section-title">Top 10 — Total Points</div>
+                    <div id="statsTopTotal"></div>
+                </div>
             </div>
 
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <p>Made by <strong>Aqeel Al Rowai</strong> - Finalissima</p>
-        </footer>
-
-    </div>
-
-    <!-- TOAST -->
-    <div class="toast" id="toast">
-        <div id="toastContent"></div>
-    </div>
-
-    <!-- MAINTENANCE OVERLAY -->
-    <div id="sectionMaintenance" class="maintenance-overlay">
-        <div class="maint-box">
-            <h2>MAINTENANCE</h2>
-            <p>This section is currently locked.</p>
-        </div>
-    </div>
-
-    <!-- SETTINGS MODAL -->
-    <div class="settings-modal" id="settingsModal">
-        <div class="settings-box">
-            <div class="settings-header">
-                <span>SETTINGS</span>
-                <button class="close-btn" id="closeSettings">×</button>
+            <div id="statsView-charts" class="stats-view">
+                <div id="chartsContent"></div>
             </div>
-            <div class="settings-body" id="settingsBody"></div>
+
+            <div id="statsView-clubs" class="stats-view">
+                <div class="clubs-controls">
+                    <button class="clubs-edit-btn" id="clubsEditBtn" onclick="toggleClubsEditMode()">تعديل</button>
+                </div>
+                <div id="clubsLoading" class="stats-loading">
+                    <div class="spinner"></div>
+                    <div>Loading Nations...</div>
+                </div>
+                <div id="clubsList" class="clubs-list"></div>
+                <div id="clubModal"></div>
+            </div>
+
+            <div id="statsView-search" class="stats-view">
+                <div class="stats-search-box">
+                    <input type="text" id="statsSearchInput" class="stats-search-input" placeholder="ابحث عن مدير..." autocomplete="off">
+                </div>
+                <div id="statsSearchResults" class="stats-search-results"></div>
+                <div id="statsProfile" style="display:none;"></div>
+            </div>
+
+            <div id="statsView-records" class="stats-view">
+                <div class="stats-section">
+                    <div class="stats-section-title">League Records</div>
+                    <div classdiv=" id="statsRecordsContentsp" class="innerstats-records-grid"></div>
+                </div"></>
+            </divdiv>
+
+            <div id="statsView>
+-managers" class="stats                       -view">
+                <div id="mhContent <">
+                    <div class="mdivh-loading">
+                       >Loading managers...</div>
+                    </div>
+                </div>
+            </div>
+
         </div>
+
     </div>
 
-    <!-- SCRIPTS -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="config.js"></script>
-    <script src="js/teams.js"></script>
-    <script src="js/matchweeks.js"></script>
-    <script src="js/players-teams.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/fixtures.js"></script>
-    <script src="js/standings.js"></script>
-    <script src="js/totw.js"></script>
-    <script src="js/stats.js"></script>
+</div>
+
+<div id="squadModal"></div>
+<div id="teamModal"></div>
+<div id="mhModal"></div>
+
+<div id="statsView-fpl" style="display:none !important;">
+    <div id="fplDbContent"></div>
+    <div id="fplModal"></div>
+</div>
+
+<script>
+(function() {
+    let pressTimer = null;
+
+    function setupButton(btn, callback) {
+        if (!btn) return;
+        btn.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
+        btn.addEventListener('touchstart', function(event) {
+            pressTimer = setTimeout(function() { callback(); }, 800);
+        }, { passive: true });
+        btn.addEventListener('touchend', function() { clearTimeout(pressTimer); });
+        btn.addEventListener('touchcancel', function() { clearTimeout(pressTimer); });
+        btn.addEventListener('mousedown', function() {
+            pressTimer = setTimeout(function() { callback(); }, 800);
+        });
+        btn.addEventListener('mouseup', function() { clearTimeout(pressTimer); });
+        btn.addEventListener('mouseleave', function() { clearTimeout(pressTimer); });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        setupButton(document.getElementById('hiddenEditBtn'), unlockSecretPanel);
+        setupButton(document.getElementById('hiddenEditBtn2'), unlockSecretPanel);
+    });
+})();
+</script>
+
+<script>
+(function(){
+    const box=document.getElementById('errorBox');
+    const content=document.getElementById('errorContent');
+
+    function showError(msg){
+        const line=document.createElement('div');
+        line.className='err-line';
+        line.textContent=msg;
+        content.appendChild(line);
+        box.classList.add('show');
+    }
+
+    window.onerror=function(message,source,lineno,colno,error){
+        if (!source || source === '' ||
+            source.indexOf('extension') !== -1 ||
+            source.indexOf('chrome-extension') !== -1 ||
+            source.indexOf('moz-extension') !== -1 ||
+            message.indexOf('Script error') === 0 ||
+            message.indexOf('ethereum') !== -1 ||
+            message.indexOf('MetaMask') !== -1) {
+            return false;
+        }
+        showError('❌ '+message+' | '+(source||'')+':'+lineno);
+        return false;
+    };
+
+    window.addEventListener('unhandledrejection',function(e){
+        const reason = e.reason && e.reason.message ? e.reason.message : String(e.reason);
+        if (reason.indexOf('ethereum') !== -1 ||
+            reason.indexOf('MetaMask') !== -1 ||
+            reason.indexOf('extension') !== -1) {
+            return;
+        }
+        showError('⚠️ Promise: ' + reason);
+    });
+})();
+</script>
+
+<script src="js/config.js?v=1"></script>
+<script src="js/locks.js?v=18"></script>
+<script src="js/teams.js?v=1"></script>
+<script src="js/matchweeks.js?v=1"></script>
+<script src="js/supabase.js?v=1"></script>
+<script src="js/carousel.js?v=38"></script>
+<script src="js/fixtures.js?v=40"></script>
+<script src="js/standings.js?v=9"></script>
+<script src="js/download.js?v=24"></script>
+<script src="js/players-teams.js?v=1"></script>
+<script src="js/totw.js?v=115"></script>
+<script src="js/trends.js?v=5"></script>
+<script src="js/fpl-database.js?v=5"></script>
+<script src="js/manager-squad.js?v=3"></script>
+<script src="js/manager-hub.js?v=6"></script>
+<script src="js/stats.js?v=13"></script>
+<script src="js/charts.js?v=1"></script>
+<script src="js/clubs.js?v=8"></script>
+<script src="js/team-view.js?v=2"></script>
+<script src="js/main.js?v=20"></script>
+<script src="js/backfill-history.js?v=5"></script>
 
 </body>
 </html>
