@@ -877,3 +877,73 @@ body {
     align-items: center !important;
     justify-content: center !important;
 }
+/* =========================================================
+   ROUND HIDDEN MESSAGE
+========================================================= */
+.round-hidden-msg {
+    padding: 60px 20px;
+    text-align: center;
+    color: #8B1A2F;
+}
+.round-hidden-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+}
+.round-hidden-title {
+    font-size: 18px;
+    font-weight: 900;
+    margin-bottom: 8px;
+}
+.round-hidden-sub {
+    font-size: 13px;
+    color: #999;
+    font-weight: 700;
+}
+
+/* =========================================================
+   MATCHWEEK MANAGER
+========================================================= */
+.mwm-rounds-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+.mwm-round-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: #FAF6F0;
+    border: 2px solid #E5D4A5;
+    border-radius: 12px;
+    gap: 10px;
+}
+.mwm-round-info { flex: 1; text-align: right; }
+.mwm-round-num {
+    font-size: 15px;
+    font-weight: 900;
+    color: #8B1A2F;
+    margin-bottom: 3px;
+}
+.mwm-round-meta {
+    font-size: 11px;
+    color: #666;
+    font-weight: 700;
+}
+.mwm-hidden { color: #C0392B; }
+.mwm-visible { color: #27AE60; }
+
+.mwm-round-actions {
+    display: flex;
+    gap: 6px;
+}
+.mwm-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
