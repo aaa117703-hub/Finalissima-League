@@ -76,13 +76,13 @@ function fetchWithTimeout(url, options, timeoutMs) {
 
 const MANAGERS_CACHE_KEY = 'fin_managers_cache_v2';
 const MANAGERS_CACHE_TTL = 6 * 60 * 60 * 1000;
-const MANAGERS_TOTAL_PAGES = 7;
 let _managersCache = null;
 let _managersLoading = null;
 
 async function getAllManagersCached(forceRefresh) {
     let baseList;
 
+    /* 1) كاش في الذاكرة */
     if (!forceRefresh && _managersCache && _managersCache.length > 0) {
         baseList = _managersCache;
     } else if (_managersLoading) {
@@ -90,6 +90,7 @@ async function getAllManagersCached(forceRefresh) {
     } else {
         let fromCache = false;
 
+        /* 2) كاش من localStorage */
         if (!forceRefresh) {
             try {
                 const cached = localStorage.getItem(MANAGERS_CACHE_KEY);
@@ -100,6 +101,7 @@ async function getAllManagersCached(forceRefresh) {
                         _managersCache = parsed.data;
                         baseList = _managersCache;
                         fromCache = true;
+                        console.log('[Managers] From cache:', baseList.length);
                     }
                 }
             } catch (e) {
@@ -107,49 +109,50 @@ async function getAllManagersCached(forceRefresh) {
             }
         }
 
+        /* 3) جلب من الـ Worker — طلب واحد فقط ?league=all */
         if (!fromCache) {
             _managersLoading = (async function() {
                 const all = [];
                 const seenIds = {};
 
-                /* ⭐ نجيب من كل دوري في LEAGUE_IDS */
-                for (let i = 0; i < LEAGUE_IDS.length; i++) {
-                    const league = LEAGUE_IDS[i];
+                try {
+                    const url = MANAGERS_WORKER_URL + '/?league=all';
+                    console.log('[Managers] Fetching:', url);
 
-                    try {
-                        const url = MANAGERS_WORKER_URL + '/?page=1&league=' + league.id;
+                    const res = await fetchWithTimeout(url, {}, 30000);
 
-                        const res = await fetchWithTimeout(url, {}, 10000);
-
-                        if (!res.ok) {
-                            console.warn('[Managers] ' + league.name + ' HTTP ' + res.status);
-                            continue;
-                        }
-
+                    if (!res.ok) {
+                        console.warn('[Managers] HTTP ' + res.status);
+                    } else {
                         const data = await res.json();
 
-                        if (data && data.standings && data.standings.results) {
-                            data.standings.results.forEach(function(m) {
+                        if (data && data.ok && Array.isArray(data.managers)) {
+                            data.managers.forEach(function(m) {
                                 /* نتجنب المشرف (مكرر في كل دوري) */
                                 if (m.entry === 2984723) return;
                                 if (seenIds[m.entry]) return;
 
                                 seenIds[m.entry] = true;
 
-                                /* نضيف اسم المنتخب */
-                                m._team = league.name;
+                                /* نحول nation code → اسم المنتخب الكامل */
+                                const league = LEAGUE_IDS.find(function(l) {
+                                    return l.code === m.nation;
+                                });
+
+                                m._team = league ? league.name : m.nation;
+                                m._nationCode = m.nation;
 
                                 all.push(m);
                             });
 
-                            console.log('[Managers] ' + league.name + ': ' + data.standings.results.length);
+                            console.log('[Managers] Total loaded:', all.length);
+                        } else {
+                            console.warn('[Managers] Invalid response shape');
                         }
-                    } catch (e) {
-                        console.warn('[Managers] ' + league.name + ' failed:', e.message);
                     }
+                } catch (e) {
+                    console.warn('[Managers] fetch failed:', e.message);
                 }
-
-                console.log('[Managers] Total loaded:', all.length);
 
                 _managersCache = all;
 
@@ -170,6 +173,7 @@ async function getAllManagersCached(forceRefresh) {
         }
     }
 
+    /* 4) إضافة المديرين اليدويين */
     const manual = getManualEntries();
 
     if (manual.length === 0) {
