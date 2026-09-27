@@ -40,12 +40,27 @@ async function init() {
     }
 
     /* ====== 6. Supabase ====== */
-    if (!window.sbClient || typeof loadScoresFromSupabase !== 'function') {
-        console.warn('[Main] Supabase not available — working offline');
+    if (!window.sbClient) {
+        console.warn('[Main] Supabase client not available — working offline');
         return;
     }
 
-    if (typeof matchweeks === 'undefined') {
+    /* ⭐ جديد: تحميل الجولات المخصصة من Supabase */
+    if (typeof loadCustomMatchweeksIntoMemory === 'function') {
+        try {
+            await loadCustomMatchweeksIntoMemory();
+            if (typeof renderFixtures === 'function') renderFixtures();
+        } catch (e) {
+            console.warn('[Main] Custom matchweeks load failed:', e.message);
+        }
+    }
+
+    if (typeof loadScoresFromSupabase !== 'function') {
+        console.warn('[Main] loadScoresFromSupabase not available');
+        return;
+    }
+
+    if (typeof window.matchweeks === 'undefined') {
         console.warn('[Main] matchweeks not loaded');
         return;
     }
@@ -66,7 +81,7 @@ async function init() {
     }
 
     try {
-        const remoteScores = await loadScoresFromSupabase(matchweeks);
+        const remoteScores = await loadScoresFromSupabase(window.matchweeks);
 
         if (remoteScores && Object.keys(remoteScores).length > 0) {
             scoresStorage = remoteScores;
