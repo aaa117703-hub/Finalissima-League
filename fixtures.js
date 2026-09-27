@@ -3,29 +3,7 @@
 ========================================================= */
 
 /* ===== ذاكرة مؤقتة للجولات المخصصة ===== */
-window.customMatchweeks = null; // { round: { matches, is_hidden } }
-
-async function loadCustomMatchweeksIntoMemory() {
-    try {
-        const data = await loadCustomMatchweeks();
-        if (data) {
-            window.customMatchweeks = data;
-            // ندمجها مع matchweeks العام — نستبدل المباريات
-            Object.keys(data).forEach(function(rStr) {
-                const r = parseInt(rStr, 10);
-                const custom = data[r];
-                if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
-                    matchweeks[r] = custom.matches;
-                }
-            });
-            console.log('[Custom MW] loaded:', Object.keys(data).length, 'rounds');
-        } else {
-            console.log('[Custom MW] no custom data, using defaults');
-        }
-    } catch (e) {
-        console.warn('[Custom MW] load failed:', e);
-    }
-}
+window.customMatchweeks = null;
 
 /* ===== هل الجولة مخفية؟ ===== */
 function isRoundHidden(round) {
@@ -37,14 +15,43 @@ function isRoundHidden(round) {
 
 /* ===== هل نعرض الجولة للمستخدم؟ ===== */
 function canUserSeeRound(round) {
-    // الإدارة دايماً تشوف
-    if (editMode || isAdmin()) return true;
-    // الجولة مخفية؟
+    if (editMode || (typeof isAdmin === 'function' && isAdmin())) return true;
     if (isRoundHidden(round)) return false;
     return true;
 }
 
-/* ===== الحالة الافتراضية ===== */
+/* ===== تحميل الجولات المخصصة من Supabase ===== */
+async function loadCustomMatchweeksIntoMemory() {
+    try {
+        if (typeof loadCustomMatchweeks !== 'function') {
+            console.warn('[Custom MW] loadCustomMatchweeks not available');
+            return;
+        }
+
+        const data = await loadCustomMatchweeks();
+        if (data) {
+            window.customMatchweeks = data;
+
+            /* ندمجها مع window.matchweeks */
+            Object.keys(data).forEach(function(rStr) {
+                const r = parseInt(rStr, 10);
+                const custom = data[r];
+                if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
+                    window.matchweeks[r] = custom.matches;
+                }
+            });
+
+            console.log('[Custom MW] loaded:', Object.keys(data).length, 'rounds');
+        } else {
+            window.customMatchweeks = {};
+            console.log('[Custom MW] no custom data, using defaults');
+        }
+    } catch (e) {
+        console.warn('[Custom MW] load failed:', e);
+        window.customMatchweeks = {};
+    }
+}
+
 let editMode = false;
 
 function initRoundDropdown() {
@@ -108,7 +115,7 @@ function switchTab(tabName) {
     if (tabName === 'standings') {
         const el = document.getElementById('standingsTab');
         if (el) el.classList.add('active');
-        renderStandings();
+        if (typeof renderStandings === 'function') renderStandings();
     } else if (tabName === 'totw') {
         const el = document.getElementById('totwTab');
         if (el) el.classList.add('active');
@@ -133,7 +140,7 @@ function unlockSecretPanel() {
         const panel = document.getElementById('editPanel');
         if (panel) panel.style.display = 'flex';
         renderFixtures();
-        showToast('Edit mode enabled', true);
+        if (typeof showToast === 'function') showToast('Edit mode enabled', true);
         return;
     }
 
@@ -156,14 +163,13 @@ function exitEditMode() {
     const panel = document.getElementById('editPanel');
     if (panel) panel.style.display = 'none';
     renderFixtures();
-    renderStandings();
+    if (typeof renderStandings === 'function') renderStandings();
 }
 
 function updateScore(round, idx, type, val) {
     scoresStorage['r' + round + '_m' + idx + '_' + type] = val;
 }
 
-/* ===== رسم المواجهات ===== */
 function renderFixtures() {
     try {
         const list = document.getElementById('fixturesList');
@@ -190,7 +196,7 @@ function renderFixtures() {
             return;
         }
 
-        const matches = matchweeks[currentRound] || [];
+        const matches = (window.matchweeks && window.matchweeks[currentRound]) || [];
 
         matches.forEach(function(match, idx) {
             const home = teamsMap[match[0]] || { name: match[0], logo: '' };
@@ -252,7 +258,7 @@ async function saveCurrentRound() {
     if (saveBtn) saveBtn.disabled = true;
     if (clearBtn) clearBtn.disabled = true;
 
-    const matches = matchweeks[currentRound] || [];
+    const matches = (window.matchweeks && window.matchweeks[currentRound]) || [];
 
     matches.forEach(function(match, idx) {
         const homeInput = document.getElementById('home_r' + currentRound + '_m' + idx);
@@ -269,7 +275,7 @@ async function saveCurrentRound() {
     let result = { ok: true };
 
     try {
-        result = await saveRoundToSupabase(currentRound, matchweeks, scoresStorage);
+        result = await saveRoundToSupabase(currentRound, window.matchweeks, scoresStorage);
     } catch (e) {
         result = { ok: false, error: e };
     }
@@ -310,7 +316,7 @@ async function clearCurrentRound() {
     if (saveBtn) saveBtn.disabled = true;
     if (clearBtn) clearBtn.disabled = true;
 
-    const matches = matchweeks[currentRound] || [];
+    const matches = (window.matchweeks && window.matchweeks[currentRound]) || [];
 
     matches.forEach(function(match, idx) {
         delete scoresStorage['r' + currentRound + '_m' + idx + '_home'];
