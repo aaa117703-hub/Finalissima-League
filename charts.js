@@ -10,16 +10,16 @@ let chartsData = null;
 let chartInstances = {};
 
 const CHART_COLORS = [
-    '#8B1A2F', // maroon
-    '#C8A95F', // gold
-    '#B22A45', // light maroon
-    '#8B7340', // dark gold
-    '#4A0A15', // deep maroon
-    '#E5D4A5', // light gold
-    '#6B0F1F', // dark maroon
-    '#D6BF7E', // gold 400
-    '#2D0A0F', // deep
-    '#A02038'  // maroon 400
+    '#8B1A2F',
+    '#C8A95F',
+    '#B22A45',
+    '#8B7340',
+    '#4A0A15',
+    '#E5D4A5',
+    '#6B0F1F',
+    '#D6BF7E',
+    '#2D0A0F',
+    '#A02038'
 ];
 
 function destroyCharts() {
@@ -39,11 +39,17 @@ function hexToRgba(hex, alpha) {
     return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
 }
 
+/* ⭐ استخدام cleanDisplayName */
 function shortenName(name, max) {
     max = max || 14;
+
+    if (typeof cleanDisplayName === 'function') {
+        return cleanDisplayName(name, max);
+    }
+
     if (!name) return '';
     if (name.length <= max) return name;
-    return name.substring(0, max - 1) + '…';
+    return name.substring(0, max);
 }
 
 if (typeof Chart !== 'undefined') {
@@ -128,7 +134,7 @@ function buildRankProgression(ranks) {
         });
 
         return {
-            label: shortenName(entry.entry_name || entry.player_name, 12),
+            label: shortenName(entry.player_name || entry.entry_name, 12),
             data: data,
             borderColor: color,
             backgroundColor: hexToRgba(color, 0.08),
@@ -160,7 +166,7 @@ function buildTop15Total(managers) {
         .slice(0, 15);
 
     return {
-        labels: sorted.map(m => shortenName(m.entry_name || m.player_name, 14)),
+        labels: sorted.map(m => shortenName(m.player_name || m.entry_name, 14)),
         datasets: [{
             label: 'Total Points',
             data: sorted.map(m => m.total || 0),
@@ -239,7 +245,7 @@ function buildRisersFallers(ranks) {
         if (!prev[entryId]) return;
         const diff = prev[entryId].rank - last[entryId].rank;
         changes.push({
-            name: shortenName(last[entryId].entry_name || last[entryId].player_name, 14),
+            name: shortenName(last[entryId].player_name || last[entryId].entry_name, 14),
             diff: diff
         });
     });
