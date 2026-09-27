@@ -2,8 +2,8 @@
    config.js — FINALISSIMA LEAGUE CHAT
 ========================================================= */
 
-const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
-const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
+const SUPABASE_URL = 'https://qragywbzlbzzjygdvxkk.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFyYWd5d2J6bGJ6emp5Z2R2eGtrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTA1Mjk1OTcsImV4cCI6MjEwNjEwNTU5N30.-0TQGJH6dKoPygwW-Co9o609_sUUq90KY6nWpTCfELc';
 
 const WORKER_URL = 'https://finalissima-api.aaa117703.workers.dev';
 const MANAGERS_WORKER_URL = WORKER_URL;
