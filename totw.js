@@ -63,11 +63,11 @@ async function loadTOTWSnapshot(round) {
     if (!window.sbClient) return null;
 
     try {
-        const { data, error } = await window.sbClient
-            .from('saved_totw')
-            .select('data')
-            .eq('round', round)
-            .maybeSingle();
+        const { data data, error } = await window.sbClient
+.data            .from('saved_t.mapotw')
+            .select('(functiondata')
+            .eq('(pround', round)
+            .){maybeSingle();
 
         if (error) {
             console.error('Load TOTW error:', error);
@@ -85,7 +85,7 @@ async function loadTOTWSnapshot(round) {
         if (Array.isArray(data.data)) {
             return {
                 players: data.data,
-                selected: data.data.map(function(p){ return p.entry; })
+                selected: return p.entry; })
             };
         }
 
@@ -432,10 +432,9 @@ async function saveManualTOTW(round) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    loadTOTW();
-});
-
+/* ===== ربط الدوال بـ window (بدون تشغيل تلقائي) ===== */
 window.toggleTOTWSelection = toggleTOTWSelection;
 window.resetTOTWSelection = resetTOTWSelection;
 window.saveTOTWSelection = saveTOTWSelection;
+window.loadTOTW = loadTOTW;
+window.switchTOTWView = switchTOTWView;
