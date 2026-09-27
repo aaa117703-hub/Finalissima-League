@@ -4,7 +4,7 @@
 // Round-Robin (كل منتخب ضد كل منتخب مرتين)
 // =========================================================
 
-const matchweeks = {
+window.matchweeks = {
 
     1: [["ARG","BEL"],["BRA","COL"],["CRO","ENG"],["GER","GRE"],["HUN","ITA"],["MEX","NED"],["NOR","RUS"],["SRB","ESP"],["SUI","TUR"],["URU","VEN"]],
     2: [["BEL","BRA"],["COL","CRO"],["ENG","GER"],["GRE","HUN"],["ITA","MEX"],["NED","NOR"],["RUS","SRB"],["ESP","SUI"],["TUR","URU"],["VEN","ARG"]],
@@ -49,5 +49,5 @@ const matchweeks = {
 
 // دالة مساعدة: جلب مباريات جولة معينة
 function getMatchesForRound(round) {
-    return matchweeks[round] || [];
+    return window.matchweeks[round] || [];
 }
