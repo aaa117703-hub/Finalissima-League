@@ -50,6 +50,11 @@ function openSettingsMatchweeks() {
 
 /* ===== تبديل الإخفاء ===== */
 async function toggleRoundVisibility(round) {
+    if (typeof setRoundHidden !== 'function') {
+        if (typeof showToast === 'function') showToast('setRoundHidden not available', false, 3000);
+        return;
+    }
+
     const custom = window.customMatchweeks ? window.customMatchweeks[round] : null;
     const currentHidden = custom ? custom.is_hidden : true;
     const newHidden = !currentHidden;
@@ -84,12 +89,16 @@ async function toggleRoundVisibility(round) {
 
 /* ===== فتح محرر المباريات ===== */
 function openRoundEditor(round) {
+    if (typeof teamsMap === 'undefined') {
+        if (typeof showToast === 'function') showToast('teamsMap not loaded', false, 3000);
+        return;
+    }
+
     const body = document.getElementById('settingsBody');
     if (!body) return;
 
     window._editingRound = round;
 
-    /* جيب المباريات الحالية */
     const custom = window.customMatchweeks ? window.customMatchweeks[round] : null;
     let matches = [];
 
@@ -106,13 +115,14 @@ function openRoundEditor(round) {
 
 /* ===== رسم واجهة التحرير ===== */
 function renderRoundEditor() {
+    if (typeof teamsMap === 'undefined') return;
+
     const body = document.getElementById('settingsBody');
     if (!body) return;
 
     const round = window._editingRound;
     const matches = window._editingMatches;
 
-    /* قائمة المنتخبات */
     let teamOptions = '';
     const teamsList = Object.keys(teamsMap).sort();
     teamsList.forEach(function(code) {
@@ -147,10 +157,8 @@ function renderRoundEditor() {
         '<button class="mwm-add-btn" onclick="addEditingMatch()">➕ إضافة مباراة</button>' +
         '<button class="mwm-save-btn" onclick="saveRoundMatches()">💾 حفظ الجولة</button>';
 
-    /* اختر القيم الحالية */
     setTimeout(function() {
         const selects = document.querySelectorAll('.mwm-select');
-        let matchIdx = 0;
         selects.forEach(function(sel, i) {
             const idx = Math.floor(i / 2);
             const side = i % 2;
@@ -178,6 +186,11 @@ function removeEditingMatch(idx) {
 }
 
 async function saveRoundMatches() {
+    if (typeof saveCustomMatchweek !== 'function') {
+        if (typeof showToast === 'function') showToast('saveCustomMatchweek not available', false, 3000);
+        return;
+    }
+
     const round = window._editingRound;
     const matches = window._editingMatches.filter(function(m) {
         return m[0] && m[1] && m[0] !== m[1];
@@ -214,7 +227,6 @@ async function saveRoundMatches() {
             showToast('تم حفظ الجولة ' + round, true, 2500);
         }
 
-        /* ارجع للقائمة */
         setTimeout(function() {
             openSettingsMatchweeks();
             if (typeof renderFixtures === 'function') renderFixtures();
