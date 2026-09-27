@@ -29,7 +29,6 @@ document.addEventListener('touchend', function(e) {
 <style>
 /* =========================================================
    BASE + RESET + LAYOUT فقط
-   (الألوان كلها في theme.css)
 ========================================================= */
 
 @font-face{
@@ -173,25 +172,113 @@ body{
     -webkit-tap-highlight-color:transparent;touch-action:manipulation;outline:none;
 }
 
-/* ========== CAROUSEL ========== */
-.carousel-wrapper{width:100%;margin:10px auto 0;padding:0 8px;}
-.carousel{
-    position:relative;width:100%;overflow:hidden;
-    border-radius:20px;
-    touch-action:pan-y;cursor:pointer;
-}
-.carousel-track{position:relative;width:100%;height:auto;}
-.carousel-slide{position:relative;inset:0;width:100%;display:none;opacity:0;transition:opacity .7s ease;}
-.carousel-slide.active{display:block;opacity:1;}
-.carousel-slide img{width:100%;height:auto;display:block;object-fit:contain;}
+/* =========================================================
+   TEXT CAROUSEL (بدل البانرات)
+========================================================= */
 
-.carousel-dots{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:10px;}
-.carousel-dot{
-    width:8px;height:8px;border-radius:50%;border:none;
-    cursor:pointer;padding:0;transition:.25s;
+.text-carousel-wrapper{
+    width:100%;
+    margin:16px auto 12px;
+    padding:0 8px;
 }
-.carousel-dot.active{
-    width:22px;border-radius:10px;
+
+.text-carousel{
+    position:relative;
+    width:100%;
+    min-height:140px;
+    border-radius:20px;
+    overflow:hidden;
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    box-shadow:0 8px 32px rgba(139, 26, 47, 0.35);
+    border:3px solid #C8A95F;
+    cursor:pointer;
+}
+
+.text-slide{
+    position:absolute;
+    top:0;left:0;right:0;bottom:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    text-align:center;
+    opacity:0;
+    transition:opacity 0.6s ease;
+    pointer-events:none;
+}
+
+.text-slide.active{
+    display:flex;
+    opacity:1;
+    pointer-events:auto;
+    animation:textSlideIn 0.6s ease;
+}
+
+@keyframes textSlideIn{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+}
+
+.text-slide-icon{
+    font-size:48px;
+    line-height:1;
+    margin-bottom:12px;
+    filter:drop-shadow(0 4px 12px rgba(200, 169, 95, 0.5));
+    animation:iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+}
+
+.text-slide-title{
+    font-size:28px;
+    font-weight:900;
+    color:#FFFFFF;
+    letter-spacing:1px;
+    margin-bottom:6px;
+    text-shadow:0 2px 8px rgba(0,0,0,0.4);
+    font-family:'Cairo',sans-serif;
+}
+
+.text-slide-sub{
+    font-size:13px;
+    font-weight:700;
+    color:#E5D4A5;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    font-family:'Inter',sans-serif;
+    opacity:0.9;
+}
+
+.text-carousel-dots{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-top:12px;
+}
+
+.text-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:rgba(139, 26, 47, 0.3);
+    border:none;
+    cursor:pointer;
+    padding:0;
+    transition:all 0.3s ease;
+}
+
+.text-dot:hover{background:rgba(139, 26, 47, 0.5);}
+
+.text-dot.active{
+    width:24px;
+    border-radius:10px;
+    background:#8B1A2F;
+    box-shadow:0 0 10px rgba(139, 26, 47, 0.5);
 }
 
 /* ========== ROUND SELECTOR ========== */
@@ -514,6 +601,14 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
     z-index:999999;
     text-align:center;font-weight:bold;
 }
+
+/* Mobile */
+@media (max-width:400px){
+    .text-carousel{min-height:120px;}
+    .text-slide-icon{font-size:40px;}
+    .text-slide-title{font-size:24px;}
+    .text-slide-sub{font-size:11px;}
+}
 </style>
 
 <link rel="stylesheet" href="mobile.css">
@@ -553,11 +648,36 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
     </div>
 </div>
 
-<div class="carousel-wrapper">
-    <div class="carousel" id="carousel">
-        <div class="carousel-track" id="carouselTrack"></div>
+<!-- ⭐ TEXT CAROUSEL -->
+<div class="text-carousel-wrapper">
+    <div class="text-carousel" id="textCarousel">
+        <div class="text-slide active" data-tab="fixtures" onclick="switchTab('fixtures')">
+            <span class="text-slide-icon">⚽</span>
+            <span class="text-slide-title">المواجهات</span>
+            <span class="text-slide-sub">Fixtures</span>
+        </div>
+        <div class="text-slide" data-tab="standings" onclick="switchTab('standings')">
+            <span class="text-slide-icon">📊</span>
+            <span class="text-slide-title">الترتيب</span>
+            <span class="text-slide-sub">Standings</span>
+        </div>
+        <div class="text-slide" data-tab="totw" onclick="switchTab('totw')">
+            <span class="text-slide-icon">👥</span>
+            <span class="text-slide-title">التشكيلة</span>
+            <span class="text-slide-sub">Team of the Week</span>
+        </div>
+        <div class="text-slide" data-tab="stats" onclick="switchTab('stats')">
+            <span class="text-slide-icon">📈</span>
+            <span class="text-slide-title">الإحصائيات</span>
+            <span class="text-slide-sub">Statistics</span>
+        </div>
     </div>
-    <div class="carousel-dots" id="carouselDots"></div>
+    <div class="text-carousel-dots" id="textCarouselDots">
+        <button class="text-dot active" onclick="goToTextSlide(0); resetTextTimer();"></button>
+        <button class="text-dot" onclick="goToTextSlide(1); resetTextTimer();"></button>
+        <button class="text-dot" onclick="goToTextSlide(2); resetTextTimer();"></button>
+        <button class="text-dot" onclick="goToTextSlide(3); resetTextTimer();"></button>
+    </div>
 </div>
 
 <div class="round-selector-row">
@@ -751,15 +871,15 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
             <div id="statsView-records" class="stats-view">
                 <div class="stats-section">
                     <div class="stats-section-title">League Records</div>
-                    <div classdiv=" id="statsRecordsContentsp" class="innerstats-records-grid"></div>
-                </div"></>
-            </divdiv>
+                    <div id="statsRecordsContent" class="stats-records-grid"></div>
+                </div>
+            </div>
 
-            <div id="statsView>
--managers" class="stats                       -view">
-                <div id="mhContent <">
-                    <div class="mdivh-loading">
-                       >Loading managers...</div>
+            <div id="statsView-managers" class="stats-view">
+                <div id="mhContent">
+                    <div class="mh-loading">
+                        <div class="spinner"></div>
+                        <div>Loading managers...</div>
                     </div>
                 </div>
             </div>
@@ -845,11 +965,11 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 </script>
 
 <script src="js/config.js?v=1"></script>
+<script src="js/text-carousel.js?v=1"></script>
 <script src="js/locks.js?v=18"></script>
 <script src="js/teams.js?v=1"></script>
 <script src="js/matchweeks.js?v=1"></script>
 <script src="js/supabase.js?v=1"></script>
-<script src="js/carousel.js?v=38"></script>
 <script src="js/fixtures.js?v=40"></script>
 <script src="js/standings.js?v=9"></script>
 <script src="js/download.js?v=24"></script>
