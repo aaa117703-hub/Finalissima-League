@@ -1,6 +1,5 @@
 /* =========================================================
    manager-squad.js — FINALISSIMA LEAGUE CHAT
-   عرض تشكيلة أي مدير من FPL
 ========================================================= */
 
 (function(){
@@ -229,11 +228,16 @@ async function openSquadModal(entryId, managerName){
     const modal = document.getElementById('squadModal');
     if(!modal) return;
 
+    /* ⭐ عرض الاسم المختصر */
+    const displayName = (typeof cleanDisplayName === 'function')
+        ? cleanDisplayName(managerName, 13)
+        : (managerName || 'Squad');
+
     modal.innerHTML =
         '<div class="squad-modal-box">' +
             '<button class="squad-modal-close" onclick="document.getElementById(\'squadModal\').classList.remove(\'show\')">×</button>' +
             '<div class="squad-modal-title">' +
-                '<div class="squad-modal-manager">' + escapeHTML(managerName || 'Squad') + '</div>' +
+                '<div class="squad-modal-manager">' + escapeHTML(displayName) + '</div>' +
                 '<div class="squad-modal-subtitle">Loading...</div>' +
             '</div>' +
             '<div class="squad-loading"><div class="spinner"></div><div>Loading squad...</div></div>' +
@@ -269,13 +273,13 @@ async function openSquadModal(entryId, managerName){
             console.warn('[SQUAD] Live data unavailable:', e.message);
         }
 
-        const content = renderSquad(managerName, usedGw, picksData, liveData);
+        const content = renderSquad(displayName, usedGw, picksData, liveData);
 
         modal.innerHTML =
             '<div class="squad-modal-box">' +
                 '<button class="squad-modal-close" onclick="document.getElementById(\'squadModal\').classList.remove(\'show\')">×</button>' +
                 '<div class="squad-modal-title">' +
-                    '<div class="squad-modal-manager">' + escapeHTML(managerName || 'Squad') + '</div>' +
+                    '<div class="squad-modal-manager">' + escapeHTML(displayName) + '</div>' +
                     '<div class="squad-modal-subtitle">GW ' + usedGw + ' Squad</div>' +
                 '</div>' +
                 content +
@@ -291,7 +295,7 @@ async function openSquadModal(entryId, managerName){
             '<div class="squad-modal-box">' +
                 '<button class="squad-modal-close" onclick="document.getElementById(\'squadModal\').classList.remove(\'show\')">×</button>' +
                 '<div class="squad-modal-title">' +
-                    '<div class="squad-modal-manager">' + escapeHTML(managerName || 'Squad') + '</div>' +
+                    '<div class="squad-modal-manager">' + escapeHTML(displayName) + '</div>' +
                 '</div>' +
                 '<div class="squad-error">Failed to load squad.<br><small>' + escapeHTML(e.message) + '</small></div>' +
             '</div>';
