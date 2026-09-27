@@ -1,6 +1,5 @@
 /* =========================================================
    players-teams.js — FINALISSIMA LEAGUE CHAT
-   الدفعة 1: Argentina → Croatia
 ========================================================= */
 
 const PLAYERS_TEAMS = {
@@ -82,11 +81,7 @@ const PLAYERS_TEAMS = {
         "Mena Kadhem",
         "Yas One",
         "BASHER LM10"
-    ]
-
-    // ⏳ الدفعة 2 تكمل من هنا (England → Italy)
-};
-,
+    ],
 
     "England": [
         "sajad alazawy 🐐🐐",
@@ -154,21 +149,19 @@ const PLAYERS_TEAMS = {
 
     "Italy": [
         "@ c5e_4",
-        "بوجهك مساكين وبظهرك سجاجين -",
-        "mustafa jbr",
+        "Martinبوجهك مساكين وبظهرك سجاجين R -",
+        "mustafa jbrMA",
         "Mustafa Ali",
-        "Karrar H",
-        "Othman flick",
-        "Ali NAJM❤️",
+        "K",
+arrar H",
+        "       Othman flick",
+        " "Ali NAJM❤️",
         "H cr",
         "Ammar --",
         "abbas ars",
         "حيدر ميثم",
         "عباس سعد"
-    ]
-
-    // ⏳ الدفعة 3 تكمل من هنا (Mexico → Serbia)
-,
+    ],
 
     "Mexico": [
         "Toffee Kettana",
@@ -222,7 +215,6 @@ const PLAYERS_TEAMS = {
         "Blal  Abd",
         "Ali Mohammed",
         "Mohsen Hadi",
-        "Martin RMA",
         "Mujtaba Ali",
         "Abdalla A.",
         "Mustafa مانشستر زرقاء",
@@ -248,10 +240,7 @@ const PLAYERS_TEAMS = {
         "Mohamed Abbas 🇮🇶",
         "abobaker Ahmed",
         "ali mohammed"
-    ]
-
-    // ⏳ الدفعة 4 تكمل من هنا (Spain → Venezuela)
-,
+    ],
 
     "Spain": [
         "MOHEMN FADEL",
@@ -345,7 +334,6 @@ function normalizePlayerName(name) {
 
     let result = name;
 
-    /* تحويل الحروف المزخرفة */
     result = result.replace(/[\u{1D538}-\u{1D56B}]/gu, function(match) {
         const code = match.codePointAt(0);
         if (code >= 0x1D538 && code <= 0x1D551) {
@@ -379,14 +367,12 @@ function normalizePlayerName(name) {
         return match;
     });
 
-    /* حذف الإيموجي */
     result = result
         .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
         .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
         .replace(/[\u{2600}-\u{27BF}]/gu, '')
         .replace(/[\u{FE00}-\u{FE0F}]/gu, '');
 
-    /* توحيد المسافات + lowercase */
     result = result.replace(/\s+/g, ' ').trim().toLowerCase();
 
     return result;
