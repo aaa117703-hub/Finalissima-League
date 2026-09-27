@@ -2,6 +2,51 @@
    fixtures.js — FINALISSIMA LEAGUE CHAT
 ========================================================= */
 
+/* ===== ذاكرة مؤقتة للجولات المخصصة ===== */
+window.customMatchweeks = null; // { round: { matches, is_hidden } }
+
+async function loadCustomMatchweeksIntoMemory() {
+    try {
+        const data = await loadCustomMatchweeks();
+        if (data) {
+            window.customMatchweeks = data;
+            // ندمجها مع matchweeks العام — نستبدل المباريات
+            Object.keys(data).forEach(function(rStr) {
+                const r = parseInt(rStr, 10);
+                const custom = data[r];
+                if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
+                    matchweeks[r] = custom.matches;
+                }
+            });
+            console.log('[Custom MW] loaded:', Object.keys(data).length, 'rounds');
+        } else {
+            console.log('[Custom MW] no custom data, using defaults');
+        }
+    } catch (e) {
+        console.warn('[Custom MW] load failed:', e);
+    }
+}
+
+/* ===== هل الجولة مخفية؟ ===== */
+function isRoundHidden(round) {
+    if (!window.customMatchweeks) return false;
+    const custom = window.customMatchweeks[round];
+    if (!custom) return false;
+    return custom.is_hidden === true;
+}
+
+/* ===== هل نعرض الجولة للمستخدم؟ ===== */
+function canUserSeeRound(round) {
+    // الإدارة دايماً تشوف
+    if (editMode || isAdmin()) return true;
+    // الجولة مخفية؟
+    if (isRoundHidden(round)) return false;
+    return true;
+}
+
+/* ===== الحالة الافتراضية ===== */
+let editMode = false;
+
 function initRoundDropdown() {
     const select = document.getElementById('roundSelect');
     if (!select) return;
@@ -118,6 +163,7 @@ function updateScore(round, idx, type, val) {
     scoresStorage['r' + round + '_m' + idx + '_' + type] = val;
 }
 
+/* ===== رسم المواجهات ===== */
 function renderFixtures() {
     try {
         const list = document.getElementById('fixturesList');
@@ -132,6 +178,17 @@ function renderFixtures() {
         if (fixturesTitle) fixturesTitle.innerText = 'MATCHWEEK ' + currentRound;
 
         list.innerHTML = '';
+
+        /* ===== هل الجولة مخفية للمستخدم؟ ===== */
+        if (!canUserSeeRound(currentRound)) {
+            list.innerHTML =
+                '<div class="round-hidden-msg">' +
+                    '<div class="round-hidden-icon">🔒</div>' +
+                    '<div class="round-hidden-title">المواجهات غير متاحة حالياً</div>' +
+                    '<div class="round-hidden-sub">سيتم الإعلان عن مباريات هذه الجولة قريباً</div>' +
+                '</div>';
+            return;
+        }
 
         const matches = matchweeks[currentRound] || [];
 
@@ -308,3 +365,8 @@ function setupEruda() {
         clickTimer = setTimeout(function() { clickCount = 0; }, 2000);
     });
 }
+
+/* ===== ربط الدوال بـ window ===== */
+window.loadCustomMatchweeksIntoMemory = loadCustomMatchweeksIntoMemory;
+window.isRoundHidden = isRoundHidden;
+window.canUserSeeRound = canUserSeeRound;
