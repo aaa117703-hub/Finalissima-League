@@ -1,242 +1,92 @@
-// =========================================================
-// main.js — Finalissima League (Landing + SPA)
-// =========================================================
+/* =========================================================
+   main.js — FINALISSIMA LEAGUE CHAT
+========================================================= */
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('[Main] Finalissima starting...');
+async function init() {
 
-    initLandingCards();
-    initRoundSelector();
-    initTabs();
-    initStatsTabs();
-    initRoundNav();
-    initSettings();
-    initBackButton();
-
-    console.log('[Main] Ready. Round:', currentRound);
-});
-
-// =========================================================
-// 1. LANDING
-// =========================================================
-
-function initLandingCards() {
-    const cards = document.querySelectorAll('[data-goto]');
-    cards.forEach(function(card) {
-        card.addEventListener('click', function() {
-            const tab = this.getAttribute('data-goto');
-            if (!tab) return;
-            openSPA(tab);
-        });
-    });
-}
-
-function openSPA(tabName) {
-    const landing = document.getElementById('landingView');
-    if (landing) landing.classList.add('hide');
-
-    const spa = document.getElementById('spaView');
-    if (spa) spa.classList.add('show');
-
-    if (tabName) switchTab(tabName);
-}
-
-function closeSPA() {
-    const landing = document.getElementById('landingView');
-    if (landing) landing.classList.remove('hide');
-
-    const spa = document.getElementById('spaView');
-    if (spa) spa.classList.remove('show');
-}
-
-// =========================================================
-// 2. ROUND SELECTOR
-// =========================================================
-
-function initRoundSelector() {
-    const selector = document.getElementById('roundSelector');
-    if (!selector) return;
-
-    selector.innerHTML = '';
-    for (let i = 1; i <= 38; i++) {
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = 'Round ' + i;
-        selector.appendChild(opt);
-    }
-
-    selector.value = currentRound;
-
-    selector.addEventListener('change', function() {
-        const newRound = parseInt(this.value, 10);
-        if (isNaN(newRound) || newRound < 1 || newRound > 38) return;
-        currentRound = newRound;
-        localStorage.setItem('fin_last_round', String(currentRound));
-        reloadActiveTab();
-    });
-}
-
-// =========================================================
-// 3. TABS
-// =========================================================
-
-function initTabs() {
-    const tabs = document.querySelectorAll('.tab-btn');
-    tabs.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const tab = this.getAttribute('data-tab');
-            if (tab) switchTab(tab);
-        });
-    });
-}
-
-function switchTab(tabName) {
-    document.querySelectorAll('.tab-btn').forEach(function(b) {
-        b.classList.toggle('active', b.getAttribute('data-tab') === tabName);
-    });
-
-    document.querySelectorAll('.tab-pane').forEach(function(p) {
-        p.classList.remove('active');
-    });
-
-    const target = document.getElementById('tab-' + tabName);
-    if (target) target.classList.add('active');
-
-    const roundBar = document.getElementById('roundBar');
-    if (roundBar) {
-        if (tabName === 'fixtures' || tabName === 'totw') {
-            roundBar.style.display = 'flex';
-        } else {
-            roundBar.style.display = 'none';
+    /* ====== 1. Carousel ====== */
+    if (typeof buildCarousel === 'function') {
+        buildCarousel();
+        setupCarouselTouch();
+        if (window.__carouselAutoStart !== false) {
+            startCarousel();
         }
     }
 
-    activeTab = tabName;
-    reloadActiveTab();
-}
+    /* ====== 2. Round dropdown + Render ====== */
+    if (typeof initRoundDropdown === 'function') initRoundDropdown();
+    if (typeof renderFixtures === 'function')   renderFixtures();
+    if (typeof renderStandings === 'function')  renderStandings();
 
-function reloadActiveTab() {
-    switch (activeTab) {
-        case 'fixtures':
-            if (typeof renderFixtures === 'function') renderFixtures();
-            break;
-        case 'standings':
+    /* ====== 3. Eruda (اختياري) ====== */
+    if (typeof setupEruda === 'function') {
+        try { setupEruda(); } catch (e) { console.warn('[Eruda]', e); }
+    }
+
+    /* ====== 4. Lock system ====== */
+    if (typeof initLockSystem === 'function') {
+        initLockSystem().catch(function(e) {
+            console.warn('[LockSystem]', e);
+        });
+    }
+
+    /* ====== 5. app-ready event ====== */
+    try {
+        window.dispatchEvent(new CustomEvent('app-ready', {
+            detail: { timestamp: Date.now() }
+        }));
+    } catch (e) {
+        console.warn('[Main] app-ready dispatch failed:', e);
+    }
+
+    /* ====== 6. Supabase ====== */
+    if (!window.sbClient || typeof loadScoresFromSupabase !== 'function') {
+        console.warn('[Main] Supabase not available — working offline');
+        return;
+    }
+
+    if (typeof matchweeks === 'undefined') {
+        console.warn('[Main] matchweeks not loaded');
+        return;
+    }
+
+    try {
+        const { error: testError } = await window.sbClient
+            .from('match_results')
+            .select('id')
+            .limit(1);
+
+        if (testError) {
+            console.warn('[Main] DB Connection:', testError.message);
+            return;
+        }
+    } catch (connErr) {
+        console.warn('[Main] Network:', connErr.message);
+        return;
+    }
+
+    try {
+        const remoteScores = await loadScoresFromSupabase(matchweeks);
+
+        if (remoteScores && Object.keys(remoteScores).length > 0) {
+            scoresStorage = remoteScores;
+
+            try {
+                localStorage.setItem('fin_scores', JSON.stringify(scoresStorage));
+            } catch (lsErr) {
+                console.warn('[Main] localStorage full:', lsErr.message);
+            }
+
+            if (typeof renderFixtures === 'function')  renderFixtures();
             if (typeof renderStandings === 'function') renderStandings();
-            break;
-        case 'totw':
-            if (typeof renderTOTW === 'function') renderTOTW();
-            break;
-        case 'stats':
-            if (typeof renderStats === 'function') renderStats();
-            break;
+        }
+    } catch (e) {
+        console.warn('[Main] Load failed:', e.message);
     }
 }
 
-// =========================================================
-// 4. STATS TABS
-// =========================================================
-
-function initStatsTabs() {
-    const tabs = document.querySelectorAll('.stats-tab');
-    tabs.forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            const stat = this.getAttribute('data-stats');
-            if (!stat) return;
-
-            document.querySelectorAll('.stats-tab').forEach(function(b) {
-                b.classList.toggle('active', b.getAttribute('data-stats') === stat);
-            });
-
-            if (typeof renderStatsSection === 'function') {
-                renderStatsSection(stat);
-            }
-        });
-    });
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
 }
-
-// =========================================================
-// 5. ROUND NAVIGATION
-// =========================================================
-
-function initRoundNav() {
-    const prev = document.getElementById('prevRound');
-    const next = document.getElementById('nextRound');
-
-    if (prev) {
-        prev.addEventListener('click', function() {
-            if (currentRound > 1) {
-                currentRound--;
-                localStorage.setItem('fin_last_round', String(currentRound));
-                syncRoundUI();
-            }
-        });
-    }
-
-    if (next) {
-        next.addEventListener('click', function() {
-            if (currentRound < 38) {
-                currentRound++;
-                localStorage.setItem('fin_last_round', String(currentRound));
-                syncRoundUI();
-            }
-        });
-    }
-}
-
-function syncRoundUI() {
-    const selector = document.getElementById('roundSelector');
-    if (selector) selector.value = currentRound;
-    reloadActiveTab();
-}
-
-// =========================================================
-// 6. SETTINGS MODAL
-// =========================================================
-
-function initSettings() {
-    const modal = document.getElementById('settingsModal');
-    const closeBtn = document.getElementById('closeSettings');
-
-    if (closeBtn) {
-        closeBtn.addEventListener('click', function() {
-            if (modal) modal.classList.remove('show');
-        });
-    }
-
-    if (modal) {
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) modal.classList.remove('show');
-        });
-    }
-}
-
-// =========================================================
-// 7. BACK BUTTON
-// =========================================================
-
-function initBackButton() {
-    const btn = document.getElementById('backBtn');
-    if (btn) {
-        btn.addEventListener('click', closeSPA);
-    }
-}
-
-// =========================================================
-// 8. HELPER
-// =========================================================
-
-function getCurrentRoundMatches() {
-    if (typeof matchweeks === 'undefined') return [];
-    return matchweeks[currentRound] || [];
-}
-
-// =========================================================
-// 9. EXPOSE
-// =========================================================
-
-window.openSPA = openSPA;
-window.closeSPA = closeSPA;
-window.switchTab = switchTab;
-window.reloadActiveTab = reloadActiveTab;
-window.syncRoundUI = syncRoundUI;
-window.getCurrentRoundMatches = getCurrentRoundMatches;
