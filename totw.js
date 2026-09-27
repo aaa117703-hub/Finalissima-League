@@ -12,11 +12,15 @@ let currentTOTWSelected = [];
 let currentTOTWRound = 0;
 let currentTOTWSaved = false;
 
+/* ⭐ استخدام cleanDisplayName */
 function shortenPlayerName(name) {
-    if (!name) return name;
+    if (typeof cleanDisplayName === 'function') {
+        return cleanDisplayName(name, 13);
+    }
+    if (!name) return '';
     const result = name.trim();
-    if (result.length <= 12) return result;
-    return result.substring(0, 12);
+    if (result.length <= 13) return result;
+    return result.substring(0, 13);
 }
 
 function getLatestRound() {
@@ -229,7 +233,7 @@ function renderTOTWList(players) {
     players.forEach(function(player, index) {
         const entryId = player.entry;
         const rawName = player.player_name || player.entry_name || 'Unknown';
-        const entryName = player.entry_name || '';
+        const displayName = shortenPlayerName(rawName);
         const points = player.event_total || 0;
         const total = player.total || 0;
         const isSelected = currentTOTWSelected.indexOf(entryId) !== -1;
@@ -253,7 +257,7 @@ function renderTOTWList(players) {
         html += '<div class="totw-list-rank">' + (index + 1) + '</div>';
         html += logoHtml;
         html += '<div class="totw-list-names">';
-        html += '<div class="totw-list-entry">' + (entryName || rawName) + '</div>';
+        html += '<div class="totw-list-entry">' + displayName + '</div>';
         html += '<div class="totw-list-player">' + rawName + '</div>';
         html += '</div>';
         html += '<div class="totw-list-gw">' + points + '</div>';
