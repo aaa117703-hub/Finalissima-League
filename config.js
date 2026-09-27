@@ -10,6 +10,29 @@ const MANAGERS_WORKER_URL = WORKER_URL;
 
 const LEAGUE_ID = '810632';
 
+const LEAGUE_IDS = [
+    { code: 'ARG', id: 607955, name: 'Argentina' },
+    { code: 'BEL', id: 608229, name: 'Belgium' },
+    { code: 'BRA', id: 607908, name: 'Brazil' },
+    { code: 'COL', id: 608079, name: 'Colombia' },
+    { code: 'CRO', id: 608184, name: 'Croatia' },
+    { code: 'ENG', id: 608142, name: 'England' },
+    { code: 'GER', id: 607996, name: 'Germany' },
+    { code: 'GRE', id: 608107, name: 'Greece' },
+    { code: 'HUN', id: 608287, name: 'Hungary' },
+    { code: 'ITA', id: 608133, name: 'Italy' },
+    { code: 'MEX', id: 608118, name: 'Mexico' },
+    { code: 'NED', id: 608203, name: 'Netherlands' },
+    { code: 'NOR', id: 607978, name: 'Norway' },
+    { code: 'RUS', id: 608220, name: 'Russia' },
+    { code: 'SRB', id: 608007, name: 'Serbia' },
+    { code: 'ESP', id: 608271, name: 'Spain' },
+    { code: 'SUI', id: 608249, name: 'Switzerland' },
+    { code: 'TUR', id: 608057, name: 'Turkey' },
+    { code: 'URU', id: 608261, name: 'Uruguay' },
+    { code: 'VEN', id: 608097, name: 'Venezuela' }
+];
+
 window.sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let editMode = false;
@@ -51,7 +74,7 @@ function fetchWithTimeout(url, options, timeoutMs) {
         .catch(function(err) { if (timeoutId) clearTimeout(timeoutId); throw err; });
 }
 
-const MANAGERS_CACHE_KEY = 'fin_managers_cache_v1';
+const MANAGERS_CACHE_KEY = 'fin_managers_cache_v2';
 const MANAGERS_CACHE_TTL = 6 * 60 * 60 * 1000;
 const MANAGERS_TOTAL_PAGES = 7;
 let _managersCache = null;
@@ -59,62 +82,117 @@ let _managersLoading = null;
 
 async function getAllManagersCached(forceRefresh) {
     let baseList;
+
     if (!forceRefresh && _managersCache && _managersCache.length > 0) {
         baseList = _managersCache;
     } else if (_managersLoading) {
         baseList = await _managersLoading;
     } else {
         let fromCache = false;
+
         if (!forceRefresh) {
             try {
                 const cached = localStorage.getItem(MANAGERS_CACHE_KEY);
                 if (cached) {
                     const parsed = JSON.parse(cached);
-                    if (parsed && parsed.data && Array.isArray(parsed.data) && (Date.now() - parsed.ts < MANAGERS_CACHE_TTL)) {
+                    if (parsed && parsed.data && Array.isArray(parsed.data) &&
+                        (Date.now() - parsed.ts < MANAGERS_CACHE_TTL)) {
                         _managersCache = parsed.data;
                         baseList = _managersCache;
                         fromCache = true;
                     }
                 }
-            } catch (e) { console.warn('[Managers] cache read failed:', e.message); }
+            } catch (e) {
+                console.warn('[Managers] cache read failed:', e.message);
+            }
         }
+
         if (!fromCache) {
             _managersLoading = (async function() {
                 const all = [];
-                for (let page = 1; page <= MANAGERS_TOTAL_PAGES; page++) {
+                const seenIds = {};
+
+                /* ⭐ نجيب من كل دوري في LEAGUE_IDS */
+                for (let i = 0; i < LEAGUE_IDS.length; i++) {
+                    const league = LEAGUE_IDS[i];
+
                     try {
-                        const res = await fetchWithTimeout(MANAGERS_WORKER_URL + '/?page=' + page);
-                        if (!res.ok) { console.warn('[Managers] page ' + page + ' HTTP ' + res.status); break; }
+                        const url = MANAGERS_WORKER_URL + '/?page=1&league=' + league.id;
+
+                        const res = await fetchWithTimeout(url, {}, 10000);
+
+                        if (!res.ok) {
+                            console.warn('[Managers] ' + league.name + ' HTTP ' + res.status);
+                            continue;
+                        }
+
                         const data = await res.json();
+
                         if (data && data.standings && data.standings.results) {
-                            all.push.apply(all, data.standings.results);
-                            if (data.standings.has_next !== true) break;
-                        } else break;
-                    } catch (e) { console.warn('[Managers] page ' + page + ' failed:', e.message); break; }
+                            data.standings.results.forEach(function(m) {
+                                /* نتجنب المشرف (مكرر في كل دوري) */
+                                if (m.entry === 2984723) return;
+                                if (seenIds[m.entry]) return;
+
+                                seenIds[m.entry] = true;
+
+                                /* نضيف اسم المنتخب */
+                                m._team = league.name;
+
+                                all.push(m);
+                            });
+
+                            console.log('[Managers] ' + league.name + ': ' + data.standings.results.length);
+                        }
+                    } catch (e) {
+                        console.warn('[Managers] ' + league.name + ' failed:', e.message);
+                    }
                 }
+
+                console.log('[Managers] Total loaded:', all.length);
+
                 _managersCache = all;
+
                 try {
-                    localStorage.setItem(MANAGERS_CACHE_KEY, JSON.stringify({ ts: Date.now(), data: all }));
-                } catch (e) { console.warn('[Managers] cache write failed:', e.message); }
+                    localStorage.setItem(MANAGERS_CACHE_KEY, JSON.stringify({
+                        ts: Date.now(),
+                        data: all
+                    }));
+                } catch (e) {
+                    console.warn('[Managers] cache write failed:', e.message);
+                }
+
                 _managersLoading = null;
                 return all;
             })();
+
             baseList = await _managersLoading;
         }
     }
+
     const manual = getManualEntries();
-    if (manual.length === 0) return baseList;
+
+    if (manual.length === 0) {
+        return baseList;
+    }
+
     const result = baseList.slice();
     const existingIds = {};
     result.forEach(function(m) { existingIds[m.entry] = true; });
+
     manual.forEach(function(m) {
-        if (!existingIds[m.entry]) result.push(m);
-        else {
+        if (!existingIds[m.entry]) {
+            result.push(m);
+        } else {
             for (let i = 0; i < result.length; i++) {
-                if (result[i].entry === m.entry) { result[i] = m; break; }
+                if (result[i].entry === m.entry) {
+                    result[i] = m;
+                    break;
+                }
             }
         }
     });
+
     return result;
 }
 
