@@ -1,15 +1,11 @@
 /* =========================================================
-   fixtures.js — v40
-   - unlockSecretPanel: فقط editMode (PIN 1999)
-   - نظام القفل انتقل للإعدادات
+   fixtures.js — FINALISSIMA LEAGUE CHAT
 ========================================================= */
 
 function initRoundDropdown() {
     const select = document.getElementById('roundSelect');
     if (!select) return;
-
     select.innerHTML = '';
-
     for (let i = 1; i <= 38; i++) {
         const opt = document.createElement('option');
         opt.value = i;
@@ -19,47 +15,36 @@ function initRoundDropdown() {
     }
 }
 
-
 function selectRound(value) {
     currentRound = parseInt(value, 10);
-    localStorage.setItem('fpl_last_round', currentRound);
+    localStorage.setItem('fin_last_round', currentRound);
     renderFixtures();
     if (activeTab === 'standings') renderStandings();
 }
-
 
 function changeRound(step) {
     currentRound += step;
     if (currentRound < 1) currentRound = 1;
     if (currentRound > 38) currentRound = 38;
-    localStorage.setItem('fpl_last_round', currentRound);
+    localStorage.setItem('fin_last_round', currentRound);
     renderFixtures();
     if (activeTab === 'standings') renderStandings();
 }
 
-
-/* =========================================================
-   SWITCH TAB
-========================================================= */
-
 function switchTab(tabName) {
-
     if (
         typeof isLocked === 'function' &&
         typeof isAdmin === 'function' &&
         !isAdmin()
     ) {
-
         if (tabName === 'fixtures' && isLocked('fixtures')) {
             showSectionMaintenance('المواجهات');
             return;
         }
-
         if (tabName === 'standings' && isLocked('standings')) {
             showSectionMaintenance('الترتيب');
             return;
         }
-
         if (tabName === 'totw' && isLocked('totw')) {
             showSectionMaintenance('تشكيلة الأسبوع');
             return;
@@ -93,61 +78,45 @@ function switchTab(tabName) {
     }
 }
 
-
-/* =========================================================
-   SECRET PANEL — Edit Mode فقط
-========================================================= */
-
 function unlockSecretPanel() {
-
     const pass = prompt('Enter password:');
-
     if (pass === null) return;
 
     if (pass === '1999') {
-
         editMode = true;
-
         localStorage.setItem('tg_admin', 'true');
-
         const panel = document.getElementById('editPanel');
         if (panel) panel.style.display = 'flex';
-
         renderFixtures();
-
         showToast('Edit mode enabled', true);
+        return;
+    }
 
+    if (pass === '024680') {
+        if (typeof activateLockControl === 'function') {
+            activateLockControl();
+        }
         return;
     }
 
     alert('Incorrect password!');
 }
 
-
 function unlockEditWithPassword() {
     unlockSecretPanel();
 }
 
-
 function exitEditMode() {
     editMode = false;
-
     const panel = document.getElementById('editPanel');
     if (panel) panel.style.display = 'none';
-
     renderFixtures();
     renderStandings();
 }
 
-
 function updateScore(round, idx, type, val) {
     scoresStorage['r' + round + '_m' + idx + '_' + type] = val;
 }
-
-
-/* =========================================================
-   RENDER FIXTURES
-========================================================= */
 
 function renderFixtures() {
     try {
@@ -186,7 +155,6 @@ function renderFixtures() {
             } else {
                 const hDisplay = homeScoreStr !== '' ? homeScoreStr : '-';
                 const aDisplay = awayScoreStr !== '' ? awayScoreStr : '-';
-
                 scoreContent =
                     '<span class="score-display">' + hDisplay + '</span>' +
                     '<span class="vs-text">-</span>' +
@@ -217,14 +185,8 @@ function renderFixtures() {
     }
 }
 
-
-/* =========================================================
-   SAVE
-========================================================= */
-
 async function saveCurrentRound() {
     if (isSaving) return;
-
     isSaving = true;
     showToast('Saving...', false);
 
@@ -238,15 +200,14 @@ async function saveCurrentRound() {
     matches.forEach(function(match, idx) {
         const homeInput = document.getElementById('home_r' + currentRound + '_m' + idx);
         const awayInput = document.getElementById('away_r' + currentRound + '_m' + idx);
-
         if (homeInput && awayInput) {
             scoresStorage['r' + currentRound + '_m' + idx + '_home'] = homeInput.value;
             scoresStorage['r' + currentRound + '_m' + idx + '_away'] = awayInput.value;
         }
     });
 
-    localStorage.setItem('fpl_scores', JSON.stringify(scoresStorage));
-    localStorage.setItem('fpl_last_round', currentRound);
+    localStorage.setItem('fin_scores', JSON.stringify(scoresStorage));
+    localStorage.setItem('fin_last_round', currentRound);
 
     let result = { ok: true };
 
@@ -257,19 +218,10 @@ async function saveCurrentRound() {
     }
 
     if (result.ok && typeof saveManualTOTW === 'function') {
-        try {
-            await saveManualTOTW(currentRound);
-        } catch (e) {
-            console.warn('TOTW snapshot failed:', e);
-        }
+        try { await saveManualTOTW(currentRound); } catch (e) { console.warn('TOTW snapshot failed:', e); }
     }
-
     if (result.ok && typeof saveCurrentRanks === 'function') {
-        try {
-            await saveCurrentRanks(currentRound);
-        } catch (e) {
-            console.warn('Save ranks failed:', e);
-        }
+        try { await saveCurrentRanks(currentRound); } catch (e) { console.warn('Save ranks failed:', e); }
     }
 
     isSaving = false;
@@ -286,11 +238,6 @@ async function saveCurrentRound() {
         showToast('Save failed: ' + errMsg, false, 20000);
     }
 }
-
-
-/* =========================================================
-   CLEAR
-========================================================= */
 
 async function clearCurrentRound() {
     if (isSaving) return;
@@ -313,7 +260,7 @@ async function clearCurrentRound() {
         delete scoresStorage['r' + currentRound + '_m' + idx + '_away'];
     });
 
-    localStorage.setItem('fpl_scores', JSON.stringify(scoresStorage));
+    localStorage.setItem('fin_scores', JSON.stringify(scoresStorage));
 
     let result = { ok: true };
 
@@ -338,32 +285,26 @@ async function clearCurrentRound() {
     }
 }
 
-
 setInterval(function() {
     if (Object.keys(scoresStorage).length > 0) {
-        localStorage.setItem('fpl_scores', JSON.stringify(scoresStorage));
+        localStorage.setItem('fin_scores', JSON.stringify(scoresStorage));
     }
 }, 5000);
-
 
 function setupEruda() {
     let clickCount = 0;
     let clickTimer = null;
-
     const titleEl = document.getElementById('currentRoundTitle');
     if (!titleEl) return;
-
     titleEl.addEventListener('click', function() {
         clickCount++;
         clearTimeout(clickTimer);
-
         if (clickCount >= 5) {
             clickCount = 0;
             if (typeof eruda !== 'undefined' && eruda.init) {
                 try { eruda.init(); eruda.show(); } catch (e) {}
             }
         }
-
         clickTimer = setTimeout(function() { clickCount = 0; }, 2000);
     });
 }
