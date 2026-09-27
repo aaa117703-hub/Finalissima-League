@@ -221,6 +221,10 @@ function openSettingsMain() {
             '<span class="si-icon">🏆</span>' +
             '<span class="si-label">إدارة المنتخبات</span>' +
         '</button>' +
+        '<button class="settings-item" onclick="openSettingsMatchweeks()">' +
+            '<span class="si-icon">📋</span>' +
+            '<span class="si-label">إدارة المواجهات</span>' +
+        '</button>' +
         '<button class="settings-item" onclick="openSettingsLocks()">' +
             '<span class="si-icon">🔐</span>' +
             '<span class="si-label">قفل الأقسام</span>' +
