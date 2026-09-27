@@ -918,9 +918,13 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
         btn.addEventListener('mouseleave', function() { clearTimeout(pressTimer); });
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        setupButton(document.getElementById('hiddenEditBtn'), unlockSecretPanel);
-        setupButton(document.getElementById('hiddenEditBtn2'), unlockSecretPanel);
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            if (typeof window.unlockSecretPanel === 'function') {
+                setupButton(document.getElementById('hiddenEditBtn'), window.unlockSecretPanel);
+                setupButton(document.getElementById('hiddenEditBtn2'), window.unlockSecretPanel);
+            }
+        }, 500);
     });
 })();
 </script>
@@ -986,5 +990,6 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 <script src="main.js?v=2"></script>
 <script src="backfill-history.js?v=2"></script>
 <script src="admin-matchweeks.js?v=1"></script>
+
 </body>
 </html>
