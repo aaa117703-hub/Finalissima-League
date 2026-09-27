@@ -4,8 +4,10 @@
 
 const SUPABASE_URL = 'https://YOUR_PROJECT.supabase.co';
 const SUPABASE_ANON_KEY = 'YOUR_ANON_KEY_HERE';
+
 const WORKER_URL = 'https://finalissima-api.aaa117703.workers.dev';
 const MANAGERS_WORKER_URL = WORKER_URL;
+
 const LEAGUE_ID = '810632';
 
 window.sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -52,15 +54,15 @@ function fetchWithTimeout(url, options, timeoutMs) {
 const MANAGERS_CACHE_KEY = 'fin_managers_cache_v1';
 const MANAGERS_CACHE_TTL = 6 * 60 * 60 * 1000;
 const MANAGERS_TOTAL_PAGES = 7;
-let _managersCache = null;
+let _man {
+agersCache = null;
 let _managersLoading = null;
 
 async function getAllManagersCached(forceRefresh) {
     let baseList;
     if (!forceRefresh && _managersCache && _managersCache.length > 0) {
         baseList = _managersCache;
-    } else if (_managersLoading) {
-        baseList = await _managersLoading;
+    } else if (_managersLoading)        baseList = await _managersLoading;
     } else {
         let fromCache = false;
         if (!forceRefresh) {
