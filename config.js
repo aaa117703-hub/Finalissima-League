@@ -54,15 +54,15 @@ function fetchWithTimeout(url, options, timeoutMs) {
 const MANAGERS_CACHE_KEY = 'fin_managers_cache_v1';
 const MANAGERS_CACHE_TTL = 6 * 60 * 60 * 1000;
 const MANAGERS_TOTAL_PAGES = 7;
-let _man {
-agersCache = null;
+let _managersCache = null;
 let _managersLoading = null;
 
 async function getAllManagersCached(forceRefresh) {
     let baseList;
     if (!forceRefresh && _managersCache && _managersCache.length > 0) {
         baseList = _managersCache;
-    } else if (_managersLoading)        baseList = await _managersLoading;
+    } else if (_managersLoading) {
+        baseList = await _managersLoading;
     } else {
         let fromCache = false;
         if (!forceRefresh) {
