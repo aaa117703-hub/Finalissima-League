@@ -1,5 +1,6 @@
 /* =========================================================
    players-teams.js — FINALISSIMA LEAGUE CHAT
+   مع دالة تنظيف الأسماء تلقائياً
 ========================================================= */
 
 const PLAYERS_TEAMS = {
@@ -49,7 +50,7 @@ const PLAYERS_TEAMS = {
         "MOHAMMED NED",
         "Radawy",
         "The Gunners",
-        "HASSAN LOTHBROK 👑"
+        "HASSAN LOTHBROK"
     ],
 
     "Colombia": [
@@ -84,7 +85,7 @@ const PLAYERS_TEAMS = {
     ],
 
     "England": [
-        "sajad alazawy 🐐🐐",
+        "sajad alazawy",
         "يُوسـف أَزهـر دّاخِـل A",
         "IG ali-cts2",
         "Sajad Abbas",
@@ -95,12 +96,12 @@ const PLAYERS_TEAMS = {
         "Ahmed .",
         "Fantasy King",
         "khalid abdullah",
-        "𝙷𝙰𝚂𝚂𝙰𝙽 𝙰𝙳𝙽𝙰𝙽 --",
+        "𝙷𝙰𝚂𝚂𝙰𝙽 𝙰𝙳𝙽𝙰𝙽",
         "I BAQERENO"
     ],
 
     "Germany": [
-        "JÜRGEN -",
+        "JÜRGEN",
         "Brhm jose",
         "Ahmed Akram",
         "Abdullah Al-saray",
@@ -124,10 +125,10 @@ const PLAYERS_TEAMS = {
         "Baqer Emad",
         "Yousef Hameed",
         "Karar Ghasan",
-        "IBRAHIM -",
+        "IBRAHIM",
         "Zhra J",
         "Dhurgham maher",
-        "مـحمـد حـيـدر 🇮🇶",
+        "مـحمـد حـيـدر",
         "Omar Amer"
     ],
 
@@ -149,13 +150,12 @@ const PLAYERS_TEAMS = {
 
     "Italy": [
         "@ c5e_4",
-        "Martinبوجهك مساكين وبظهرك سجاجين R -",
-        "mustafa jbrMA",
+        "Mustafa Firas",
+        "mustafa jbr",
         "Mustafa Ali",
-        "K",
-arrar H",
-        "       Othman flick",
-        " "Ali NAJM❤️",
+        "Karrar H",
+        "Othman flick",
+        "Ali NAJM",
         "H cr",
         "Ammar --",
         "abbas ars",
@@ -183,7 +183,7 @@ arrar H",
         "سـبيشل وان",
         "M0hamed Al-Asadi",
         "Abbas Abbas",
-        "CHE -",
+        "CHE",
         "م. محمد الدليمي",
         "حيدر علي",
         "ali Mohammed",
@@ -202,22 +202,23 @@ arrar H",
         "haider kanon",
         "Apex Star",
         "AHMED RIYADH",
-        "krar Tarq 🇮🇶",
+        "krar Tarq",
         "Al-hussien Ali",
         "Fc Mohammed",
-        "Mohammed smko Mustafa",
+        "Mohammed smko",
         "Sir Alex Ali Alwash",
         "ahmed dawood",
-        "صوفي 🇮🇶"
+        "صوفي"
     ],
 
     "Russia": [
         "Blal  Abd",
         "Ali Mohammed",
         "Mohsen Hadi",
+        "Martin RMA",
         "Mujtaba Ali",
         "Abdalla A.",
-        "Mustafa مانشستر زرقاء",
+        "Mustafa Man",
         "Haider Albayati",
         "Sir  Adel",
         "sohaep muthana",
@@ -237,7 +238,7 @@ arrar H",
         "AB . Mahdi",
         "SAJAD HASSAN",
         "ꋊꄲꄲꇙ 4",
-        "Mohamed Abbas 🇮🇶",
+        "Mohamed Abbas",
         "abobaker Ahmed",
         "ali mohammed"
     ],
@@ -301,7 +302,7 @@ arrar H",
         "ilias zaa",
         "رحيم المياحي",
         "Fadi Nazar",
-        "علي قيصر عزيز .",
+        "علي قيصر عزيز",
         "SAGAD1 SAGAD1"
     ],
 
@@ -325,45 +326,94 @@ arrar H",
 
 
 /* =========================================================
+   CLEAN DISPLAY NAME — تنظيف + قص تلقائي
+========================================================= */
+
+function cleanDisplayName(name, maxLen) {
+    if (!name) return '';
+
+    maxLen = maxLen || 13;
+
+    let result = String(name);
+
+    /* 1. تحويل الحروف المزخرفة */
+    result = result.replace(/[\u{1D400}-\u{1D7FF}]/gu, function(match) {
+        const code = match.codePointAt(0);
+        if (code >= 0x1D400 && code <= 0x1D419) return String.fromCharCode(code - 0x1D400 + 65);
+        if (code >= 0x1D41A && code <= 0x1D433) return String.fromCharCode(code - 0x1D41A + 97);
+        if (code >= 0x1D434 && code <= 0x1D44D) return String.fromCharCode(code - 0x1D434 + 65);
+        if (code >= 0x1D44E && code <= 0x1D467) return String.fromCharCode(code - 0x1D44E + 97);
+        if (code >= 0x1D468 && code <= 0x1D481) return String.fromCharCode(code - 0x1D468 + 65);
+        if (code >= 0x1D482 && code <= 0x1D49B) return String.fromCharCode(code - 0x1D482 + 97);
+        if (code >= 0x1D538 && code <= 0x1D551) return String.fromCharCode(code - 0x1D538 + 65);
+        if (code >= 0x1D552 && code <= 0x1D56B) return String.fromCharCode(code - 0x1D552 + 97);
+        if (code >= 0x1D5A0 && code <= 0x1D5B9) return String.fromCharCode(code - 0x1D5A0 + 65);
+        if (code >= 0x1D5BA && code <= 0x1D5D3) return String.fromCharCode(code - 0x1D5BA + 97);
+        if (code >= 0x1D608 && code <= 0x1D621) return String.fromCharCode(code - 0x1D608 + 65);
+        if (code >= 0x1D622 && code <= 0x1D63B) return String.fromCharCode(code - 0x1D622 + 97);
+        if (code >= 0x1D670 && code <= 0x1D689) return String.fromCharCode(code - 0x1D670 + 65);
+        if (code >= 0x1D68A && code <= 0x1D6A3) return String.fromCharCode(code - 0x1D68A + 97);
+        return match;
+    });
+
+    /* 2. شيل الإيموجي */
+    result = result
+        .replace(/[\u{1F000}-\u{1FAFF}]/gu, '')
+        .replace(/[\u{2600}-\u{27BF}]/gu, '')
+        .replace(/[\u{FE00}-\u{FE0F}]/gu, '')
+        .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '');
+
+    /* 3. شيل التطويل العربي */
+    result = result.replace(/\u0640+/g, '');
+
+    /* 4. شيل التشكيل العربي */
+    result = result.replace(/[\u064B-\u065F]/g, '');
+
+    /* 5. حول _ و - لمسافات */
+    result = result.replace(/[_\-,]+/g, ' ');
+
+    /* 6. شيل النقاط في النهاية */
+    result = result.replace(/\.+$/, '');
+
+    /* 7. توحيد المسافات */
+    result = result.replace(/\s+/g, ' ').trim();
+
+    /* 8. القص لـ maxLen */
+    if (result.length > maxLen) {
+        result = result.substring(0, maxLen).trim();
+    }
+
+    return result;
+}
+
+
+/* =========================================================
    NORMALIZE PLAYER NAME
 ========================================================= */
 
 function normalizePlayerName(name) {
-
     if (!name) return '';
 
     let result = name;
 
     result = result.replace(/[\u{1D538}-\u{1D56B}]/gu, function(match) {
         const code = match.codePointAt(0);
-        if (code >= 0x1D538 && code <= 0x1D551) {
-            return String.fromCharCode(code - 0x1D538 + 65);
-        }
-        if (code >= 0x1D552 && code <= 0x1D56B) {
-            return String.fromCharCode(code - 0x1D552 + 97);
-        }
+        if (code >= 0x1D538 && code <= 0x1D551) return String.fromCharCode(code - 0x1D538 + 65);
+        if (code >= 0x1D552 && code <= 0x1D56B) return String.fromCharCode(code - 0x1D552 + 97);
         return match;
     });
 
     result = result.replace(/[\u{1D400}-\u{1D433}]/gu, function(match) {
         const code = match.codePointAt(0);
-        if (code >= 0x1D400 && code <= 0x1D419) {
-            return String.fromCharCode(code - 0x1D400 + 65);
-        }
-        if (code >= 0x1D41A && code <= 0x1D433) {
-            return String.fromCharCode(code - 0x1D41A + 97);
-        }
+        if (code >= 0x1D400 && code <= 0x1D419) return String.fromCharCode(code - 0x1D400 + 65);
+        if (code >= 0x1D41A && code <= 0x1D433) return String.fromCharCode(code - 0x1D41A + 97);
         return match;
     });
 
     result = result.replace(/[\u{1D608}-\u{1D63B}]/gu, function(match) {
         const code = match.codePointAt(0);
-        if (code >= 0x1D608 && code <= 0x1D621) {
-            return String.fromCharCode(code - 0x1D608 + 65);
-        }
-        if (code >= 0x1D622 && code <= 0x1D63B) {
-            return String.fromCharCode(code - 0x1D622 + 97);
-        }
+        if (code >= 0x1D608 && code <= 0x1D621) return String.fromCharCode(code - 0x1D608 + 65);
+        if (code >= 0x1D622 && code <= 0x1D63B) return String.fromCharCode(code - 0x1D622 + 97);
         return match;
     });
 
