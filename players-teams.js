@@ -1,116 +1,423 @@
-// =========================================================
-// players-teams.js — Finalissima League
-// توزيع 187 مدير على 20 منتخب
-// =========================================================
+/* =========================================================
+   players-teams.js — FINALISSIMA LEAGUE CHAT
+   الدفعة 1: Argentina → Croatia
+========================================================= */
 
 const PLAYERS_TEAMS = {
 
     "Argentina": [
-        "Ali X Y H", "Yousef Haider", "Hashim AL-Lamy", "Ali Daheer", "عمر فاروق",
-        "سـبيشل وان", "بوفازعه الحبوني", "BENO .", "Mohammed Adel", "Mohammed Regli"
+        "Ali Sm",
+        "Hashim AL-Lamy",
+        "Sfcb 9",
+        "Salah Altaay",
+        "Ali Saif",
+        "H A",
+        "Zz O",
+        "Mohammed Alaa",
+        "Mohamed Baqer",
+        "Salah Alani",
+        "MESSI THE GOAT",
+        "Mohammed Ahmed",
+        "Al-Hassan Ali"
     ],
 
     "Belgium": [
-        "M0hamed Al-Asadi", "Yaseen X", "JÜRGEN -", "Cold Mohammed", "Ali Mohammed",
-        "baqer sattar", "sajad alazawy", "Karar Haider", "Haider Sadeq"
+        "محمد باقر ستار",
+        "George Ramsn",
+        "hassan Belgium",
+        "Durgham BEL",
+        "Bel Laith",
+        "sir brhm",
+        "The Phenomenon",
+        "Aisen Bel",
+        "Mojtaba Altimime",
+        "MoAli Belgium",
+        "Yousif mohamed",
+        "Yousif Bel",
+        "Hussein Adil"
     ],
 
     "Brazil": [
-        "Mohsen Hadi", "محمد باقر ستار", "haedr thamir", "Martin RMA", "alhassan haaland",
-        "FPL FAKE", "Abbas Abbas", "hamza -f", "حساب احتياطي"
+        "Ezolite e",
+        "مصطفى أحمد",
+        "haider muslim",
+        "Mohammed Falah",
+        "muktar mohammed",
+        "Anas Ghanem",
+        "Ridha Mohammed",
+        "Abu al3bi",
+        "elaga 7",
+        "MOHAMMED NED",
+        "Radawy",
+        "The Gunners",
+        "HASSAN LOTHBROK 👑"
     ],
 
     "Colombia": [
-        "XABI ZAIN", "Ali Saif", "CHE -", "Durgham BEL", "Mujtaba Ali",
-        "Mohammed Nader", "hassan salman", "Abdalla A.", "م. محمد الدليمي"
+        "Haider Sadeq",
+        "haedr thamir",
+        "Ahmed Husham",
+        "3le 3le",
+        "-- --",
+        "ali hassan",
+        "حسن طالب",
+        "sufyan alazi",
+        "MOSTAFA Mansour26",
+        "Ahmed Raed",
+        "eng. Huthayfa",
+        "Mustafa Qasm",
+        "Ahmed Ali"
     ],
 
     "Croatia": [
-        "MOHAMED ALSAADE", "Maher Qasem", "حيدر علي", "Brhm jose", "H A",
-        "Apex Star", "Mohammed Nawras", "Zz O", "AHMED RIYADH"
-    ],
+        "Yousef Haider",
+        "Baqer Alhilfi",
+        "Mustafa Sardar",
+        "ALi Ghazi",
+        "Izzat Ali",
+        "Mohmmed Hussein",
+        "MUSTAFA WW",
+        "Mahmoud Iq",
+        "mohammed alshwali",
+        "Mena Kadhem",
+        "Yas One",
+        "BASHER LM10"
+    ]
+
+    // ⏳ الدفعة 2 تكمل من هنا (England → Italy)
+};
+,
 
     "England": [
-        "احمد مهند", "Abbas Modhafer", "sir brhm", "krar Tarq", "Sajad Basem",
-        "Ali ARS", "علي هادي", "Mohammed i", "IRAQ - ARS"
+        "sajad alazawy 🐐🐐",
+        "يُوسـف أَزهـر دّاخِـل A",
+        "IG ali-cts2",
+        "Sajad Abbas",
+        "مرتضى مطشر",
+        "ahmed M",
+        "حسن آل تالي",
+        "Hassan Salam",
+        "Ahmed .",
+        "Fantasy King",
+        "khalid abdullah",
+        "𝙷𝙰𝚂𝚂𝙰𝙽 𝙰𝙳𝙽𝙰𝙽 --",
+        "I BAQERENO"
     ],
 
     "Germany": [
-        "Mohammed Abd", "Mohammed Alaa", "The Phenomenon", "star ahmed", "Mustafa مانشستر زرقاء",
-        "mostfa mostfa", "Saif Hameed", "Moamal Ahmed", "Haider Albayati"
+        "JÜRGEN -",
+        "Brhm jose",
+        "Ahmed Akram",
+        "Abdullah Al-saray",
+        "ali qassim",
+        "Mokhled M",
+        "Ali Akbr Wissam",
+        "Yaseen Al-Ezi",
+        "MOAMAL GOAT",
+        "Sajad Ahmed",
+        "mustfa zwraa",
+        "abdalla alzawi",
+        "وسام الراوي"
     ],
 
     "Greece": [
-        "Laith CR7. Ghalib", "المــو صـلاح .", "Ahmed Amer", "يُوسـف أَزهـر دّاخِـل A", "Ahmed Husham",
-        "Muhamed .", "IG ali-cts2", "Sajad Abbas", "ALi Ghazi"
+        "Moamal Ahmed",
+        "Muhamed .",
+        "محمد الاسدي",
+        "علي رضا",
+        "karm karm",
+        "Baqer Emad",
+        "Yousef Hameed",
+        "Karar Ghasan",
+        "IBRAHIM -",
+        "Zhra J",
+        "Dhurgham maher",
+        "مـحمـد حـيـدر 🇮🇶",
+        "Omar Amer"
     ],
 
     "Hungary": [
-        "Ahmed Akram", "Yousif Abbas", "3le 3le", "محمد الاسدي", "Youssif Mustafa",
-        "Fc Mohammed", "Salah Alani", "Mohammed Ryad", "علي رضا"
+        "Mohamed Khalid",
+        "IRAQ - ARS",
+        "Karrar Saad",
+        "Abbas Uday",
+        "Abdullah Aldoury",
+        "Ibrahim Omar",
+        "M A",
+        "جاسم جلاق",
+        "Mo Ah",
+        "Ōz .",
+        "hussein abbas10",
+        "Chelsea M",
+        "Diyar Nemo"
     ],
 
     "Italy": [
-        "Mohammed smko Mustafa", "Amjad Abbas", "Mohmmed Hussein", "karm karm", "MoAli Belgium",
-        "Abdullah Aldoury", "-- --", "Mohammed Falah", "Mustafa Jafar"
-    ],
+        "@ c5e_4",
+        "بوجهك مساكين وبظهرك سجاجين -",
+        "mustafa jbr",
+        "Mustafa Ali",
+        "Karrar H",
+        "Othman flick",
+        "Ali NAJM❤️",
+        "H cr",
+        "Ammar --",
+        "abbas ars",
+        "حيدر ميثم",
+        "عباس سعد"
+    ]
+
+    // ⏳ الدفعة 3 تكمل من هنا (Mexico → Serbia)
+,
 
     "Mexico": [
-        "Alfaruq Maad", "SAJAD HASSAN", "Baqer Emad", "MUSTAFA WW", "Mohammed Ahmed",
-        "Abdullah Al-saray", "ali hassan", "Mahmood Abbas", "Ibrahim Omar"
+        "Toffee Kettana",
+        "Cold Mohammed",
+        "Mohamed Osama",
+        "Yasser Qais",
+        "Ali Hamed",
+        "Abbas Felix",
+        "jaime Lannister",
+        "Mohammed i",
+        "Abdulrahman ALAhmed",
+        "Muqtada Fernandes",
+        "Mustafa Aqeel",
+        "Ali Jaf",
+        "Sir Sadiq"
     ],
 
     "Netherlands": [
-        "ali qassim", "Mokhled M", "Abbas Kareem", "komael Ali", "Abbas hani",
-        "احمد محمد", "𝖬𝖺𝗁𝖽𝗂 𝖠𝗁𝗆𝖾𝖽", "Ridha Mohammed", "SAJAD Al- Moussawi"
+        "سـبيشل وان",
+        "M0hamed Al-Asadi",
+        "Abbas Abbas",
+        "CHE -",
+        "م. محمد الدليمي",
+        "حيدر علي",
+        "ali Mohammed",
+        "المــو صـلاح .",
+        "Mustafa Jafar",
+        "Alfaruq Maad",
+        "SAJAD Al- Moussawi",
+        "Ahmed Radhi",
+        "Moktada T"
     ],
 
     "Norway": [
-        "Ali Akbr Wissam", "Yousef Hameed", "ahmed dawood", "Karar Ghasan", "MoAMl l",
-        "Yaseen Al-Ezi", "sohaep muthana", "MOHEMN FADEL", "NO ONE BUT ME", "mohammed alshwali"
+        "Ali Daheer",
+        "BENO .",
+        "XABI ZAIN",
+        "haider kanon",
+        "Apex Star",
+        "AHMED RIYADH",
+        "krar Tarq 🇮🇶",
+        "Al-hussien Ali",
+        "Fc Mohammed",
+        "Mohammed smko Mustafa",
+        "Sir Alex Ali Alwash",
+        "ahmed dawood",
+        "صوفي 🇮🇶"
     ],
 
     "Russia": [
-        "صوفي", "MOAMAL GOAT", "حسن طالب", "M A", "ADEL ALMADREDE",
-        "YOYO GOGO", "Ahmed Radhi", "مرتضى مطشر", "Yousif Ihsan"
+        "Blal  Abd",
+        "Ali Mohammed",
+        "Mohsen Hadi",
+        "Martin RMA",
+        "Mujtaba Ali",
+        "Abdalla A.",
+        "Mustafa مانشستر زرقاء",
+        "Haider Albayati",
+        "Sir  Adel",
+        "sohaep muthana",
+        "Ghazali Badr",
+        "hamza Al-Azirjawi",
+        "Murtaza Shaker"
     ],
 
     "Serbia": [
-        "ilias zaa", "IBRAHIM -", "ammar 7", "Al-Hassan Ali", "ahmed M",
-        "حسن آل تالي", "Zhra J", "Karrar Bassem", "Rihda alkhafaji"
-    ],
+        "baqer sattar",
+        "Ammar Farhan",
+        "سيد محمد Altaweel",
+        "Mohammed Nawras",
+        "Mohammed Ryad",
+        "Muntadher Silawi",
+        "Sameer Mohammed",
+        "AB . Mahdi",
+        "SAJAD HASSAN",
+        "ꋊꄲꄲꇙ 4",
+        "Mohamed Abbas 🇮🇶",
+        "abobaker Ahmed",
+        "ali mohammed"
+    ]
+
+    // ⏳ الدفعة 4 تكمل من هنا (Spain → Venezuela)
+,
 
     "Spain": [
-        "sufyan alazi", "Sama Mhmd", "Mohamed Mustafa", "ABDULLAH JALAL", "Mohamed Jasim",
-        "Farah Mohammed", "ali aloka", "Moktada T", "Mo Ah"
+        "MOHEMN FADEL",
+        "ammar 7",
+        "علي العبودي",
+        "Rihda alkhafaji",
+        "ABDULLAH JALAL",
+        "Mohamed Jasim",
+        "AHMED NATTIQ",
+        "Ali Ali Hussein",
+        "baqr Mohammed",
+        "Hussien Tariq",
+        "Mohammed JA",
+        "I am the best",
+        "yuossef yuossef"
     ],
 
     "Switzerland": [
-        "Ōz .", "hamza Al-Azirjawi", "Sajad Ahmed", "AHMED NATTIQ", "BASHER LM10",
-        "Murtaza Shaker", "Dhurgham maher", "MOSTAFA Mansour26", "Ahmed Raed"
+        "عمر فاروق",
+        "Mohammed Adel",
+        "Mohammed Regli",
+        "alhassan haaland",
+        "Hussein sattar",
+        "احمد مهند",
+        "علي هادي",
+        "Mohammed Abd",
+        "star ahmed",
+        "Ahmed Amer",
+        "komael Ali",
+        "ADEL ALMADREDE"
     ],
 
     "Turkey": [
-        "Monti Mousawi", "Ahmed .", "HASSAN LOTHBROK", "baqr Mohammed", "Fantasy King",
-        "ali mohammed", "mustfa zwraa", "رحيم المياحي", "Omar Amer"
+        "Karar Haider",
+        "hassan salman",
+        "Maher Qasem",
+        "Sajad Basem",
+        "Amjad Abbas",
+        "Mahmood Abbas",
+        "Abbas hani",
+        "احمد محمد",
+        "𝖬𝖺𝗁𝖽𝗂 𝖠𝗁𝗆𝖾𝖽",
+        "NO ONE BUT ME",
+        "Farah Mohammed",
+        "hashimkhalid 5",
+        "Haider Ali"
     ],
 
     "Uruguay": [
-        "Fadi Nazar", "khalid abdullah", "hashimkhalid 5", "eng. Huthayfa", "Hussein Adil",
-        "Sir Sadiq", "Sura Ammar", "Mustafa Qasm", "Haider Ali", "Hussien Tariq"
+        "بوفازعه الحبوني",
+        "FPL FAKE",
+        "Abbas Modhafer",
+        "mostfa mostfa",
+        "Laith CR7. Ghalib",
+        "Abbas Kareem",
+        "YOYO GOGO",
+        "Yousif Ihsan",
+        "ilias zaa",
+        "رحيم المياحي",
+        "Fadi Nazar",
+        "علي قيصر عزيز .",
+        "SAGAD1 SAGAD1"
     ],
 
     "Venezuela": [
-        "Mohammed JA", "Ahmed Ali", "Ahad Hussein", "hussein abbas10", "سجاد وليد",
-        "I BAQERENO", "abdalla alzawi", "yuossef yuossef", "علي قيصر عزيز .",
-        "SAGAD1 SAGAD1", "وسام الراوي", "Mustafa Salam", "Al Hassan Al mujtaba"
+        "Ali Faisal",
+        "Mohammed  Nader",
+        "وليد خالد",
+        "MOHAMED ALSAADE",
+        "Ali ARS",
+        "Saif Hameed",
+        "Mustafa Jabbar",
+        "Yousif Abbas",
+        "Youssif Mustafa",
+        "Hasan Bashar",
+        "Karrar Bassem",
+        "Sama Mhmd",
+        "ali aloka"
     ]
 
 };
 
-// =========================================================
-// شعارات المنتخبات (سنستخدم الأعلام لاحقاً)
-// =========================================================
+
+/* =========================================================
+   NORMALIZE PLAYER NAME
+========================================================= */
+
+function normalizePlayerName(name) {
+
+    if (!name) return '';
+
+    let result = name;
+
+    /* تحويل الحروف المزخرفة */
+    result = result.replace(/[\u{1D538}-\u{1D56B}]/gu, function(match) {
+        const code = match.codePointAt(0);
+        if (code >= 0x1D538 && code <= 0x1D551) {
+            return String.fromCharCode(code - 0x1D538 + 65);
+        }
+        if (code >= 0x1D552 && code <= 0x1D56B) {
+            return String.fromCharCode(code - 0x1D552 + 97);
+        }
+        return match;
+    });
+
+    result = result.replace(/[\u{1D400}-\u{1D433}]/gu, function(match) {
+        const code = match.codePointAt(0);
+        if (code >= 0x1D400 && code <= 0x1D419) {
+            return String.fromCharCode(code - 0x1D400 + 65);
+        }
+        if (code >= 0x1D41A && code <= 0x1D433) {
+            return String.fromCharCode(code - 0x1D41A + 97);
+        }
+        return match;
+    });
+
+    result = result.replace(/[\u{1D608}-\u{1D63B}]/gu, function(match) {
+        const code = match.codePointAt(0);
+        if (code >= 0x1D608 && code <= 0x1D621) {
+            return String.fromCharCode(code - 0x1D608 + 65);
+        }
+        if (code >= 0x1D622 && code <= 0x1D63B) {
+            return String.fromCharCode(code - 0x1D622 + 97);
+        }
+        return match;
+    });
+
+    /* حذف الإيموجي */
+    result = result
+        .replace(/[\u{1F1E6}-\u{1F1FF}]/gu, '')
+        .replace(/[\u{1F300}-\u{1F9FF}]/gu, '')
+        .replace(/[\u{2600}-\u{27BF}]/gu, '')
+        .replace(/[\u{FE00}-\u{FE0F}]/gu, '');
+
+    /* توحيد المسافات + lowercase */
+    result = result.replace(/\s+/g, ' ').trim().toLowerCase();
+
+    return result;
+}
+
+
+/* =========================================================
+   FIND PLAYER TEAM
+========================================================= */
+
+function findPlayerTeam(playerName) {
+    if (!playerName) return null;
+    const cleanName = normalizePlayerName(playerName);
+
+    for (const team in PLAYERS_TEAMS) {
+        const players = PLAYERS_TEAMS[team];
+        for (let i = 0; i < players.length; i++) {
+            const player = normalizePlayerName(players[i]);
+            if (player === cleanName) {
+                return team;
+            }
+        }
+    }
+
+    return null;
+}
+
+
+/* =========================================================
+   TEAMS LOGOS
+========================================================= */
 
 const TEAMS_LOGOS = {
     "Argentina":   "argentina.png",
@@ -135,25 +442,40 @@ const TEAMS_LOGOS = {
     "Venezuela":   "venezuela.png"
 };
 
-// =========================================================
-// دالة: عدد المديرين في كل منتخب
-// =========================================================
 
-function getManagerCount(teamName) {
-    const list = PLAYERS_TEAMS[teamName];
-    return list ? list.length : 0;
-}
+/* =========================================================
+   TEAMS SHIRTS
+========================================================= */
 
-// =========================================================
-// دالة: كل المديرين في مصفوفة واحدة
-// =========================================================
+const TEAMS_SHIRTS = {
+    "Argentina":   { file: "argentina-shirt.png",   scale: 1 },
+    "Belgium":     { file: "belgium-shirt.png",     scale: 1 },
+    "Brazil":      { file: "brazil-shirt.png",      scale: 1 },
+    "Colombia":    { file: "colombia-shirt.png",    scale: 1 },
+    "Croatia":     { file: "croatia-shirt.png",     scale: 1 },
+    "England":     { file: "england-shirt.png",     scale: 1 },
+    "Germany":     { file: "germany-shirt.png",     scale: 1 },
+    "Greece":      { file: "greece-shirt.png",      scale: 1 },
+    "Hungary":     { file: "hungary-shirt.png",     scale: 1 },
+    "Italy":       { file: "italy-shirt.png",       scale: 1 },
+    "Mexico":      { file: "mexico-shirt.png",      scale: 1 },
+    "Netherlands": { file: "netherlands-shirt.png", scale: 1 },
+    "Norway":      { file: "norway-shirt.png",      scale: 1 },
+    "Russia":      { file: "russia-shirt.png",      scale: 1 },
+    "Serbia":      { file: "serbia-shirt.png",      scale: 1 },
+    "Spain":       { file: "spain-shirt.png",       scale: 1 },
+    "Switzerland": { file: "switzerland-shirt.png", scale: 1 },
+    "Turkey":      { file: "turkey-shirt.png",      scale: 1 },
+    "Uruguay":     { file: "uruguay-shirt.png",     scale: 1 },
+    "Venezuela":   { file: "venezuela-shirt.png",   scale: 1 }
+};
 
-function getAllManagersList() {
-    const all = [];
-    Object.keys(PLAYERS_TEAMS).forEach(function(team) {
-        PLAYERS_TEAMS[team].forEach(function(manager) {
-            all.push({ team: team, name: manager });
-        });
-    });
-    return all;
+
+/* =========================================================
+   GET SHIRT BY TEAM
+========================================================= */
+
+function getShirtForTeam(teamName) {
+    if (!teamName) return null;
+    return TEAMS_SHIRTS[teamName] || null;
 }
