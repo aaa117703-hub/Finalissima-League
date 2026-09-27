@@ -1,8 +1,5 @@
 /* =========================================================
-   locks.js — v18
-   - إصلاح: إدارة المديرين والأندية في الإعدادات
-   - إضافة: restoreSettingsContent() ترجع العناصر
-   - إضافة: استدعاء مباشر لـ mhInit و loadClubs
+   locks.js — FINALISSIMA LEAGUE CHAT
 ========================================================= */
 
 window.sectionLocks = {
@@ -25,28 +22,26 @@ const SETTINGS_PIN = '024680';
 
 const SECTIONS = [
     { key: 'fixtures',  label: 'المواجهات',  icon: '⚽' },
-    { key: 'standings', label: 'الترتيب',    icon: '🏆' },
-    { key: 'totw',      label: 'TOTW',       icon: '⭐' },
-    { key: 'stats',     label: 'الإحصائيات', icon: '📊' }
+    { key: 'standings', label: 'الترتيب',    icon: '📊' },
+    { key: 'totw',      label: 'التشكيلة',   icon: '⭐' },
+    { key: 'stats',     label: 'الإحصائيات', icon: '📈' }
 ];
-
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
 function isAdmin() {
-    return localStorage.getItem('tg_admin') === 'true';
+    return localStorage.getItem('fin_admin') === 'true';
 }
 
 function isLocker() {
-    return sessionStorage.getItem('tg_locker') === 'true';
+    return sessionStorage.getItem('fin_locker') === 'true';
 }
 
 function canBypassLocks() {
     return isLocker() || isAdmin();
 }
-
 
 /* =========================================================
    LOAD / SAVE LOCKS
@@ -77,7 +72,6 @@ async function loadLocks() {
     }
 }
 
-
 async function saveLock(section, isLocked) {
     if (!window.sbClient) return false;
 
@@ -106,11 +100,9 @@ async function saveLock(section, isLocked) {
     }
 }
 
-
 function isLocked(section) {
     return window.sectionLocks[section] === true;
 }
-
 
 /* =========================================================
    MAINTENANCE SCREEN
@@ -131,18 +123,16 @@ function showSectionMaintenance(sectionName) {
             '<h2>الموقع في حالة صيانة</h2>' +
             '<p>قسم ' + sectionName + ' قيد الصيانة حالياً</p>' +
             '<p style="font-size:12px;color:#888;margin-top:8px;">نرجع لكم قريباً</p>' +
-            '<div class="maint-team">TELEGRAM GOAT 🐐</div>' +
+            '<div class="maint-team">FINALISSIMA LEAGUE 🏆</div>' +
         '</div>';
 
     overlay.classList.add('show');
 }
 
-
 function hideSectionMaintenance() {
     const overlay = document.getElementById('sectionMaintenance');
     if (overlay) overlay.classList.remove('show');
 }
-
 
 /* =========================================================
    SETTINGS — فتح مع PIN
@@ -161,61 +151,44 @@ function openSettingsWithPin() {
     openSettingsMain();
 }
 
-
 function openSettingsModal() {
     const modal = document.getElementById('settingsModal');
     if (modal) modal.classList.add('show');
 }
 
-
 function closeSettingsModal() {
-    // ⭐ رجّع العناصر المنقولة قبل الإغلاق
     restoreSettingsContent();
-
     const modal = document.getElementById('settingsModal');
     if (modal) modal.classList.remove('show');
 }
 
-
 /* =========================================================
-   إرجاع العناصر المنقولة لمكانها الأصلي
+   إرجاع العناصر المنقولة
 ========================================================= */
 
 function restoreSettingsContent() {
-
-    // --- mhContent ---
     const mhContent = document.getElementById('mhContent');
     if (mhContent) {
         const originalParent = document.getElementById('statsView-managers');
         const settingsContainer = document.getElementById('settings-managers-content');
-
-        // إذا هو داخل الإعدادات → رجّعه
         if (settingsContainer && settingsContainer.contains(mhContent)) {
-            if (originalParent) {
-                originalParent.appendChild(mhContent);
-            }
+            if (originalParent) originalParent.appendChild(mhContent);
         }
     }
 
-    // --- clubsList ---
     const clubsList = document.getElementById('clubsList');
     if (clubsList) {
         const originalParent = document.getElementById('statsView-clubs');
         const settingsContainer = document.getElementById('settings-clubs-content');
-
         if (settingsContainer && settingsContainer.contains(clubsList)) {
-            if (originalParent) {
-                originalParent.appendChild(clubsList);
-            }
+            if (originalParent) originalParent.appendChild(clubsList);
         }
     }
 
-    // --- clubs-controls (زر التعديل) ---
     const clubsControls = document.querySelector('.clubs-controls');
     if (clubsControls) {
         const originalParent = document.getElementById('statsView-clubs');
         const settingsContainer = document.getElementById('settings-clubs-content');
-
         if (settingsContainer && settingsContainer.contains(clubsControls)) {
             if (originalParent) {
                 const list = document.getElementById('clubsList');
@@ -229,13 +202,11 @@ function restoreSettingsContent() {
     }
 }
 
-
 /* =========================================================
    SETTINGS — القائمة الرئيسية
 ========================================================= */
 
 function openSettingsMain() {
-    // ⭐ رجّع أي عنصر منقول قبل عرض القائمة
     restoreSettingsContent();
 
     const body = document.getElementById('settingsBody');
@@ -247,8 +218,8 @@ function openSettingsMain() {
             '<span class="si-label">إدارة المديرين</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsClubs()">' +
-            '<span class="si-icon">🏟️</span>' +
-            '<span class="si-label">إدارة الأندية</span>' +
+            '<span class="si-icon">🏆</span>' +
+            '<span class="si-label">إدارة المنتخبات</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsLocks()">' +
             '<span class="si-icon">🔐</span>' +
@@ -258,11 +229,10 @@ function openSettingsMain() {
             '<span class="si-icon">🔧</span>' +
             '<span class="si-label">وضع الصيانة</span>' +
         '</button>' +
-        '<div class="settings-hint">TELEGRAM GOAT 🐐</div>';
+        '<div class="settings-hint">FINALISSIMA LEAGUE CHAT 🏆</div>';
 
     openSettingsModal();
 }
-
 
 /* =========================================================
    SETTINGS — إدارة المديرين
@@ -281,23 +251,19 @@ function openSettingsManagers() {
         '</button>' +
         '<div id="settings-managers-content" class="settings-embed"></div>';
 
-    // ⭐ شغّل manager-hub
     if (typeof window.mhInit === 'function') {
         try { window.mhInit(); } catch (e) { console.warn('[Settings] mhInit error:', e); }
     }
 
-    // ⭐ انتظر ثم انقل
     let attempts = 0;
     const tryMove = function() {
         attempts++;
         const mhContent = document.getElementById('mhContent');
         const container = document.getElementById('settings-managers-content');
 
-        if (!container) return; // المستخدم رجع للقائمة الرئيسية
+        if (!container) return;
 
         if (mhContent && container && !container.contains(mhContent)) {
-
-            // تأكد أن UI جاهز (مو Loading فقط)
             const isLoading = mhContent.querySelector('.mh-loading') !== null;
             const hasContent = mhContent.innerHTML.trim() !== '';
 
@@ -307,16 +273,13 @@ function openSettingsManagers() {
             }
         }
 
-        if (attempts < 20) {
-            setTimeout(tryMove, 250);
-        }
+        if (attempts < 20) setTimeout(tryMove, 250);
     };
     tryMove();
 }
 
-
 /* =========================================================
-   SETTINGS — إدارة الأندية
+   SETTINGS — إدارة المنتخبات
 ========================================================= */
 
 function openSettingsClubs() {
@@ -332,12 +295,10 @@ function openSettingsClubs() {
         '</button>' +
         '<div id="settings-clubs-content" class="settings-embed"></div>';
 
-    // ⭐ شغّل clubs
     if (typeof loadClubs === 'function') {
         try { loadClubs(); } catch (e) { console.warn('[Settings] loadClubs error:', e); }
     }
 
-    // ⭐ انتظر ثم انقل
     let attempts = 0;
     const tryMove = function() {
         attempts++;
@@ -345,10 +306,9 @@ function openSettingsClubs() {
         const clubsControls = document.querySelector('.clubs-controls');
         const container = document.getElementById('settings-clubs-content');
 
-        if (!container) return; // المستخدم رجع
+        if (!container) return;
 
         if (clubsList && container && !container.contains(clubsList)) {
-
             const hasContent = clubsList.innerHTML.trim() !== '';
             const hasEmpty = clubsList.querySelector('.clubs-empty') !== null;
 
@@ -359,13 +319,10 @@ function openSettingsClubs() {
             }
         }
 
-        if (attempts < 20) {
-            setTimeout(tryMove, 250);
-        }
+        if (attempts < 20) setTimeout(tryMove, 250);
     };
     tryMove();
 }
-
 
 /* =========================================================
    SETTINGS — قفل الأقسام
@@ -409,7 +366,6 @@ function openSettingsLocks() {
         itemsHtml;
 }
 
-
 async function toggleLockFromSettings(sectionKey) {
     const current = isLocked(sectionKey);
     const newState = !current;
@@ -437,7 +393,6 @@ async function toggleLockFromSettings(sectionKey) {
         if (typeof showToast === 'function') showToast('فشل الحفظ', false, 3000);
     }
 }
-
 
 /* =========================================================
    SETTINGS — الصيانة
@@ -467,20 +422,16 @@ function openSettingsMaintenance() {
         '</button>';
 }
 
-
 async function activateMaintenance() {
     const pass = prompt('أدخل رمز التأكيد:');
     if (pass !== LOCK_PIN) {
-        if (pass !== null && typeof showToast === 'function') {
-            showToast('الرمز غلط', false, 2500);
-        }
+        if (pass !== null && typeof showToast === 'function') showToast('الرمز غلط', false, 2500);
         return;
     }
 
     if (typeof showToast === 'function') showToast('جاري التفعيل...', false, 30000);
 
     let allOk = true;
-
     for (let i = 0; i < SECTIONS.length; i++) {
         const ok = await saveLock(SECTIONS[i].key, true);
         if (!ok) allOk = false;
@@ -495,20 +446,16 @@ async function activateMaintenance() {
     openSettingsMaintenance();
 }
 
-
 async function deactivateMaintenance() {
     const pass = prompt('أدخل رمز التأكيد:');
     if (pass !== LOCK_PIN) {
-        if (pass !== null && typeof showToast === 'function') {
-            showToast('الرمز غلط', false, 2500);
-        }
+        if (pass !== null && typeof showToast === 'function') showToast('الرمز غلط', false, 2500);
         return;
     }
 
     if (typeof showToast === 'function') showToast('جاري الإلغاء...', false, 30000);
 
     let allOk = true;
-
     for (let i = 0; i < SECTIONS.length; i++) {
         const ok = await saveLock(SECTIONS[i].key, false);
         if (!ok) allOk = false;
@@ -523,16 +470,14 @@ async function deactivateMaintenance() {
     openSettingsMaintenance();
 }
 
-
 /* =========================================================
    INIT
 ========================================================= */
 
 async function initLockSystem() {
-    localStorage.removeItem('tg_locker');
+    localStorage.removeItem('fin_locker');
     await loadLocks();
 }
-
 
 window.openSettingsWithPin = openSettingsWithPin;
 window.openSettingsModal = openSettingsModal;
@@ -546,3 +491,7 @@ window.toggleLockFromSettings = toggleLockFromSettings;
 window.activateMaintenance = activateMaintenance;
 window.deactivateMaintenance = deactivateMaintenance;
 window.restoreSettingsContent = restoreSettingsContent;
+window.isLocked = isLocked;
+window.isAdmin = isAdmin;
+window.showSectionMaintenance = showSectionMaintenance;
+window.hideSectionMaintenance = hideSectionMaintenance;
