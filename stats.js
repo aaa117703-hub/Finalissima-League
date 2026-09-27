@@ -11,6 +11,17 @@ let statsRankMap = {};
 let statsLoaded = false;
 let statsComputed = null;
 
+/* ⭐ استخدام cleanDisplayName */
+function statsDisplayName(name) {
+    if (typeof cleanDisplayName === 'function') {
+        return cleanDisplayName(name, 13);
+    }
+    if (!name) return '';
+    const result = String(name).trim();
+    if (result.length <= 13) return result;
+    return result.substring(0, 13);
+}
+
 async function fetchAllManagersForStats() {
     if (typeof getAllManagersCached === 'function') {
         return await getAllManagersCached();
@@ -81,7 +92,7 @@ function computeLeagueStats(managers) {
 
 function createStatsRow(rank, manager, value, valueLabel) {
     const rawName = manager.player_name || manager.entry_name || 'Unknown';
-    const entryName = manager.entry_name || '';
+    const displayName = statsDisplayName(rawName);
 
     let teamName = '';
     if (typeof findPlayerTeam === 'function') {
@@ -113,8 +124,8 @@ function createStatsRow(rank, manager, value, valueLabel) {
         '<div class="stats-rank ' + rankClass + '">' + rank + '</div>' +
         logoHtml +
         '<div class="stats-row-names">' +
-            '<div class="stats-row-entry">' + (entryName || rawName) + '</div>' +
-            '<div class="stats-row-player">' + rawName + '</div>' +
+            '<div class="stats-row-entry">' + displayName + '</div>' +
+            '<div class="stats-row-player">' + (teamName || '') + '</div>' +
         '</div>' +
         '<div class="stats-row-value">' +
             '<div class="stats-row-value-num">' + value + '</div>' +
@@ -166,7 +177,7 @@ function renderStatsRecords(stats) {
         cards.push({
             label: 'Highest GW',
             value: stats.highestEvent,
-            name: m.player_name || m.entry_name,
+            name: statsDisplayName(m.player_name || m.entry_name),
             color: 'gold'
         });
     }
@@ -176,7 +187,7 @@ function renderStatsRecords(stats) {
         cards.push({
             label: 'Top Total',
             value: stats.highestTotal,
-            name: m.player_name || m.entry_name,
+            name: statsDisplayName(m.player_name || m.entry_name),
             color: 'gold'
         });
     }
@@ -254,7 +265,7 @@ function renderSearchResults(results) {
 
     results.forEach(function(m) {
         const rawName = m.player_name || m.entry_name || '';
-        const entryName = m.entry_name || '';
+        const displayName = statsDisplayName(rawName);
         const rank = getRankForEntry(m.entry);
 
         let teamName = '';
@@ -275,8 +286,8 @@ function renderSearchResults(results) {
             '<div class="stats-search-rank">#' + rank + '</div>' +
             logoHtml +
             '<div class="stats-search-names">' +
-                '<div class="stats-search-entry">' + (entryName || rawName) + '</div>' +
-                '<div class="stats-search-player">' + rawName + '</div>' +
+                '<div class="stats-search-entry">' + displayName + '</div>' +
+                '<div class="stats-search-player">' + (teamName || rawName) + '</div>' +
             '</div>' +
             '<div class="stats-search-total">' + (m.total || 0) + '</div>';
 
@@ -293,7 +304,7 @@ function renderManagerProfile(manager) {
     if (!container) return;
 
     const rawName = manager.player_name || manager.entry_name || '';
-    const entryName = manager.entry_name || '';
+    const displayName = statsDisplayName(rawName);
 
     const rank = getRankForEntry(manager.entry);
     const safeRank = rank > 0 ? rank : 0;
@@ -328,8 +339,8 @@ function renderManagerProfile(manager) {
             '<button class="stats-profile-close" onclick="document.getElementById(\'statsProfile\').style.display=\'none\'">X</button>' +
             '<div class="stats-profile-rank-badge">#' + safeRank + '</div>' +
             '<div class="stats-profile-shirt">' + logoHtml + '</div>' +
-            '<div class="stats-profile-entry">' + (entryName || rawName) + '</div>' +
-            '<div class="stats-profile-player">' + rawName + '</div>' +
+            '<div class="stats-profile-entry">' + displayName + '</div>' +
+            '<div class="stats-profile-player">' + (teamName || rawName) + '</div>' +
             (teamName ? '<div class="stats-profile-team">' + teamName + '</div>' : '') +
             '<div class="stats-profile-stats">' +
                 '<div class="stats-profile-stat stats-stat-total"><div class="stats-stat-label">Total</div><div class="stats-stat-value">' + (manager.total || 0) + '</div></div>' +
