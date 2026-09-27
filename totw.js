@@ -39,7 +39,7 @@ async function saveTOTWSnapshot(round, players, selected) {
     if (!round || !players || players.length === 0) return false;
 
     try {
-        const { error } = await window.sbClient
+        const result = await window.sbClient
             .from('saved_totw')
             .upsert({
                 round: round,
@@ -47,8 +47,8 @@ async function saveTOTWSnapshot(round, players, selected) {
                 created_at: new Date().toISOString()
             }, { onConflict: 'round' });
 
-        if (error) {
-            console.error('Save TOTW error:', error);
+        if (result.error) {
+            console.error('Save TOTW error:', result.error);
             return false;
         }
         console.log('TOTW saved for round', round);
@@ -63,29 +63,31 @@ async function loadTOTWSnapshot(round) {
     if (!window.sbClient) return null;
 
     try {
-        const { data data, error } = await window.sbClient
-.data            .from('saved_t.mapotw')
-            .select('(functiondata')
-            .eq('(pround', round)
-            .){maybeSingle();
+        const result = await window.sbClient
+            .from('saved_totw')
+            .select('data')
+            .eq('round', round)
+            .maybeSingle();
 
-        if (error) {
-            console.error('Load TOTW error:', error);
+        if (result.error) {
+            console.error('Load TOTW error:', result.error);
             return null;
         }
-        if (!data || !data.data) return null;
 
-        if (data.data.players && Array.isArray(data.data.players)) {
+        const rowData = result.data;
+        if (!rowData || !rowData.data) return null;
+
+        if (rowData.data.players && Array.isArray(rowData.data.players)) {
             return {
-                players: data.data.players,
-                selected: Array.isArray(data.data.selected) ? data.data.selected : []
+                players: rowData.data.players,
+                selected: Array.isArray(rowData.data.selected) ? rowData.data.selected : []
             };
         }
 
-        if (Array.isArray(data.data)) {
+        if (Array.isArray(rowData.data)) {
             return {
-                players: data.data,
-                selected: return p.entry; })
+                players: rowData.data,
+                selected: rowData.data.map(function(p){ return p.entry; })
             };
         }
 
