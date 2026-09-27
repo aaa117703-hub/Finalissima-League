@@ -1,0 +1,608 @@
+/* =========================================================
+   totw.css — v30
+   - إصلاح: حذف الحافة الخضراء المضيئة
+   - إصلاح: List grid (6 columns متطابقة)
+   - إصلاح: شعارات List بحجم صحيح
+========================================================= */
+
+.totw-tabs{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+    margin-bottom:12px;
+    padding:0 4px;
+}
+
+.totw-tab-btn{
+    padding:6px 22px;
+    background:#FFFFFF;
+    color:#6B7280;
+    border:2px solid #EDE9FE;
+    border-radius:50px;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    cursor:pointer;
+    transition:all .3s ease;
+    font-family:inherit;
+    outline:none;
+}
+
+.totw-tab-btn.active{
+    background:linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    color:#FFFFFF;
+    border-color:#7C3AED;
+    box-shadow:0 4px 14px rgba(124,58,237,.35);
+}
+
+.totw-tab-btn:hover{
+    transform:translateY(-2px);
+    border-color:#A78BFA;
+    color:#7C3AED;
+}
+
+.totw-pitch-wrapper{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    margin-bottom:16px;
+}
+
+/* =========================================================
+   الملعب — حذفنا الحافة الخضراء المضيئة
+========================================================= */
+
+.totw-pitch{
+    position:relative;
+    width:100%;
+    max-width:480px;
+    aspect-ratio:860/1160;
+    background-image:url('./pitch-bg.png');
+    background-size:100% 100%;
+    background-position:center;
+    background-repeat:no-repeat;
+    border:3px solid #5B21B6;
+    border-radius:18px;
+    box-shadow:0 10px 40px rgba(0,0,0,.25);
+    overflow:hidden;
+}
+
+/* =========================================================
+   عنوان TEAM OF THE WEEK — بنفسجي متلاشي
+========================================================= */
+
+.totw-pitch-title{
+    position:absolute;
+    top:12.5%;
+    left:50%;
+    transform:translateX(-50%);
+    color:#ffffff;
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    z-index:5;
+    white-space:nowrap;
+    font-family:inherit;
+    text-align:center;
+    padding:6px 40px;
+    border-radius:0;
+    background:linear-gradient(90deg,
+        rgba(123, 63, 245, 0)    0%,
+        rgba(123, 63, 245, 0.35) 8%,
+        rgba(123, 63, 245, 0.85) 20%,
+        rgba(123, 63, 245, 1)    50%,
+        rgba(123, 63, 245, 0.85) 80%,
+        rgba(123, 63, 245, 0.35) 92%,
+        rgba(123, 63, 245, 0)    100%);
+    box-shadow:none;
+    text-shadow:
+        0 1px 3px rgba(0,0,0,.65),
+        0 0 10px rgba(123, 63, 245, .7);
+}
+
+.totw-pitch-title .gw-label{
+    display:none !important;
+}
+
+.totw-players{
+    position:absolute;
+    inset:0;
+    z-index:2;
+}
+
+/* =========================================================
+   الصفوف
+========================================================= */
+
+.totw-row{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    position:absolute;
+    left:0;
+    right:0;
+}
+
+.totw-row-gk{
+    top:22%;
+    justify-content:center;
+}
+
+.totw-row-def{
+    top:38%;
+    justify-content:space-evenly;
+    padding:0 14%;
+}
+
+.totw-row-mid{
+    top:56%;
+    justify-content:space-evenly;
+    padding:0 4%;
+}
+
+.totw-row-fwd{
+    top:74%;
+    justify-content:space-evenly;
+    padding:0 22%;
+}
+
+/* =========================================================
+   الكرت
+========================================================= */
+
+.totw-card{
+    width:60px;
+    display:flex;
+    flex-direction:column;
+    align-items:stretch;
+    justify-content:flex-start;
+    padding:0;
+    margin:0;
+    position:relative;
+    transition:transform .3s ease;
+    border-radius:4px;
+    overflow:hidden;
+    box-shadow:0 2px 6px rgba(0,0,0,.35);
+    box-sizing:border-box;
+}
+
+.totw-card:hover{
+    transform:scale(1.08);
+    z-index:100;
+}
+
+.totw-card .tc-shirt{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:60px;
+    height:54px;
+    position:relative;
+    z-index:3;
+    flex-shrink:0;
+    background:rgba(30, 90, 50, 0.55);
+    padding:4px 6px 0 6px;
+    box-sizing:border-box;
+    margin:0;
+}
+
+.totw-card .tc-shirt img{
+    max-width:100%;
+    max-height:100%;
+    width:auto;
+    height:auto;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));
+}
+
+.totw-card .tc-shirt-fallback{
+    background:rgba(255,255,255,.95);
+    border-radius:50%;
+    padding:4px;
+}
+
+.totw-card .tc-shirt-empty{
+    background:transparent;
+}
+
+.totw-card .tc-name{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:60px;
+    height:14px;
+    padding:0 3px;
+    margin-top:-6px;
+    background:#ffffff;
+    color:#37003c;
+    font-size:7px;
+    font-weight:900;
+    text-align:center;
+    line-height:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    position:relative;
+    z-index:10;
+    flex-shrink:0;
+    box-sizing:border-box;
+    border:none;
+    border-radius:0;
+}
+
+.totw-card .tc-points{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:60px;
+    height:14px;
+    padding:0 6px;
+    margin:0;
+    background:#37003c;
+    color:#ffffff;
+    font-size:9px;
+    font-weight:900;
+    text-align:center;
+    letter-spacing:0.5px;
+    position:relative;
+    z-index:4;
+    flex-shrink:0;
+    box-sizing:border-box;
+    border:none;
+    border-radius:0;
+}
+
+/* =========================================================
+   عرض القائمة — ⭐ محدّث ومصلّح
+========================================================= */
+
+.totw-list-view{
+    width:100%;
+    max-width:520px;
+    margin:0 auto 16px;
+    background:#FFFFFF;
+    border:1.5px solid #EDE9FE;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 4px 16px rgba(124,58,237,.1);
+}
+
+.totw-count-bar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 16px;
+    background:#F5F3FF;
+    border-bottom:1.5px solid #EDE9FE;
+    font-size:13px;
+    font-weight:800;
+    color:#6D28D9;
+}
+
+.totw-count-bar .count-num{
+    color:#7C3AED;
+    font-weight:900;
+    font-size:16px;
+    margin:0 2px;
+}
+
+.totw-actions{
+    display:flex;
+    gap:6px;
+}
+
+.totw-actions button{
+    padding:6px 12px;
+    border-radius:8px;
+    font-size:10px;
+    font-weight:900;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    cursor:pointer;
+    border:none;
+    font-family:inherit;
+    transition:all .2s ease;
+}
+
+.totw-actions .save-btn{
+    background:linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    color:#fff;
+}
+
+.totw-actions .save-btn.saved{
+    background:linear-gradient(135deg, #10B981 0%, #059669 100%);
+}
+
+.totw-actions .reset-btn{
+    background:#F3F4F6;
+    color:#6B7280;
+}
+
+.totw-actions button:active{
+    transform:scale(0.95);
+}
+
+/* Header — 6 columns مطابقة للـ items */
+.totw-list-header{
+    display:grid;
+    grid-template-columns:26px 26px 32px 1fr 46px 50px;
+    gap:6px;
+    align-items:center;
+    padding:10px 12px;
+    border-bottom:1.5px solid #EDE9FE;
+    background:#F5F3FF;
+    color:#5B21B6;
+    font-size:9px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:1px;
+}
+
+.totw-list-h-check{text-align:center;font-size:11px;}
+.totw-list-h-rank{text-align:center;}
+.totw-list-h-logo{width:32px;}
+.totw-list-h-team{text-align:right;padding-right:2px;}
+.totw-list-h-gw{text-align:center;}
+.totw-list-h-total{text-align:center;}
+
+.totw-list-item{
+    display:grid;
+    grid-template-columns:26px 26px 32px 1fr 46px 50px;
+    gap:6px;
+    align-items:center;
+    padding:8px 12px;
+    border-bottom:1px solid #F3F4F6;
+    color:#111827;
+    min-height:52px;
+    background:#FFFFFF;
+    cursor:pointer;
+    transition:background .2s ease;
+}
+
+.totw-list-item:last-child{border-bottom:none;}
+.totw-list-item:hover{background:#F5F3FF;}
+.totw-list-item.selected{background:#F5F3FF;}
+
+.totw-list-check{
+    width:20px;
+    height:20px;
+    border:1.5px solid #A78BFA;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:11px;
+    font-weight:900;
+    color:transparent;
+    margin:0 auto;
+    background:#FFFFFF;
+    transition:all .2s ease;
+}
+
+.totw-list-check.checked{
+    background:#7C3AED;
+    border-color:#7C3AED;
+    color:#FFFFFF;
+}
+
+.totw-list-rank{
+    text-align:center;
+    font-size:12px;
+    font-weight:800;
+    color:#9CA3AF;
+}
+
+.totw-list-logo{
+    width:32px;
+    height:32px;
+    min-width:32px;
+    min-height:32px;
+    max-width:32px;
+    max-height:32px;
+    position:relative;
+    overflow:hidden;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:transparent;
+    border:none;
+    border-radius:0;
+}
+
+.totw-list-logo img{
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    display:block;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.15));
+}
+
+.totw-list-logo-empty{
+    background:#F5F3FF;
+    color:#A78BFA;
+    font-size:14px;
+    border-radius:50%;
+}
+
+.totw-list-names{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+    overflow:hidden;
+    text-align:right;
+}
+
+.totw-list-entry{
+    font-size:12px;
+    font-weight:900;
+    color:#111827;
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    line-height:1.2;
+}
+
+.totw-list-player{
+    font-size:10px;
+    font-weight:600;
+    color:#9CA3AF;
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    line-height:1.2;
+}
+
+.totw-list-gw{
+    text-align:center;
+    font-size:13px;
+    font-weight:900;
+    color:#7C3AED;
+    letter-spacing:0.5px;
+}
+
+.totw-list-total{
+    text-align:center;
+    font-size:13px;
+    font-weight:900;
+    color:#111827;
+    letter-spacing:0.5px;
+}
+
+/* =========================================================
+   Loading + Error
+========================================================= */
+
+.totw-loading{
+    text-align:center;
+    padding:40px 20px;
+    color:#7C3AED;
+    font-size:15px;
+    font-weight:900;
+}
+
+.totw-loading .spinner{
+    display:inline-block;
+    width:36px;
+    height:36px;
+    border:4px solid rgba(124,58,237,.2);
+    border-top-color:#7C3AED;
+    border-radius:50%;
+    animation:spinTOTW .8s linear infinite;
+    margin-bottom:14px;
+}
+
+@keyframes spinTOTW{
+    0%{transform:rotate(0)}
+    100%{transform:rotate(360deg)}
+}
+
+.totw-error{
+    text-align:center;
+    padding:24px 16px;
+    background:rgba(255,0,90,.15);
+    border:2px solid #ff005a;
+    border-radius:12px;
+    color:#ff005a;
+    font-size:13px;
+    font-weight:800;
+}
+
+/* =========================================================
+   الموبايل
+========================================================= */
+
+@media(max-width:480px){
+
+    .totw-tab-btn{
+        padding:5px 18px;
+        font-size:10px;
+        letter-spacing:1.2px;
+    }
+
+    .totw-pitch{max-width:100%;}
+
+    .totw-pitch-title{
+        font-size:11px;
+        letter-spacing:2px;
+        top:12.5%;
+        padding:5px 30px;
+    }
+
+    .totw-card{width:50px;}
+
+    .totw-card .tc-shirt{
+        width:50px;
+        height:44px;
+        padding:3px 4px 0 4px;
+    }
+
+    .totw-card .tc-name{
+        width:50px;
+        height:12px;
+        font-size:6px;
+        margin-top:-5px;
+    }
+
+    .totw-card .tc-points{
+        width:50px;
+        height:12px;
+        font-size:8px;
+    }
+
+    .totw-row-def{padding:0 10%;}
+    .totw-row-mid{padding:0 3%;}
+    .totw-row-fwd{padding:0 18%;}
+
+    /* List — mobile */
+    .totw-list-view{
+        max-width:100%;
+    }
+
+    .totw-list-header{
+        grid-template-columns:22px 22px 28px 1fr 38px 42px;
+        padding:8px;
+        gap:5px;
+        font-size:8px;
+    }
+
+    .totw-list-item{
+        grid-template-columns:22px 22px 28px 1fr 38px 42px;
+        padding:8px;
+        gap:5px;
+        min-height:48px;
+    }
+
+    .totw-list-check{
+        width:18px;
+        height:18px;
+        font-size:10px;
+    }
+
+    .totw-list-rank{
+        font-size:11px;
+    }
+
+    .totw-list-logo{
+        width:28px;
+        height:28px;
+        min-width:28px;
+        min-height:28px;
+        max-width:28px;
+        max-height:28px;
+    }
+
+    .totw-list-entry{font-size:11px;}
+    .totw-list-player{font-size:9px;}
+    .totw-list-gw,
+    .totw-list-total{font-size:12px;}
+}

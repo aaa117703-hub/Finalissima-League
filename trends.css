@@ -1,0 +1,150 @@
+/* =========================================================
+   trends.css — Cosmic Amethyst Theme
+========================================================= */
+
+/* =========================================================
+   TREND ROW
+========================================================= */
+
+.trend-row{
+    display:grid;
+    grid-template-columns:44px 1fr 70px;
+    gap:10px;
+    align-items:center;
+    padding:11px 8px;
+    border-bottom:1px solid rgba(124,77,255,.12);
+    border-radius:10px;
+    transition:all .25s ease;
+    min-height:60px;
+}
+
+.trend-row:last-child{border-bottom:none;}
+
+.trend-row:hover{
+    background:rgba(124,77,255,.12);
+    transform:translateX(-4px);
+}
+
+/* الشعار — حجم موحّد */
+.trend-row-logo{
+    width:44px;
+    height:44px;
+    min-width:44px;
+    min-height:44px;
+    max-width:44px;
+    max-height:44px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    flex-shrink:0;
+    background:transparent;
+    border:none;
+    position:relative;
+}
+
+.trend-row-logo img{
+    width:100%;
+    height:100%;
+    max-width:100%;
+    max-height:100%;
+    object-fit:contain;
+    object-position:center;
+    display:block;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+
+.trend-row-logo-empty{
+    font-size:20px;
+    color:#a89cc8;
+}
+
+/* الأسماء */
+.trend-row-names{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    min-width:0;
+    overflow:hidden;
+    text-align:right;
+}
+
+.trend-row-entry{
+    font-size:13px;
+    font-weight:900;
+    color:#ffffff;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    line-height:1.2;
+    letter-spacing:.3px;
+}
+
+.trend-row-player{
+    font-size:10px;
+    font-weight:600;
+    color:#a89cc8;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    line-height:1.2;
+}
+
+/* الفرق */
+.trend-row-diff{
+    font-size:16px;
+    font-weight:900;
+    text-align:center;
+    letter-spacing:.5px;
+    font-family:'EnglishCustom', sans-serif;
+    padding:6px 10px;
+    border-radius:50px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:64px;
+    justify-self:center;
+}
+
+/* الصعود — تركوازي */
+.trend-diff-up{
+    color:#00e5ff;
+    background:rgba(0, 229, 255, 0.15);
+    border:1px solid rgba(0, 229, 255, 0.4);
+    text-shadow:0 0 10px rgba(0, 229, 255, 0.5);
+}
+
+/* الهبوط — أحمر */
+.trend-diff-down{
+    color:#ff5252;
+    background:rgba(229, 57, 53, 0.18);
+    border:1px solid rgba(229, 57, 53, 0.45);
+    text-shadow:0 0 10px rgba(255, 82, 82, 0.4);
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:480px){
+
+    .trend-row{
+        grid-template-columns:38px 1fr 60px;
+        padding:10px 6px;
+        gap:8px;
+        min-height:56px;
+    }
+
+    .trend-row-logo{
+        width:38px;
+        height:38px;
+        min-width:38px;
+        min-height:38px;
+        max-width:38px;
+        max-height:38px;
+    }
+
+    .trend-row-entry{font-size:12px;}
+    .trend-row-player{font-size:9px;}
+    .trend-row-diff{font-size:14px;min-width:54px;padding:5px 8px;}
+}

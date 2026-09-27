@@ -1,0 +1,239 @@
+/* =========================================================
+   charts.css — v1
+   قسم الرسوم البيانية — Light Purple Theme
+========================================================= */
+
+/* ========== TABS — Horizontal Scroll (يسمح بالتبويب الجديد) ========== */
+
+.stats-tabs {
+    display: flex !important;
+    gap: 6px !important;
+    overflow-x: auto !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding: 4px 2px 8px !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
+}
+
+.stats-tabs::-webkit-scrollbar {
+    display: none !important;
+}
+
+.stats-tab-btn {
+    flex-shrink: 0 !important;
+}
+
+/* ========== CHARTS CONTAINER ========== */
+
+#statsView-charts {
+    padding: 4px 0 20px;
+}
+
+/* ========== INTRO BAR ========== */
+
+.charts-intro {
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(0, 184, 255, 0.06) 100%);
+    border: 1.5px solid var(--purple-100, #EDE9FE);
+    border-radius: 14px;
+    margin-bottom: 16px;
+    font-size: 12px;
+    color: var(--text-secondary, #6B7280);
+    text-align: center;
+    line-height: 1.7;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.charts-intro strong {
+    color: var(--purple-600, #6D28D9);
+    font-weight: 900;
+    font-size: 14px;
+}
+
+/* ========== CHART CARD ========== */
+
+.chart-card {
+    background: #FFFFFF;
+    border: 1.5px solid var(--purple-100, #EDE9FE);
+    border-radius: 18px;
+    padding: 18px 14px 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 12px rgba(124, 58, 237, 0.06);
+    animation: chartFadeIn 0.5s ease both;
+    overflow: hidden;
+    position: relative;
+}
+
+.chart-card:nth-child(2) { animation-delay: 0.05s; }
+.chart-card:nth-child(3) { animation-delay: 0.10s; }
+.chart-card:nth-child(4) { animation-delay: 0.15s; }
+.chart-card:nth-child(5) { animation-delay: 0.20s; }
+
+.chart-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #7C3AED 0%, #A855F7 50%, #00B8FF 100%);
+    border-radius: 18px 18px 0 0;
+}
+
+@keyframes chartFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== CHART TITLE ========== */
+
+.chart-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 16px;
+    padding: 0 4px;
+    font-size: 13px;
+    font-weight: 900;
+    color: var(--text-primary, #111827);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.chart-title .chart-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 2px 4px rgba(124, 58, 237, 0.3));
+    flex-shrink: 0;
+}
+
+.chart-title .chart-sub {
+    margin-left: auto;
+    color: var(--purple-500, #7C3AED);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    background: var(--purple-50, #F5F3FF);
+    border: 1px solid var(--purple-100, #EDE9FE);
+    border-radius: 20px;
+    white-space: nowrap;
+}
+
+/* ========== CHART WRAP ========== */
+
+.chart-wrap {
+    position: relative;
+    width: 100%;
+    height: 280px;
+}
+
+.chart-wrap.chart-tall {
+    height: 340px;
+}
+
+.chart-wrap canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* ========== LOADING ========== */
+
+.charts-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    gap: 14px;
+    color: var(--purple-600, #6D28D9);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.charts-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(124, 58, 237, 0.2);
+    border-top-color: var(--purple-500, #7C3AED);
+    border-radius: 50%;
+    animation: chartsSpin 0.8s linear infinite;
+}
+
+@keyframes chartsSpin {
+    to { transform: rotate(360deg); }
+}
+
+/* ========== ERROR ========== */
+
+.charts-error {
+    padding: 20px;
+    background: rgba(220, 38, 38, 0.08);
+    border: 1.5px solid rgba(220, 38, 38, 0.3);
+    border-radius: 14px;
+    color: var(--red-600, #DC2626);
+    font-size: 13px;
+    font-weight: 700;
+    text-align: center;
+}
+
+/* ========== EMPTY ========== */
+
+.chart-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: var(--text-tertiary, #9CA3AF);
+    font-size: 13px;
+    font-weight: 700;
+    background: var(--purple-50, #F5F3FF);
+    border-radius: 12px;
+    line-height: 1.8;
+    border: 1px dashed var(--purple-100, #EDE9FE);
+}
+
+.chart-empty .chart-empty-icon {
+    font-size: 42px;
+    display: block;
+    margin-bottom: 12px;
+    opacity: 0.6;
+}
+
+/* ========== MOBILE ========== */
+
+@media (max-width: 400px) {
+    .chart-wrap {
+        height: 240px;
+    }
+
+    .chart-wrap.chart-tall {
+        height: 300px;
+    }
+
+    .chart-title {
+        font-size: 12px;
+        gap: 8px;
+    }
+
+    .chart-title .chart-icon {
+        font-size: 18px;
+    }
+
+    .chart-title .chart-sub {
+        font-size: 9px;
+        padding: 2px 8px;
+    }
+
+    .chart-card {
+        padding: 14px 10px 10px;
+        margin-bottom: 12px;
+    }
+}

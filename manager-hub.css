@@ -1,0 +1,938 @@
+/* =========================================================
+   manager-hub.css — v2
+   ثيم: Deep Purple + Cyan + Emerald (مريح للعين)
+   إصلاح: Pull-to-Refresh + Swipe-back
+========================================================= */
+
+/* =========================================================
+   القسم الأساسي
+========================================================= */
+
+#statsView-managers {
+    width: 100%;
+    min-height: 60vh;
+    color: #e8e8f5;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+}
+
+#mhContent {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+}
+
+/* منع pull-to-refresh داخل القائمة */
+.mh-list-container {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-y;
+}
+
+
+/* =========================================================
+   Loading / Empty
+========================================================= */
+
+.mh-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    gap: 14px;
+    color: #a0a8c0;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.mh-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #6a7290;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+}
+
+
+/* =========================================================
+   Controls Bar
+========================================================= */
+
+.mh-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 18px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.18) 0%, rgba(0, 212, 255, 0.10) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    border-radius: 16px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.mh-stats {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: #a0a8c0;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mh-stats span {
+    color: #00d4ff;
+    font-size: 18px;
+    font-weight: 900;
+    text-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+    letter-spacing: 0.5px;
+}
+
+.mh-edit-btn {
+    padding: 8px 18px;
+    background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 3px 12px rgba(124, 58, 237, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.25s ease;
+}
+
+.mh-edit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(124, 58, 237, 0.55);
+}
+
+.mh-edit-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+.mh-edit-btn.active {
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+
+/* =========================================================
+   Add Form
+========================================================= */
+
+.mh-add-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.12) 0%, rgba(0, 212, 255, 0.08) 100%);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.25);
+}
+
+.mh-add-input,
+.mh-add-select {
+    flex: 1 1 140px;
+    min-width: 0;
+    padding: 10px 12px;
+    background: rgba(15, 10, 30, 0.7);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mh-add-input::placeholder {
+    color: #6a7290;
+    font-weight: 600;
+}
+
+.mh-add-input:focus,
+.mh-add-select:focus {
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.18);
+}
+
+.mh-add-select option {
+    background: #1a0f2e;
+    color: #fff;
+}
+
+.mh-add-btn {
+    flex: 0 0 auto;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 3px 12px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mh-add-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(16, 185, 129, 0.55);
+}
+
+.mh-add-btn:active {
+    transform: translateY(0) scale(0.97);
+}
+
+
+/* =========================================================
+   Search
+========================================================= */
+
+.mh-search-box {
+    width: 100%;
+    position: relative;
+}
+
+.mh-search-input {
+    width: 100%;
+    padding: 12px 16px 12px 42px;
+    background: rgba(15, 10, 30, 0.75);
+    border: 1px solid rgba(124, 58, 237, 0.35);
+    border-radius: 14px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 700;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.mh-search-input::placeholder {
+    color: #6a7290;
+    font-weight: 600;
+}
+
+.mh-search-input:focus {
+    border-color: #00d4ff;
+    background: rgba(15, 10, 30, 0.9);
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.18), 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+/* أيقونة بحث */
+.mh-search-box::before {
+    content: '';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2300d4ff' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") center/contain no-repeat;
+    pointer-events: none;
+    opacity: 0.85;
+}
+
+
+/* =========================================================
+   List Container
+========================================================= */
+
+.mh-list-container {
+    background: linear-gradient(180deg, rgba(15, 10, 30, 0.6) 0%, rgba(20, 12, 40, 0.6) 100%);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: 16px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+}
+
+.mh-list-container.edit-mode {
+    border-color: rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 24px rgba(16, 185, 129, 0.15);
+}
+
+
+/* =========================================================
+   List Header
+========================================================= */
+
+.mh-list-header {
+    display: grid;
+    grid-template-columns: 34px 36px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(124, 58, 237, 0.35) 0%, rgba(0, 212, 255, 0.15) 100%);
+    border-bottom: 1px solid rgba(124, 58, 237, 0.4);
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    color: #c0c8e0;
+    text-transform: uppercase;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.mh-list-container.edit-mode .mh-list-header {
+    grid-template-columns: 34px 36px 1fr auto 68px;
+}
+
+.mh-lh-num { text-align: center; }
+.mh-lh-logo { width: 36px; }
+.mh-lh-name { text-align: left; }
+.mh-lh-team { text-align: right; }
+.mh-lh-action { width: 68px; }
+
+
+/* =========================================================
+   List Rows
+========================================================= */
+
+.mh-list-row {
+    display: grid;
+    grid-template-columns: 34px 36px 1fr auto;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.12);
+    background: transparent;
+    transition: background 0.2s ease, transform 0.15s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.mh-list-container.edit-mode .mh-list-row {
+    grid-template-columns: 34px 36px 1fr auto 68px;
+}
+
+.mh-list-row:last-child {
+    border-bottom: none;
+}
+
+.mh-list-row::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, #00d4ff 0%, #7c3aed 100%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+}
+
+.mh-list-row:hover {
+    background: rgba(124, 58, 237, 0.12);
+}
+
+.mh-list-row:hover::before {
+    opacity: 1;
+}
+
+.mh-list-row:active {
+    background: rgba(0, 212, 255, 0.10);
+    transform: scale(0.995);
+}
+
+.mh-lr-num {
+    font-size: 12px;
+    font-weight: 800;
+    color: #6a7290;
+    text-align: center;
+    letter-spacing: 0.3px;
+}
+
+.mh-lr-logo {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50%;
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.mh-lr-logo img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+.mh-lr-logo-empty {
+    background: rgba(124, 58, 237, 0.08);
+    border-style: dashed;
+    border-color: rgba(124, 58, 237, 0.3);
+}
+
+.mh-lr-logo-empty::after {
+    content: '—';
+    color: #5a6280;
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.mh-lr-name {
+    font-size: 13px;
+    font-weight: 800;
+    color: #e8e8f5;
+    letter-spacing: 0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    transition: color 0.2s ease;
+}
+
+.mh-list-row:hover .mh-lr-name {
+    color: #00d4ff;
+}
+
+.mh-lr-team {
+    font-size: 11px;
+    font-weight: 800;
+    color: #00d4ff;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 130px;
+    text-align: right;
+    padding: 3px 9px;
+    background: rgba(0, 212, 255, 0.08);
+    border: 1px solid rgba(0, 212, 255, 0.2);
+    border-radius: 8px;
+}
+
+.mh-lr-team-none {
+    color: #6a7290;
+    background: rgba(106, 114, 144, 0.08);
+    border-color: rgba(106, 114, 144, 0.2);
+    font-style: italic;
+}
+
+/* أزرار الإجراءات */
+.mh-lr-move,
+.mh-lr-delete {
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    border: none;
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+    font-family: inherit;
+}
+
+.mh-lr-move {
+    background: linear-gradient(135deg, #00d4ff 0%, #0088cc 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.4);
+    margin-right: 4px;
+}
+
+.mh-lr-move:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 12px rgba(0, 212, 255, 0.6);
+}
+
+.mh-lr-delete {
+    background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+.mh-lr-delete:hover {
+    transform: scale(1.1);
+    box-shadow: 0 3px 12px rgba(239, 68, 68, 0.6);
+}
+
+.mh-lr-move:active,
+.mh-lr-delete:active {
+    transform: scale(0.95);
+}
+
+
+/* =========================================================
+   Modal (Password / Move)
+========================================================= */
+
+#mhModal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 99998;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+#mhModal.show {
+    display: flex;
+}
+
+.mh-modal-box {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(135deg, #1a0f2e 0%, #0f0a1e 100%);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow:
+        0 0 40px rgba(124, 58, 237, 0.35),
+        0 20px 60px rgba(0, 0, 0, 0.7),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: mhModalIn 0.25s ease;
+    direction: rtl;
+}
+
+@keyframes mhModalIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.mh-modal-title {
+    font-size: 16px;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    letter-spacing: 1px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid rgba(124, 58, 237, 0.25);
+    background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mh-pass-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(15, 10, 30, 0.8);
+    border: 1px solid rgba(124, 58, 237, 0.4);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 6px;
+    text-align: center;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mh-pass-input:focus {
+    border-color: #00d4ff;
+    box-shadow: 0 0 0 3px rgba(0, 212, 255, 0.18);
+}
+
+.mh-modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.mh-modal-btn {
+    flex: 1;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: none;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+}
+
+.mh-modal-cancel {
+    background: rgba(255, 255, 255, 0.08);
+    color: #c0c8e0;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.mh-modal-cancel:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+}
+
+.mh-modal-confirm {
+    background: linear-gradient(135deg, #00d4ff 0%, #0088cc 100%);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(0, 212, 255, 0.4);
+}
+
+.mh-modal-confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.55);
+}
+
+.mh-modal-btn:active {
+    transform: scale(0.97);
+}
+
+.mh-modal-error {
+    color: #ef4444;
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+    margin-top: 10px;
+    min-height: 16px;
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   Move Options (قائمة الفرق للنقل)
+========================================================= */
+
+.mh-move-list {
+    max-height: 50vh;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding: 4px;
+    margin: 0 -4px;
+}
+
+.mh-move-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.mh-move-list::-webkit-scrollbar-track {
+    background: rgba(124, 58, 237, 0.1);
+    border-radius: 3px;
+}
+
+.mh-move-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #00d4ff, #7c3aed);
+    border-radius: 3px;
+}
+
+.mh-move-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 11px 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(124, 58, 237, 0.2);
+    border-radius: 10px;
+    color: #e8e8f5;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    cursor: pointer;
+    text-align: left;
+    margin-bottom: 6px;
+    transition: all 0.18s ease;
+    direction: ltr;
+}
+
+.mh-move-option:hover {
+    background: rgba(0, 212, 255, 0.12);
+    border-color: rgba(0, 212, 255, 0.4);
+    transform: translateX(3px);
+    color: #fff;
+}
+
+.mh-move-option:active {
+    transform: translateX(3px) scale(0.98);
+}
+
+.mh-move-option img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    flex-shrink: 0;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
+.mh-move-option span {
+    flex: 1;
+    text-align: left;
+}
+
+
+/* =========================================================
+   Spinner
+========================================================= */
+
+.spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(124, 58, 237, 0.2);
+    border-top-color: #00d4ff;
+    border-radius: 50%;
+    animation: mhSpin 0.8s linear infinite;
+}
+
+@keyframes mhSpin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* =========================================================
+   Mobile adjustments
+========================================================= */
+
+@media (max-width: 400px) {
+    .mh-list-row,
+    .mh-list-header {
+        grid-template-columns: 30px 32px 1fr auto;
+        gap: 6px;
+        padding: 10px 10px;
+    }
+
+    .mh-list-container.edit-mode .mh-list-row,
+    .mh-list-container.edit-mode .mh-list-header {
+        grid-template-columns: 30px 32px 1fr auto 60px;
+    }
+
+    .mh-lr-team {
+        max-width: 90px;
+        font-size: 10px;
+        padding: 2px 7px;
+    }
+
+    .mh-lr-name {
+        font-size: 12px;
+    }
+
+    .mh-lr-move,
+    .mh-lr-delete {
+        width: 26px;
+        height: 26px;
+        font-size: 12px;
+    }
+
+    .mh-modal-box {
+        padding: 20px 16px;
+    }
+}
+/* =========================================================
+   Manager-Hub v4 — Additions
+   - Refresh button
+   - Manual ID form
+   - Manual entries badge
+========================================================= */
+
+/* أزرار التحكم */
+.mh-control-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mh-refresh-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #00d4ff 0%, #0088cc 100%);
+    color: #fff;
+    border: none;
+    font-size: 18px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+    box-shadow: 0 3px 12px rgba(0, 212, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-family: inherit;
+}
+
+.mh-refresh-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(0, 212, 255, 0.55);
+}
+
+.mh-refresh-btn:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.mh-refresh-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+.mh-refresh-btn.spinning {
+    animation: mhSpin 1s linear infinite;
+}
+
+/* Manual ID Form */
+.mh-manual-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.12) 0%, rgba(245, 158, 11, 0.06) 100%);
+    border: 1px solid rgba(251, 191, 36, 0.35);
+    border-radius: 14px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 3px 14px rgba(0, 0, 0, 0.25);
+}
+
+.mh-manual-label {
+    font-size: 12px;
+    font-weight: 900;
+    color: #fbbf24;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.mh-manual-input {
+    flex: 1 1 120px;
+    min-width: 0;
+    padding: 10px 12px;
+    background: rgba(15, 10, 30, 0.7);
+    border: 1px solid rgba(251, 191, 36, 0.4);
+    border-radius: 10px;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+    font-family: inherit;
+    outline: none;
+    letter-spacing: 1px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mh-manual-input::placeholder {
+    color: #8a7a50;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.mh-manual-input:focus {
+    border-color: #fbbf24;
+    box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.18);
+}
+
+/* إخفاء أسهم input[type=number] */
+.mh-manual-input::-webkit-outer-spin-button,
+.mh-manual-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+.mh-manual-input[type=number] {
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+
+.mh-manual-add-btn {
+    flex: 0 0 auto;
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    color: #1a0f2e;
+    border: none;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 1.2px;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 3px 12px rgba(251, 191, 36, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-transform: uppercase;
+}
+
+.mh-manual-add-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(251, 191, 36, 0.55);
+}
+
+.mh-manual-add-btn:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.mh-manual-add-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Manual row styling in list */
+.mh-row-manual {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.06) 0%, transparent 60%);
+    border-left: 2px solid rgba(251, 191, 36, 0.4);
+}
+
+.mh-row-manual:hover {
+    background: linear-gradient(90deg, rgba(251, 191, 36, 0.14) 0%, rgba(251, 191, 36, 0.04) 100%);
+}
+
+.mh-lr-logo-manual {
+    background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+    color: #1a0f2e;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    border-color: rgba(251, 191, 36, 0.5);
+}
+
+.mh-lr-team-manual {
+    color: #fbbf24;
+    background: rgba(251, 191, 36, 0.1);
+    border-color: rgba(251, 191, 36, 0.3);
+    font-style: normal;
+    font-family: monospace;
+}
+
+.mh-lr-spacer {
+    width: 30px;
+    height: 30px;
+}
