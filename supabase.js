@@ -1,5 +1,5 @@
 /* =========================================================
-   supabase.js
+   supabase.js — FINALISSIMA LEAGUE CHAT
 ========================================================= */
 
 async function loadScoresFromSupabase(matchweeks) {
@@ -52,7 +52,6 @@ async function loadScoresFromSupabase(matchweeks) {
     }
 }
 
-
 async function saveRoundToSupabase(round, matchweeks, scoresStorage) {
     try {
         const matches = matchweeks[round] || [];
@@ -104,7 +103,6 @@ async function saveRoundToSupabase(round, matchweeks, scoresStorage) {
         return { ok: false, error: e };
     }
 }
-
 
 async function clearRoundFromSupabase(round) {
     try {
