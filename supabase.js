@@ -122,3 +122,103 @@ async function clearRoundFromSupabase(round) {
         return { ok: false, error: e };
     }
 }
+
+/* =========================================================
+   دوال الجولات المخصصة (custom_matchweeks) — جديد
+========================================================= */
+
+/**
+ * يجيب كل الجولات المخصصة من Supabase
+ * ترجع: { 1: { matches: [...], is_hidden: true }, 2: {...}, ... }
+ */
+async function loadCustomMatchweeks() {
+    try {
+        const res = await window.sbClient
+            .from('custom_matchweeks')
+            .select('round, matches, is_hidden');
+
+        if (res.error) {
+            console.error('[Custom MW] load error:', res.error);
+            return null;
+        }
+
+        if (!res.data || res.data.length === 0) {
+            return null;
+        }
+
+        const result = {};
+        res.data.forEach(function(row) {
+            const r = parseInt(row.round, 10);
+            result[r] = {
+                matches: Array.isArray(row.matches) ? row.matches : [],
+                is_hidden: row.is_hidden === true
+            };
+        });
+
+        return result;
+    } catch (e) {
+        console.error('[Custom MW] load exception:', e);
+        return null;
+    }
+}
+
+/**
+ * يحفظ جولة مخصصة (upsert)
+ */
+async function saveCustomMatchweek(round, matches, isHidden) {
+    try {
+        const { error } = await window.sbClient
+            .from('custom_matchweeks')
+            .upsert(
+                {
+                    round: parseInt(round, 10),
+                    matches: matches,
+                    is_hidden: isHidden === true,
+                    updated_at: new Date().toISOString()
+                },
+                { onConflict: 'round' }
+            );
+
+        if (error) {
+            console.error('[Custom MW] save error:', error);
+            return { ok: false, error: error };
+        }
+
+        return { ok: true };
+    } catch (e) {
+        console.error('[Custom MW] save exception:', e);
+        return { ok: false, error: e };
+    }
+}
+
+/**
+ * يبدّل حالة الإخفاء لجولة
+ */
+async function setRoundHidden(round, isHidden) {
+    try {
+        const { error } = await window.sbClient
+            .from('custom_matchweeks')
+            .upsert(
+                {
+                    round: parseInt(round, 10),
+                    is_hidden: isHidden === true,
+                    updated_at: new Date().toISOString()
+                },
+                { onConflict: 'round' }
+            );
+
+        if (error) {
+            console.error('[Custom MW] setHidden error:', error);
+            return { ok: false, error: error };
+        }
+
+        return { ok: true };
+    } catch (e) {
+        console.error('[Custom MW] setHidden exception:', e);
+        return { ok: false, error: e };
+    }
+}
+
+window.loadCustomMatchweeks = loadCustomMatchweeks;
+window.saveCustomMatchweek = saveCustomMatchweek;
+window.setRoundHidden = setRoundHidden;
