@@ -1,6 +1,5 @@
 /* =========================================================
    clubs.js — FINALISSIMA LEAGUE CHAT
-   إدارة المنتخبات + Modal اللاعبين
 ========================================================= */
 
 const CLUBS_PIN = '024680';
@@ -11,6 +10,17 @@ let clubsLoaded = false;
 let clubsEditMode = false;
 let currentOpenClub = null;
 let cpModalEl = null;
+
+/* ⭐ استخدام cleanDisplayName */
+function clubsDisplayName(name) {
+    if (typeof cleanDisplayName === 'function') {
+        return cleanDisplayName(name, 13);
+    }
+    if (!name) return '';
+    const result = String(name).trim();
+    if (result.length <= 13) return result;
+    return result.substring(0, 13);
+}
 
 function _clubsNormalize(s) {
     if (typeof normalizePlayerName === 'function') {
@@ -301,8 +311,9 @@ function renderClubPlayersModal(team, logoHtml, players) {
             else if (rank === 2) rowClass = ' cp-top-2';
             else if (rank === 3) rowClass = ' cp-top-3';
 
-            const displayEntry = p.entry_name || p.player_name || p.name || 'Unknown';
-            const displayPlayer = p.player_name && p.player_name !== displayEntry ? p.player_name : '';
+            /* ⭐ عرض الاسم المختصر */
+            const displayName = clubsDisplayName(p.name);
+
             const pointsDisplay = p.found ? (p.total || 0) : '—';
             const notFoundClass = p.found ? '' : ' cp-not-found';
 
@@ -311,8 +322,7 @@ function renderClubPlayersModal(team, logoHtml, players) {
                     '<div class="cp-rank">' + rank + '</div>' +
                     '<div class="cp-logo cp-logo-empty"></div>' +
                     '<div class="cp-names">' +
-                        '<div class="cp-name">' + escapeHtml(displayEntry) + '</div>' +
-                        (displayPlayer ? '<div class="cp-player">' + escapeHtml(displayPlayer) + '</div>' : '') +
+                        '<div class="cp-name">' + escapeHtml(displayName) + '</div>' +
                     '</div>' +
                     '<div class="cp-points' + (p.found ? '' : ' cp-points-empty') + '">' +
                         pointsDisplay +
@@ -385,7 +395,7 @@ function openClubDetail(team) {
             playersHtml +=
                 '<div class="club-player-row">' +
                     '<div class="club-player-num">' + (index + 1) + '</div>' +
-                    '<div class="club-player-name">' + player + '</div>' +
+                    '<div class="club-player-name">' + clubsDisplayName(player) + '</div>' +
                     (clubsEditMode ?
                         '<button class="club-player-del" onclick="deletePlayer(\'' +
                             team.replace(/'/g, "\\'") + '\',' + index + ')">X</button>'
