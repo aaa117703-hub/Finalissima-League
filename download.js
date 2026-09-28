@@ -1,5 +1,6 @@
 /* =========================================================
    download.js — FINALISSIMA LEAGUE CHAT
+   Web Share API للـ iOS Photos
 ========================================================= */
 
 function waitForImagesToLoad(element) {
@@ -129,6 +130,83 @@ function isCanvasTainted(canvas) {
     }
 }
 
+/* ⭐ دالة جديدة: تحويل blob إلى file */
+function blobToFile(blob, filename) {
+    try {
+        return new File([blob], filename, {
+            type: blob.type || 'image/png',
+            lastModified: Date.now()
+        });
+    } catch (e) {
+        console.warn('[DL] blobToFile failed, trying fallback:', e);
+        /* fallback للمتصفحات القديمة */
+        blob.name = filename;
+        blob.lastModified = Date.now();
+        return blob;
+    }
+}
+
+/* ⭐ دالة جديدة: محاولة Web Share API أولاً */
+async function shareOrDownload(blob, filename) {
+    /* 1) نحاول Web Share API */
+    if (navigator.canShare && navigator.share) {
+        try {
+            const file = blobToFile(blob, filename);
+            const shareData = {
+                files: [file],
+                title: 'Finalissima League',
+                text: 'Matchweek Image'
+            };
+
+            /* نتحقق إذا المتصفح يقدر يشارك الملف */
+            if (navigator.canShare(shareData)) {
+                dlDebug('Trying Web Share API...');
+                await navigator.share(shareData);
+
+                if (typeof showToast === 'function') {
+                    showToast('تم! اخترت حفظ في الصور', true, 2500);
+                }
+                return true;
+            } else {
+                dlDebug('canShare returned false', true);
+            }
+        } catch (err) {
+            /* إذا المستخدم ألغى → ما نعتبرها فشل */
+            if (err.name === 'AbortError') {
+                dlDebug('User cancelled share');
+                return true;
+            }
+            dlDebug('Share failed: ' + err.message, true);
+        }
+    } else {
+        dlDebug('Web Share API not supported', true);
+    }
+
+    /* 2) Fallback: التنزيل المباشر */
+    try {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = url;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        setTimeout(function() {
+            URL.revokeObjectURL(url);
+        }, 2000);
+
+        if (typeof showToast === 'function') {
+            showToast('تم التحميل (Files)', true, 2500);
+        }
+        return true;
+    } catch (e) {
+        dlDebug('Fallback failed: ' + e.message, true);
+        return false;
+    }
+}
+
 function showImageModal(blob, filename) {
     const old = document.getElementById('dlImageModal');
     if (old) {
@@ -138,6 +216,7 @@ function showImageModal(blob, filename) {
     }
 
     const url = URL.createObjectURL(blob);
+    const canShare = !!(navigator.canShare && navigator.share);
 
     const modal = document.createElement('div');
     modal.id = 'dlImageModal';
@@ -156,46 +235,66 @@ function showImageModal(blob, filename) {
         'font-family:inherit'
     ].join(';');
 
+    /* زر الحفظ الرئيسي — حسب دعم المتصفح */
+    let primaryBtnText = canShare
+        ? '📥 حفظ في الصور'
+        : '📥 حفظ في Files';
+    let primaryHint = canShare
+        ? 'يفتح قائمة iOS → اختر "حفظ في الصور"'
+        : 'يحفظ في ملفات الجهاز';
+
     modal.innerHTML =
-        '<div style="text-align:center;color:#C8A95F;margin-bottom:10px;font-weight:900;font-size:15px;letter-spacing:0.5px;padding:8px 12px;background:rgba(200,169,95,0.15);border-radius:12px;border:1px solid #C8A95F;max-width:500px;">' +
-            '👆 اضغط مطولاً على الصورة → احفظ في الألبوم' +
+        '<div style="text-align:center;color:#C8A95F;margin-bottom:10px;font-weight:900;font-size:14px;letter-spacing:0.5px;padding:8px 14px;background:rgba(200,169,95,0.15);border-radius:12px;border:1px solid #C8A95F;max-width:500px;">' +
+            primaryHint +
         '</div>' +
-        '<img id="dlImagePreview" src="' + url + '" style="max-width:100%;max-height:65vh;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,0.8);border:2px solid #C8A95F;margin:8px 0;background:transparent;" />' +
+        '<img id="dlImagePreview" src="' + url + '" style="max-width:100%;max-height:60vh;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,0.8);border:2px solid #C8A95F;margin:8px 0;background:transparent;" />' +
         '<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-bottom:20px;">' +
-            '<button id="dlDirectBtn" style="padding:12px 22px;background:linear-gradient(135deg,#C8A95F,#8B7340);color:#fff;border:none;border-radius:24px;font-weight:900;font-size:14px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(200,169,95,0.5);cursor:pointer;font-family:inherit;">📥 تحميل مباشر</button>' +
-            '<button id="dlCloseBtn" style="padding:12px 22px;background:linear-gradient(135deg,#8B1A2F,#6B0F1F);color:#fff;border:none;border-radius:24px;font-weight:900;font-size:14px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(139,26,47,0.5);cursor:pointer;font-family:inherit;">✕ إغلاق</button>' +
+            '<button id="dlDirectBtn" style="padding:14px 26px;background:linear-gradient(135deg,#C8A95F,#8B7340);color:#fff;border:none;border-radius:28px;font-weight:900;font-size:15px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(200,169,95,0.5);cursor:pointer;font-family:inherit;">' + primaryBtnText + '</button>' +
+            '<button id="dlCloseBtn" style="padding:14px 26px;background:linear-gradient(135deg,#8B1A2F,#6B0F1F);color:#fff;border:none;border-radius:28px;font-weight:900;font-size:15px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(139,26,47,0.5);cursor:pointer;font-family:inherit;">✕ إغلاق</button>' +
         '</div>' +
-        '<div style="color:#888;font-size:11px;margin-top:8px;text-align:center;padding-bottom:20px;">' +
-            'إذا ما اشتغل التحميل المباشر — اضغط مطولاً على الصورة' +
+        '<div style="color:#888;font-size:11px;margin-top:8px;text-align:center;padding-bottom:20px;max-width:400px;">' +
+            'إذا ما اشتغل — اضغط مطولاً على الصورة ثم اختر "حفظ في الصور"' +
         '</div>';
 
     document.body.appendChild(modal);
 
-    modal.querySelector('#dlDirectBtn').addEventListener('click', function() {
-        try {
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = url;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+    /* زر الحفظ الرئيسي */
+    modal.querySelector('#dlDirectBtn').addEventListener('click', async function() {
+        const btn = this;
+        btn.disabled = true;
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '⏳ جاري...';
 
-            if (typeof showToast === 'function') {
-                showToast('تم التحميل', true, 2500);
+        try {
+            const success = await shareOrDownload(blob, filename);
+
+            if (success) {
+                /* لا نغلق الـ modal — المستخدم قد يريد استخدامه مرة أخرى */
+                setTimeout(function() {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }, 1000);
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+                if (typeof showToast === 'function') {
+                    showToast('فشل — اضغط مطولاً على الصورة', false, 4000);
+                }
             }
-        } catch (e) {
-            console.error('[DL] direct download failed:', e);
-            if (typeof showToast === 'function') {
-                showToast('اضغط مطولاً على الصورة', false, 4000);
-            }
+        } catch (err) {
+            console.error('[DL] Direct btn error:', err);
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
     });
 
+    /* زر الإغلاق */
     modal.querySelector('#dlCloseBtn').addEventListener('click', function() {
         URL.revokeObjectURL(url);
         modal.remove();
     });
 
+    /* إغلاق عند الضغط على الخلفية */
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             URL.revokeObjectURL(url);
@@ -367,7 +466,7 @@ function downloadAsImage(scaleFactor) {
                 showImageModal(blob, filename);
 
                 if (typeof showToast === 'function') {
-                    showToast('اضغط مطولاً على الصورة', true, 3500);
+                    showToast('اضغط على زر الحفظ', true, 2500);
                 }
 
             }, 'image/png', 1.0);
