@@ -604,3 +604,47 @@
     .totw-list-gw,
     .totw-list-total{font-size:12px;}
 }
+/* =========================================================
+   TOTW Mode Tabs (Week / Month)
+========================================================= */
+
+.totw-mode-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0 8px;
+    padding: 0 8px;
+}
+
+.totw-mode-btn {
+    flex: 1;
+    max-width: 200px;
+    padding: 12px 16px;
+    border-radius: 14px;
+    border: 2px solid #E5D4A5;
+    background: #FFFFFF;
+    color: #8B1A2F;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .25s ease;
+}
+
+.totw-mode-btn.active {
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #FFFFFF;
+    border-color: #C8A95F;
+    box-shadow: 0 4px 14px rgba(139, 26, 47, 0.35);
+}
+
+.totw-mode-btn:hover:not(.active) {
+    background: #FAF6F0;
+    border-color: #C8A95F;
+    transform: translateY(-1px);
+}
+
+.totw-mode-btn:active {
+    transform: translateY(0) scale(0.97);
+}
