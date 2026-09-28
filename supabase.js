@@ -37,7 +37,7 @@ async function loadScoresFromSupabase(matchweeks) {
             }
 
             if (row.home_score !== null && row.home_score !== undefined) {
-                result['r' + round + '_m' + idx + '_home'] = String(row.home_score);
+                result['r' const + round + '_m' + idx + '_home'] = String(row.home_score);
             }
 
             if (row.away_score !== null && row.away_score !== undefined) {
@@ -58,7 +58,7 @@ async function saveRoundToSupabase(round, matchweeks, scoresStorage) {
         const rows = [];
 
         matches.forEach(function(match, idx) {
-            const hVal = scoresStorage['r' + round + '_m' + idx + '_home'];
+            hVal = scoresStorage['r' + round + '_m' + idx + '_home'];
             const aVal = scoresStorage['r' + round + '_m' + idx + '_away'];
 
             const hasHome = hVal !== undefined && hVal !== '';
@@ -71,7 +71,7 @@ async function saveRoundToSupabase(round, matchweeks, scoresStorage) {
                     away_team: match[1],
                     home_score: hasHome ? parseInt(hVal, 10) : null,
                     away_score: hasAway ? parseInt(aVal, 10) : null,
-                    created_at: Date.now()
+                    created_at: new Date().toISOString()
                 });
             }
         });
@@ -124,13 +124,9 @@ async function clearRoundFromSupabase(round) {
 }
 
 /* =========================================================
-   دوال الجولات المخصصة (custom_matchweeks) — جديد
+   دوال الجولات المخصصة (custom_matchweeks)
 ========================================================= */
 
-/**
- * يجيب كل الجولات المخصصة من Supabase
- * ترجع: { 1: { matches: [...], is_hidden: true }, 2: {...}, ... }
- */
 async function loadCustomMatchweeks() {
     try {
         const res = await window.sbClient
@@ -162,12 +158,9 @@ async function loadCustomMatchweeks() {
     }
 }
 
-/**
- * يحفظ جولة مخصصة (upsert)
- */
 async function saveCustomMatchweek(round, matches, isHidden) {
     try {
-        const { error } = await window.sbClient
+        const result = await window.sbClient
             .from('custom_matchweeks')
             .upsert(
                 {
@@ -179,9 +172,9 @@ async function saveCustomMatchweek(round, matches, isHidden) {
                 { onConflict: 'round' }
             );
 
-        if (error) {
-            console.error('[Custom MW] save error:', error);
-            return { ok: false, error: error };
+        if (result.error) {
+            console.error('[Custom MW] save error:', result.error);
+            return { ok: false, error: result.error };
         }
 
         return { ok: true };
@@ -191,12 +184,9 @@ async function saveCustomMatchweek(round, matches, isHidden) {
     }
 }
 
-/**
- * يبدّل حالة الإخفاء لجولة
- */
 async function setRoundHidden(round, isHidden) {
     try {
-        const { error } = await window.sbClient
+        const result = await window.sbClient
             .from('custom_matchweeks')
             .upsert(
                 {
@@ -207,9 +197,9 @@ async function setRoundHidden(round, isHidden) {
                 { onConflict: 'round' }
             );
 
-        if (error) {
-            console.error('[Custom MW] setHidden error:', error);
-            return { ok: false, error: error };
+        if (result.error) {
+            console.error('[Custom MW] setHidden error:', result.error);
+            return { ok: false, error: result.error };
         }
 
         return { ok: true };
