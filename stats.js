@@ -1,9 +1,7 @@
 /* =========================================================
-   stats.js — FINALISSIMA LEAGUE CHAT
+   stats.js — FINALISSIMA LEAGUE CHAT (v2)
+   يقرأ من manager_history
 ========================================================= */
-
-const STATS_WORKER_URL = 'https://finalissima-api.aaa117703.workers.dev';
-const STATS_TOTAL_PAGES = 7;
 
 let statsAllManagers = [];
 let statsSortedByTotal = [];
@@ -11,7 +9,6 @@ let statsRankMap = {};
 let statsLoaded = false;
 let statsComputed = null;
 
-/* ⭐ استخدام cleanDisplayName */
 function statsDisplayName(name) {
     if (typeof cleanDisplayName === 'function') {
         return cleanDisplayName(name, 13);
@@ -22,29 +19,22 @@ function statsDisplayName(name) {
     return result.substring(0, 13);
 }
 
+/* =========================================================
+   Fetch Managers from history
+========================================================= */
+
 async function fetchAllManagersForStats() {
-    if (typeof getAllManagersCached === 'function') {
-        return await getAllManagersCached();
+    if (typeof getManagersWithHistory !== 'function') {
+        console.warn('[Stats] getManagersWithHistory not available');
+        return [];
     }
 
-    const allResults = [];
-    for (let page = 1; page <= STATS_TOTAL_PAGES; page++) {
-        try {
-            const response = await fetch(STATS_WORKER_URL + '/?page=' + page);
-            const data = await response.json();
-            if (data && data.standings && data.standings.results) {
-                allResults.push(...data.standings.results);
-                if (data.standings.has_next !== true) break;
-            } else {
-                break;
-            }
-        } catch (e) {
-            console.error('Stats page ' + page + ' failed:', e);
-            break;
-        }
-    }
-    return allResults;
+    return await getManagersWithHistory();
 }
+
+/* =========================================================
+   Compute
+========================================================= */
 
 function computeLeagueStats(managers) {
     if (!managers || managers.length === 0) return null;
@@ -375,7 +365,7 @@ async function loadStats() {
     try {
         const managers = await fetchAllManagersForStats();
         if (!managers || managers.length === 0) {
-            throw new Error('No data');
+            throw new Error('No data from manager_history');
         }
 
         statsAllManagers = managers;
@@ -432,9 +422,7 @@ function switchStatsTab(tabName) {
 
 window.addEventListener('managers-updated', function() {
     if (!statsLoaded) return;
-
     statsLoaded = false;
-
     const statsTab = document.getElementById('statsTab');
     if (statsTab && statsTab.classList.contains('active')) {
         loadStats();
