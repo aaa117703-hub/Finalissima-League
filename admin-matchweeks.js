@@ -1,9 +1,10 @@
 /* =========================================================
-   admin-matchweeks.js — إدارة المواجهات
+   admin-matchweeks.js — إدارة المواجهات (تصميم جديد)
 ========================================================= */
 
 window._editingRound = null;
 window._editingMatches = [];
+window._pickingSide = null;
 
 /* ===== فتح صفحة الإدارة ===== */
 function openSettingsMatchweeks() {
@@ -78,7 +79,6 @@ async function toggleRoundVisibility(round) {
         }
 
         openSettingsMatchweeks();
-
         if (typeof renderFixtures === 'function') renderFixtures();
     } else {
         if (typeof showToast === 'function') {
@@ -89,11 +89,6 @@ async function toggleRoundVisibility(round) {
 
 /* ===== فتح محرر المباريات ===== */
 function openRoundEditor(round) {
-    if (typeof teamsMap === 'undefined') {
-        if (typeof showToast === 'function') showToast('teamsMap not loaded', false, 3000);
-        return;
-    }
-
     const body = document.getElementById('settingsBody');
     if (!body) return;
 
@@ -113,38 +108,17 @@ function openRoundEditor(round) {
     renderRoundEditor();
 }
 
-/* ===== رسم واجهة التحرير ===== */
+/* ===== رسم واجهة التحرير — بطاقات ===== */
 function renderRoundEditor() {
-    if (typeof teamsMap === 'undefined') return;
-
     const body = document.getElementById('settingsBody');
     if (!body) return;
 
     const round = window._editingRound;
     const matches = window._editingMatches;
 
-    let teamOptions = '';
-    const teamsList = Object.keys(teamsMap).sort();
-    teamsList.forEach(function(code) {
-        const t = teamsMap[code];
-        teamOptions += '<option value="' + code + '">' + t.name + '</option>';
-    });
-
-    let rowsHtml = '';
+    let cardsHtml = '';
     matches.forEach(function(m, idx) {
-        const home = m[0] || '';
-        const away = m[1] || '';
-        rowsHtml +=
-            '<div class="mwm-edit-row">' +
-                '<select class="mwm-select" onchange="updateEditingMatch(' + idx + ',0,this.value)">' +
-                    teamOptions +
-                '</select>' +
-                '<span class="mwm-vs">vs</span>' +
-                '<select class="mwm-select" onchange="updateEditingMatch(' + idx + ',1,this.value)">' +
-                    teamOptions +
-                '</select>' +
-                '<button class="mwm-del-btn" onclick="removeEditingMatch(' + idx + ')">🗑️</button>' +
-            '</div>';
+        cardsHtml += renderMatchCard(m, idx);
     });
 
     body.innerHTML =
@@ -152,22 +126,149 @@ function renderRoundEditor() {
             '<span class="si-icon">←</span>' +
             '<span class="si-label">رجوع للقائمة</span>' +
         '</button>' +
-        '<div class="mwm-editor-title">تحرير الجولة ' + round + '</div>' +
-        '<div class="mwm-edit-list" id="mwmEditList">' + rowsHtml + '</div>' +
+
+        '<div class="mwm-editor-header">' +
+            '<div class="mwm-editor-title">الجولة ' + round + '</div>' +
+            '<div class="mwm-editor-sub">' + matches.length + ' مباريات</div>' +
+        '</div>' +
+
+        '<div class="mwm-edit-list" id="mwmEditList">' + cardsHtml + '</div>' +
+
         '<button class="mwm-add-btn" onclick="addEditingMatch()">➕ إضافة مباراة</button>' +
         '<button class="mwm-save-btn" onclick="saveRoundMatches()">💾 حفظ الجولة</button>';
-
-    setTimeout(function() {
-        const selects = document.querySelectorAll('.mwm-select');
-        selects.forEach(function(sel, i) {
-            const idx = Math.floor(i / 2);
-            const side = i % 2;
-            const val = window._editingMatches[idx][side];
-            if (val) sel.value = val;
-        });
-    }, 50);
 }
 
+/* ===== رسم بطاقة مباراة ===== */
+function renderMatchCard(match, idx) {
+    const home = match[0] || '';
+    const away = match[1] || '';
+
+    const homeInfo = (typeof teamsMap !== 'undefined' && teamsMap[home]) ? teamsMap[home] : null;
+    const awayInfo = (typeof teamsMap !== 'undefined' && teamsMap[away]) ? teamsMap[away] : null;
+
+    let homeLogoHtml = '';
+    if (homeInfo && homeInfo.logo) {
+        homeLogoHtml = '<img class="mwm-team-logo" src="./' + homeInfo.logo + '" alt="" onerror="this.style.display=\'none\'">';
+    } else {
+        homeLogoHtml = '<div class="mwm-team-placeholder">?</div>';
+    }
+
+    let awayLogoHtml = '';
+    if (awayInfo && awayInfo.logo) {
+        awayLogoHtml = '<img class="mwm-team-logo" src="./' + awayInfo.logo + '" alt="" onerror="this.style.display=\'none\'">';
+    } else {
+        awayLogoHtml = '<div class="mwm-team-placeholder">?</div>';
+    }
+
+    const homeName = homeInfo ? homeInfo.name : 'اختر';
+    const awayName = awayInfo ? awayInfo.name : 'اختر';
+
+    return '<div class="mwm-match-card">' +
+        '<button class="mwm-del-btn" onclick="removeEditingMatch(' + idx + ')">✕</button>' +
+        '<button class="mwm-team-pick' + (home ? ' picked' : '') + '" onclick="openTeamPicker(' + idx + ', 0)">' +
+            homeLogoHtml +
+            '<div class="mwm-team-name">' + homeName + '</div>' +
+        '</button>' +
+        '<div class="mwm-vs-badge">VS</div>' +
+        '<button class="mwm-team-pick' + (away ? ' picked' : '') + '" onclick="openTeamPicker(' + idx + ', 1)">' +
+            awayLogoHtml +
+            '<div class="mwm-team-name">' + awayName + '</div>' +
+        '</button>' +
+    '</div>';
+}
+
+/* ===== فتح Modal اختيار المنتخب ===== */
+function openTeamPicker(matchIdx, side) {
+    if (typeof teamsMap === 'undefined') {
+        if (typeof showToast === 'function') showToast('teamsMap not loaded', false, 3000);
+        return;
+    }
+
+    window._pickingSide = { matchIdx: matchIdx, side: side };
+
+    let modal = document.getElementById('mwmPickerModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'mwmPickerModal';
+        modal.className = 'mwm-picker-modal';
+        document.body.appendChild(modal);
+    }
+
+    let itemsHtml = '';
+    const teamsList = Object.keys(teamsMap).sort(function(a, b) {
+        return (teamsMap[a].name || '').localeCompare(teamsMap[b].name || '');
+    });
+
+    teamsList.forEach(function(code) {
+        const t = teamsMap[code];
+        if (!t) return;
+
+        const logo = t.logo || '';
+        const name = t.name || code;
+
+        itemsHtml +=
+            '<button class="mwm-picker-item" onclick="selectTeam(\'' + code + '\')" data-name="' + name.toLowerCase() + '">' +
+                '<img src="./' + logo + '" alt="" onerror="this.style.display=\'none\'">' +
+                '<div class="mwm-picker-item-name">' + name + '</div>' +
+            '</button>';
+    });
+
+    modal.innerHTML =
+        '<div class="mwm-picker-box">' +
+            '<div class="mwm-picker-header">' +
+                '<div class="mwm-picker-title">اختر المنتخب</div>' +
+                '<button class="mwm-picker-close" onclick="closeTeamPicker()">✕</button>' +
+            '</div>' +
+            '<div class="mwm-picker-search">' +
+                '<input type="text" id="mwmPickerSearch" placeholder="🔍 ابحث..." oninput="filterTeamPicker(this.value)" autocomplete="off">' +
+            '</div>' +
+            '<div class="mwm-picker-list" id="mwmPickerList">' +
+                itemsHtml +
+            '</div>' +
+        '</div>';
+
+    modal.style.display = 'flex';
+}
+
+function closeTeamPicker() {
+    const modal = document.getElementById('mwmPickerModal');
+    if (modal) modal.style.display = 'none';
+    window._pickingSide = null;
+}
+
+function filterTeamPicker(query) {
+    const list = document.getElementById('mwmPickerList');
+    if (!list) return;
+
+    const q = query.toLowerCase().trim();
+    const items = list.querySelectorAll('.mwm-picker-item');
+
+    items.forEach(function(item) {
+        const name = item.getAttribute('data-name') || '';
+        if (q === '' || name.indexOf(q) !== -1) {
+            item.style.display = 'flex';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+function selectTeam(code) {
+    if (!window._pickingSide) return;
+
+    const side = window._pickingSide.side;
+    const matchIdx = window._pickingSide.matchIdx;
+
+    if (!window._editingMatches[matchIdx]) {
+        window._editingMatches[matchIdx] = ['', ''];
+    }
+    window._editingMatches[matchIdx][side] = code;
+
+    closeTeamPicker();
+    renderRoundEditor();
+}
+
+/* ===== تعديل/إضافة/حذف ===== */
 function updateEditingMatch(idx, side, value) {
     if (!window._editingMatches[idx]) {
         window._editingMatches[idx] = ['', ''];
@@ -185,6 +286,7 @@ function removeEditingMatch(idx) {
     renderRoundEditor();
 }
 
+/* ===== حفظ الجولة ===== */
 async function saveRoundMatches() {
     if (typeof saveCustomMatchweek !== 'function') {
         if (typeof showToast === 'function') showToast('saveCustomMatchweek not available', false, 3000);
@@ -245,3 +347,7 @@ window.updateEditingMatch = updateEditingMatch;
 window.addEditingMatch = addEditingMatch;
 window.removeEditingMatch = removeEditingMatch;
 window.saveRoundMatches = saveRoundMatches;
+window.openTeamPicker = openTeamPicker;
+window.closeTeamPicker = closeTeamPicker;
+window.filterTeamPicker = filterTeamPicker;
+window.selectTeam = selectTeam;
