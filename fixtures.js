@@ -52,7 +52,7 @@ async function loadCustomMatchweeksIntoMemory() {
     }
 }
 
-let editMode = false;
+/* ⭐ editMode موجود في config.js — ما نعرّفه هنا */
 
 function initRoundDropdown() {
     const select = document.getElementById('roundSelect');
@@ -376,3 +376,5 @@ function setupEruda() {
 window.loadCustomMatchweeksIntoMemory = loadCustomMatchweeksIntoMemory;
 window.isRoundHidden = isRoundHidden;
 window.canUserSeeRound = canUserSeeRound;
+window.unlockSecretPanel = unlockSecretPanel;
+window.exitEditMode = exitEditMode;
