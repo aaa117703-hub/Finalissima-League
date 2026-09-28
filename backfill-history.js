@@ -1,5 +1,6 @@
 /* =========================================================
    backfill-history.js — FINALISSIMA LEAGUE CHAT
+   يستخدم Worker لجلب تاريخ كل مدير
 ========================================================= */
 
 const BACKFILL_WORKER = 'https://finalissima-api.aaa117703.workers.dev';
@@ -11,24 +12,31 @@ let backfillDone = false;
 
 function showBackfillDebug(text, isError) {
     console.log('[Backfill]', text);
+    if (isError) {
+        console.error('[Backfill]', text);
+    }
 }
 
+/* ⭐ يستخدم الـ Worker بدل FPL API مباشرة */
 async function fetchManagerHistory(entryId) {
     try {
-        const res = await fetchWithTimeout(
-            'https://fantasy.premierleague.com/api/entry/' + entryId + '/history/',
-            {},
-            8000
-        );
+        const url = BACKFILL_WORKER + '/?type=history&entry=' + entryId;
+
+        const res = await fetchWithTimeout(url, {}, 15000);
 
         if (!res.ok) {
+            console.warn('[Backfill] HTTP ' + res.status + ' for entry ' + entryId);
             return [];
         }
 
         const data = await res.json();
-        if (!data || !data.current) return [];
 
-        return data.current.map(function(gw) {
+        if (!data || !data.ok || !Array.isArray(data.history)) {
+            console.warn('[Backfill] Invalid response for entry ' + entryId);
+            return [];
+        }
+
+        return data.history.map(function(gw) {
             return {
                 entry: entryId,
                 event: gw.event,
@@ -39,6 +47,7 @@ async function fetchManagerHistory(entryId) {
         });
 
     } catch (e) {
+        console.warn('[Backfill] Fetch failed for ' + entryId + ':', e.message);
         return [];
     }
 }
@@ -48,12 +57,12 @@ async function saveHistoryBatch(rows) {
     if (!rows || rows.length === 0) return false;
 
     try {
-        const { error } = await window.sbClient
+        const result = await window.sbClient
             .from('manager_history')
             .upsert(rows, { onConflict: 'entry,event' });
 
-        if (error) {
-            console.error('[Backfill] Save error:', error);
+        if (result.error) {
+            console.error('[Backfill] Save error:', result.error);
             return false;
         }
         return true;
@@ -65,6 +74,7 @@ async function saveHistoryBatch(rows) {
 
 async function runBackfillWithDebug() {
     if (backfillRunning || backfillDone) return;
+
     if (!window.sbClient) {
         showBackfillDebug('Backfill: no Supabase client', true);
         return;
@@ -84,28 +94,39 @@ async function runBackfillWithDebug() {
 
     let done = 0;
     let saved = 0;
+    let failed = 0;
     let buffer = [];
 
     for (let i = 0; i < managers.length; i++) {
         const m = managers[i];
+
         const rows = await fetchManagerHistory(m.entry);
-        buffer.push(...rows);
+
+        if (rows.length === 0) {
+            failed++;
+        } else {
+            buffer.push(...rows);
+        }
+
         done++;
 
-        if (buffer.length >= 100 || i === managers.length - 1) {
+        /* كل 50 صف → حفظ */
+        if (buffer.length >= 50 || i === managers.length - 1) {
             const ok = await saveHistoryBatch(buffer);
             if (ok) saved += buffer.length;
             buffer = [];
         }
 
-        await new Promise(function(r) { setTimeout(r, 150); });
+        /* تأخير بسيط بين الطلبات (لتجنب Rate limit) */
+        await new Promise(function(r) { setTimeout(r, 100); });
 
-        if (done % 10 === 0) {
-            showBackfillDebug('Backfill: ' + done + '/' + managers.length + ' · saved=' + saved);
+        /* تقرير كل 20 مدير */
+        if (done % 20 === 0) {
+            showBackfillDebug('Backfill: ' + done + '/' + managers.length + ' · saved=' + saved + ' · failed=' + failed);
         }
     }
 
-    showBackfillDebug('Backfill: DONE! saved=' + saved + ' rows');
+    showBackfillDebug('Backfill: DONE! saved=' + saved + ' rows, failed=' + failed);
 
     backfillRunning = false;
     backfillDone = true;
@@ -113,12 +134,37 @@ async function runBackfillWithDebug() {
     try {
         localStorage.setItem(BACKFILL_FLAG_KEY, JSON.stringify({
             ts: Date.now(),
-            saved: saved
+            saved: saved,
+            failed: failed
         }));
     } catch (e) {}
+
+    /* رسالة نجاح */
+    if (typeof showToast === 'function') {
+        showToast('Backfill: تم! ' + saved + ' سجل', true, 5000);
+    }
 }
 
 window.runBackfill = runBackfillWithDebug;
+
+/* ===== دالة يدوية لتشغيل Backfill ===== */
+window.forceBackfill = function() {
+    backfillDone = false;
+    backfillRunning = false;
+    localStorage.removeItem(BACKFILL_FLAG_KEY);
+
+    /* مسح البيانات القديمة (اختياري) */
+    if (window.sbClient) {
+        window.sbClient
+            .from('manager_history')
+            .delete()
+            .neq('id', 0)
+            .then(function() {
+                console.log('[Backfill] Old data cleared');
+                runBackfillWithDebug();
+            });
+    }
+};
 
 function shouldRunBackfill() {
     try {
