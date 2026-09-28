@@ -1,6 +1,5 @@
 /* =========================================================
-   theme.css — FINALISSIMA LEAGUE
-   Qatar 2022 Colors + Settings + Matchweek Manager
+   theme.css — FINALISSIMA LEAGUE (نظيف)
 ========================================================= */
 
 :root{
@@ -13,17 +12,86 @@
     --cream:      #FAF6F0;
 }
 
+body{ background:#FAF6F0; color:#333; }
+
 /* =========================================================
-   BASE
+   الأزرار الأساسية للموقع
 ========================================================= */
 
-body{
-    background:#FAF6F0;
-    color:#333;
+/* Fixtures buttons */
+.save-round-btn,
+.clear-round-btn,
+.download-action-btn {
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #FFFFFF;
+    border: 2px solid #C8A95F;
+}
+.save-round-btn:hover,
+.clear-round-btn:hover,
+.download-action-btn:hover {
+    transform: scale(1.03);
+}
+
+/* Round select pill */
+.round-select-pill {
+    background: #FFFFFF;
+    color: #8B1A2F;
+    border: 2px solid #C8A95F;
+    font-weight: 900;
+}
+.round-select-pill:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(200, 169, 95, 0.3);
+}
+
+/* Round indicator */
+.round-indicator {
+    color: #8B1A2F;
+    border: 2px dashed transparent;
+}
+.round-indicator:hover {
+    border-color: #C8A95F;
+}
+
+/* Nav arrows */
+.nav-arrow-btn {
+    background: #FFFFFF;
+    color: #8B1A2F;
+    border: 2px solid #C8A95F;
+}
+.nav-arrow-btn:hover {
+    background: #FAF6F0;
+}
+
+/* Download + Settings buttons */
+.download-btn,
+.settings-btn-inline {
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    border: 2px solid #C8A95F;
+    color: #FFFFFF;
 }
 
 /* =========================================================
-   SETTINGS MODAL — Finalissima Theme
+   DOWNLOAD MENU
+========================================================= */
+
+.download-menu {
+    background: #FFFFFF;
+    border: 2px solid #C8A95F;
+    box-shadow: 0 8px 24px rgba(139, 26, 47, 0.25);
+}
+.download-menu-item {
+    color: #8B1A2F;
+}
+.download-menu-item:hover {
+    background: #FAF6F0;
+}
+.download-menu-item .q-scale {
+    color: #C8A95F;
+}
+
+/* =========================================================
+   SETTINGS MODAL
 ========================================================= */
 
 .settings-modal{
@@ -205,14 +273,10 @@ body{
 #sectionMaintenance .maint-icon{font-size:48px;margin-bottom:16px;}
 
 /* =========================================================
-   MATCHWEEK MANAGER — تصميم جديد
+   MATCHWEEK MANAGER
 ========================================================= */
 
-.mwm-rounds-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
+.mwm-rounds-list { display: flex; flex-direction: column; gap: 10px; }
 
 .mwm-round-row {
     display: flex;
@@ -233,120 +297,65 @@ body{
 .mwm-round-info { flex: 1; text-align: right; }
 
 .mwm-round-num {
-    font-size: 15px;
-    font-weight: 900;
-    color: #8B1A2F;
-    margin-bottom: 4px;
-    font-family: 'Cairo', sans-serif;
+    font-size: 15px; font-weight: 900; color: #8B1A2F;
+    margin-bottom: 4px; font-family: 'Cairo', sans-serif;
 }
 
-.mwm-round-meta {
-    font-size: 11px;
-    color: #666;
-    font-weight: 700;
-}
+.mwm-round-meta { font-size: 11px; color: #666; font-weight: 700; }
 .mwm-hidden { color: #C0392B; font-weight: 900; }
 .mwm-visible { color: #27AE60; font-weight: 900; }
 
-.mwm-round-actions {
-    display: flex;
-    gap: 8px;
-}
+.mwm-round-actions { display: flex; gap: 8px; }
 
 .mwm-btn {
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    border: none;
-    font-size: 18px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: 42px; height: 42px; border-radius: 12px; border: none;
+    font-size: 18px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
     transition: all .2s ease;
 }
 .mwm-btn:active { transform: scale(0.92); }
-.mwm-toggle {
-    background: #FAF6F0;
-    border: 2px solid #C8A95F;
-}
-.mwm-edit {
-    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
-    color: #fff;
-}
-
-/* ===== محرر الجولة ===== */
+.mwm-toggle { background: #FAF6F0; border: 2px solid #C8A95F; }
+.mwm-edit { background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%); color: #fff; }
 
 .mwm-editor-header {
-    text-align: center;
-    padding: 16px 0 12px;
-    border-bottom: 3px solid #C8A95F;
-    margin-bottom: 16px;
+    text-align: center; padding: 16px 0 12px;
+    border-bottom: 3px solid #C8A95F; margin-bottom: 16px;
 }
 
 .mwm-editor-title {
-    font-size: 22px;
-    font-weight: 900;
-    color: #8B1A2F;
-    font-family: 'Cairo', sans-serif;
-    margin-bottom: 4px;
+    font-size: 22px; font-weight: 900; color: #8B1A2F;
+    font-family: 'Cairo', sans-serif; margin-bottom: 4px;
 }
 
-.mwm-editor-sub {
-    font-size: 12px;
-    color: #666;
-    font-weight: 700;
-}
+.mwm-editor-sub { font-size: 12px; color: #666; font-weight: 700; }
 
-.mwm-edit-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-/* ===== بطاقة المباراة ===== */
+.mwm-edit-list { display: flex; flex-direction: column; gap: 12px; }
 
 .mwm-match-card {
     background: #FFFFFF;
     border: 2px solid #E5D4A5;
     border-radius: 16px;
     padding: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: relative;
-    transition: all .2s ease;
+    display: flex; align-items: center; gap: 8px;
+    position: relative; transition: all .2s ease;
 }
 .mwm-match-card:hover {
     border-color: #C8A95F;
     box-shadow: 0 4px 12px rgba(139, 26, 47, 0.1);
 }
 
-/* ===== زر اختيار منتخب ===== */
-
 .mwm-team-pick {
     flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
     padding: 10px 6px;
     background: #FAF6F0;
     border: 2px solid #E5D4A5;
     border-radius: 12px;
-    cursor: pointer;
-    transition: all .2s ease;
-    min-height: 80px;
-    font-family: inherit;
-    gap: 6px;
+    cursor: pointer; transition: all .2s ease;
+    min-height: 80px; font-family: inherit; gap: 6px;
 }
-.mwm-team-pick:hover {
-    background: #F5E6D3;
-    border-color: #C8A95F;
-}
-.mwm-team-pick:active {
-    transform: scale(0.97);
-}
+.mwm-team-pick:hover { background: #F5E6D3; border-color: #C8A95F; }
+.mwm-team-pick:active { transform: scale(0.97); }
 .mwm-team-pick.picked {
     background: linear-gradient(135deg, #FFF8E7 0%, #FAF6F0 100%);
     border-color: #C8A95F;
@@ -354,49 +363,30 @@ body{
 }
 
 .mwm-team-logo {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-    display: block;
+    width: 36px; height: 36px; object-fit: contain; display: block;
     filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 }
 
 .mwm-team-placeholder {
-    width: 36px;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #E5D4A5;
-    border-radius: 50%;
-    color: #8B1A2F;
-    font-size: 20px;
-    font-weight: 900;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    background: #E5D4A5; border-radius: 50%;
+    color: #8B1A2F; font-size: 20px; font-weight: 900;
 }
 
 .mwm-team-name {
-    font-size: 12px;
-    font-weight: 900;
-    color: #8B1A2F;
-    text-align: center;
-    line-height: 1.2;
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    font-size: 12px; font-weight: 900; color: #8B1A2F;
+    text-align: center; line-height: 1.2;
+    max-width: 100%; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
 }
 
 .mwm-vs-badge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 40px;
-    height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px;
     background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
-    color: #C8A95F;
-    border-radius: 50%;
-    font-size: 13px;
-    font-weight: 900;
+    color: #C8A95F; border-radius: 50%;
+    font-size: 13px; font-weight: 900;
     font-family: 'Inter', sans-serif;
     flex-shrink: 0;
     box-shadow: 0 3px 8px rgba(139, 26, 47, 0.3);
@@ -404,63 +394,35 @@ body{
 }
 
 .mwm-del-btn {
-    position: absolute;
-    top: -8px;
-    left: -8px;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+    position: absolute; top: -8px; left: -8px;
+    width: 28px; height: 28px; border-radius: 50%;
     border: 2px solid #FFFFFF;
-    background: #C0392B;
-    color: #FFFFFF;
-    font-size: 14px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #C0392B; color: #FFFFFF;
+    font-size: 14px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
     box-shadow: 0 3px 8px rgba(192, 57, 43, 0.4);
-    transition: all .2s ease;
-    z-index: 10;
-    font-weight: 900;
+    transition: all .2s ease; z-index: 10; font-weight: 900;
 }
 .mwm-del-btn:active { transform: scale(0.9); }
 
-/* ===== أزرار الإضافة والحفظ ===== */
-
 .mwm-add-btn {
-    width: 100%;
-    padding: 16px;
-    margin-top: 14px;
-    background: #FFFFFF;
-    color: #8B1A2F;
-    border: 3px dashed #C8A95F;
-    border-radius: 14px;
-    font-size: 14px;
-    font-weight: 900;
-    cursor: pointer;
-    font-family: inherit;
-    transition: all .2s ease;
+    width: 100%; padding: 16px; margin-top: 14px;
+    background: #FFFFFF; color: #8B1A2F;
+    border: 3px dashed #C8A95F; border-radius: 14px;
+    font-size: 14px; font-weight: 900;
+    cursor: pointer; font-family: inherit; transition: all .2s ease;
 }
-.mwm-add-btn:hover {
-    background: #FAF6F0;
-    border-color: #8B1A2F;
-}
+.mwm-add-btn:hover { background: #FAF6F0; border-color: #8B1A2F; }
 .mwm-add-btn:active { transform: scale(0.98); }
 
 .mwm-save-btn {
-    width: 100%;
-    padding: 16px;
-    margin-top: 10px;
+    width: 100%; padding: 16px; margin-top: 10px;
     background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color: #FFFFFF;
-    border: 3px solid #C8A95F;
-    border-radius: 14px;
-    font-size: 16px;
-    font-weight: 900;
-    cursor: pointer;
-    font-family: inherit;
-    letter-spacing: 1px;
-    transition: all .2s ease;
+    border: 3px solid #C8A95F; border-radius: 14px;
+    font-size: 16px; font-weight: 900;
+    cursor: pointer; font-family: inherit;
+    letter-spacing: 1px; transition: all .2s ease;
     box-shadow: 0 6px 16px rgba(139, 26, 47, 0.3);
 }
 .mwm-save-btn:hover {
@@ -469,88 +431,52 @@ body{
 }
 .mwm-save-btn:active { transform: translateY(0) scale(0.98); }
 
-/* ===== Modal اختيار المنتخب ===== */
-
 .mwm-picker-modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 99999;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.7); z-index: 99999;
+    display: flex; align-items: flex-end; justify-content: center;
     animation: fadeIn .2s ease;
 }
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .mwm-picker-box {
-    width: 100%;
-    max-width: 500px;
-    max-height: 85vh;
-    background: #FFFFFF;
-    border-radius: 24px 24px 0 0;
-    display: flex;
-    flex-direction: column;
+    width: 100%; max-width: 500px; max-height: 85vh;
+    background: #FFFFFF; border-radius: 24px 24px 0 0;
+    display: flex; flex-direction: column;
     animation: slideUp .3s ease;
-    border-top: 4px solid #C8A95F;
-    overflow: hidden;
+    border-top: 4px solid #C8A95F; overflow: hidden;
 }
-@keyframes slideUp {
-    from { transform: translateY(100%); }
-    to { transform: translateY(0); }
-}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
 .mwm-picker-header {
     background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     padding: 16px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    color: #fff;
-    border-bottom: 3px solid #C8A95F;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #fff; border-bottom: 3px solid #C8A95F;
 }
 
 .mwm-picker-title {
-    font-size: 16px;
-    font-weight: 900;
-    font-family: 'Cairo', sans-serif;
-    letter-spacing: 1px;
+    font-size: 16px; font-weight: 900;
+    font-family: 'Cairo', sans-serif; letter-spacing: 1px;
 }
 
 .mwm-picker-close {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    width: 32px; height: 32px; border-radius: 50%;
     border: 2px solid #C8A95F;
-    background: transparent;
-    color: #C8A95F;
-    font-size: 16px;
-    font-weight: 900;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: transparent; color: #C8A95F;
+    font-size: 16px; font-weight: 900; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
 }
 
 .mwm-picker-search {
-    padding: 12px 16px;
-    background: #FAF6F0;
+    padding: 12px 16px; background: #FAF6F0;
     border-bottom: 2px solid #E5D4A5;
 }
-
 .mwm-picker-search input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 2px solid #E5D4A5;
-    border-radius: 12px;
-    font-size: 14px;
-    font-family: inherit;
-    background: #FFFFFF;
-    color: #333;
-    outline: none;
+    width: 100%; padding: 12px 16px;
+    border: 2px solid #E5D4A5; border-radius: 12px;
+    font-size: 14px; font-family: inherit;
+    background: #FFFFFF; color: #333; outline: none;
     transition: all .2s ease;
 }
 .mwm-picker-search input:focus {
@@ -558,94 +484,45 @@ body{
     box-shadow: 0 0 0 3px rgba(200, 169, 95, 0.2);
 }
 
+.mwm-picker-info {
+    padding: 8px 16px; background: #FAF6F0;
+    font-size: 12px; font-weight: 900; color: #8B1A2F;
+    text-align: center; border-bottom: 1px solid #E5D4A5;
+}
+
 .mwm-picker-list {
-    flex: 1;
-    overflow-y: auto;
+    flex: 1; overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 8px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
 }
 
 .mwm-picker-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 8px;
-    background: #FFFFFF;
-    border: 2px solid #E5D4A5;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all .2s ease;
-    gap: 6px;
-    font-family: inherit;
-    min-height: 90px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 12px 8px; background: #FFFFFF;
+    border: 2px solid #E5D4A5; border-radius: 12px;
+    cursor: pointer; transition: all .2s ease;
+    gap: 6px; font-family: inherit; min-height: 90px;
+    position: relative;
 }
 .mwm-picker-item:hover,
 .mwm-picker-item:active {
     background: linear-gradient(135deg, #FAF6F0 0%, #F5E6D3 100%);
-    border-color: #8B1A2F;
-    transform: scale(0.97);
+    border-color: #8B1A2F; transform: scale(0.97);
 }
 
 .mwm-picker-item img {
-    width: 40px;
-    height: 40px;
-    object-fit: contain;
+    width: 40px; height: 40px; object-fit: contain;
 }
 
 .mwm-picker-item-name {
-    font-size: 11px;
-    font-weight: 900;
-    color: #8B1A2F;
-    text-align: center;
-    line-height: 1.2;
-    text-transform: uppercase;
+    font-size: 11px; font-weight: 900; color: #8B1A2F;
+    text-align: center; line-height: 1.2; text-transform: uppercase;
 }
-
-/* =========================================================
-   ROUND HIDDEN MESSAGE
-========================================================= */
-.round-hidden-msg {
-    padding: 60px 20px;
-    text-align: center;
-    color: #8B1A2F;
-}
-.round-hidden-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-}
-.round-hidden-title {
-    font-size: 18px;
-    font-weight: 900;
-    margin-bottom: 8px;
-    font-family: 'Cairo', sans-serif;
-}
-.round-hidden-sub {
-    font-size: 13px;
-    color: #999;
-    font-weight: 700;
-}
-
-/* =========================================================
-   Mobile
-========================================================= */
-@media (max-width:400px){
-    .mwm-team-logo { width: 32px; height: 32px; }
-    .mwm-team-placeholder { width: 32px; height: 32px; font-size: 18px; }
-    .mwm-team-name { font-size: 11px; }
-    .mwm-picker-item img { width: 36px; height: 36px; }
-    .mwm-picker-item-name { font-size: 10px; }
-    .mwm-vs-badge { width: 34px; height: 34px; font-size: 11px; }
-}
-/* ===== Product disabled in picker ===== */
 
 .mwm-picker-item-disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-    position: relative;
+    opacity: 0.4; cursor: not-allowed;
     background: #F5F5F5 !important;
     border-color: #DDD !important;
 }
@@ -656,24 +533,31 @@ body{
 }
 
 .mwm-picker-item-used {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    background: #C0392B;
-    color: #FFFFFF;
-    font-size: 9px;
-    font-weight: 900;
-    padding: 2px 6px;
-    border-radius: 6px;
-    letter-spacing: 0.5px;
+    position: absolute; top: 6px; left: 6px;
+    background: #C0392B; color: #FFFFFF;
+    font-size: 9px; font-weight: 900;
+    padding: 2px 6px; border-radius: 6px; letter-spacing: 0.5px;
 }
 
-.mwm-picker-info {
-    padding: 8px 16px;
-    background: #FAF6F0;
-    font-size: 12px;
-    font-weight: 900;
-    color: #8B1A2F;
-    text-align: center;
-    border-bottom: 1px solid #E5D4A5;
+/* =========================================================
+   ROUND HIDDEN MESSAGE
+========================================================= */
+.round-hidden-msg {
+    padding: 60px 20px; text-align: center; color: #8B1A2F;
+}
+.round-hidden-icon { font-size: 48px; margin-bottom: 16px; }
+.round-hidden-title {
+    font-size: 18px; font-weight: 900; margin-bottom: 8px;
+    font-family: 'Cairo', sans-serif;
+}
+.round-hidden-sub { font-size: 13px; color: #999; font-weight: 700; }
+
+/* Mobile */
+@media (max-width:400px){
+    .mwm-team-logo { width: 32px; height: 32px; }
+    .mwm-team-placeholder { width: 32px; height: 32px; font-size: 18px; }
+    .mwm-team-name { font-size: 11px; }
+    .mwm-picker-item img { width: 36px; height: 36px; }
+    .mwm-picker-item-name { font-size: 10px; }
+    .mwm-vs-badge { width: 34px; height: 34px; font-size: 11px; }
 }
