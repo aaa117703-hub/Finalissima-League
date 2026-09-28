@@ -6,16 +6,12 @@
 const TOTW_TOP_COUNT = 20;
 const TOTW_SQUAD_SIZE = 11;
 
-let currentTOTWView = 'squad';      // 'squad' | 'list'
-let currentTOTWMode = 'week';       // 'week' | 'month'
+let currentTOTWView = 'squad';
+let currentTOTWMode = 'week';
 let currentTOTWData = [];
 let currentTOTWSelected = [];
 let currentTOTWRound = 0;
 let currentTOTWSaved = false;
-
-/* =========================================================
-   Helpers
-========================================================= */
 
 function shortenPlayerName(name) {
     if (typeof cleanDisplayName === 'function') {
@@ -33,10 +29,6 @@ function getSelectedPlayers() {
     });
 }
 
-/* =========================================================
-   جيب Top 20 من manager_history
-========================================================= */
-
 async function getTOTWTop20FromHistory() {
     if (typeof getManagersWithHistory !== 'function') {
         console.warn('[TOTW] getManagersWithHistory not available');
@@ -50,7 +42,6 @@ async function getTOTWTop20FromHistory() {
         return [];
     }
 
-    /* فلترة: نحتفظ فقط بالمديرين المعروفين */
     const filtered = managers.filter(function(m) {
         if (typeof findPlayerTeam !== 'function') return true;
         const rawName = m.player_name || m.entry_name || '';
@@ -58,7 +49,6 @@ async function getTOTWTop20FromHistory() {
         return teamName !== '';
     });
 
-    /* ترتيب حسب مجموع النقاط (تراكمي) */
     const sorted = filtered.sort(function(a, b) {
         return (b.totalPoints || 0) - (a.totalPoints || 0);
     });
@@ -67,10 +57,6 @@ async function getTOTWTop20FromHistory() {
 
     return sorted.slice(0, TOTW_TOP_COUNT);
 }
-
-/* =========================================================
-   Switch View (Squad / List)
-========================================================= */
 
 function switchTOTWView(view) {
     currentTOTWView = view;
@@ -94,10 +80,6 @@ function switchTOTWView(view) {
     }
 }
 
-/* =========================================================
-   Switch Mode (Week / Month)
-========================================================= */
-
 async function switchTOTWMode(mode) {
     currentTOTWMode = mode;
 
@@ -113,10 +95,6 @@ async function switchTOTWMode(mode) {
         await loadTOTW();
     }
 }
-
-/* =========================================================
-   Render Cards (Pitch)
-========================================================= */
 
 function renderTOTWCards(selectedPlayers) {
     const pitch = document.getElementById('totwPlayers');
@@ -187,10 +165,6 @@ function createTOTWCard(player) {
     '</div>';
 }
 
-/* =========================================================
-   Render List
-========================================================= */
-
 function renderTOTWList(players) {
     const listWrapper = document.getElementById('totwListWrapper');
     if (!listWrapper) return;
@@ -231,7 +205,7 @@ function renderTOTWList(players) {
         }
 
         let logoHtml = '';
-        if (teamName && typeof TEAMS_LOGOS !== 'undefined' && = TEAMS_LOGOS[teamName]) {
+        if (teamName && typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[teamName]) {
             logoHtml = '<div class="totw-list-logo">' +
                 '<img src="./' + TEAMS_LOGOS[teamName] + '" onerror="this.style.display=\'none\'">' +
             '</div>';
@@ -254,10 +228,6 @@ function renderTOTWList(players) {
 
     listWrapper.innerHTML = html;
 }
-
-/* =========================================================
-   Selection
-========================================================= */
 
 function toggleTOTWSelection(entryId) {
     const idx = currentTOTWSelected.indexOf(entryId);
@@ -299,19 +269,18 @@ async function saveTOTWSelection() {
 
     if (typeof showToast === 'function') showToast('Saving...', false);
 
-    /* الحفظ اليدوي — يستخدم saveTOTWSnapshot لو موجود */
     if (typeof saveTOTWSnapshot !== 'function') {
-        if (typeof showToast === 'function') showToast('Save not m available', false);
+        if (typeof showToast === 'function') showToast('Save not available', false);
         return;
     }
 
-    const ok =.event await saveTOTWSnapshot(
-       _total currentTOTWRound,
-        currentTOTW ||Data,
+    const ok = await saveTOTWSnapshot(
+        currentTOTWRound,
+        currentTOTWData,
         currentTOTWSelected
     );
 
-     if (ok) {
+    if (ok) {
         currentTOTWSaved = true;
         renderTOTWList(currentTOTWData);
         if (typeof showToast === 'function') showToast('Saved!', true);
@@ -319,10 +288,6 @@ async function saveTOTWSelection() {
         if (typeof showToast === 'function') showToast('Save failed', false);
     }
 }
-
-/* =========================================================
-   Load TOTW (Week Mode — تراكمي)
-========================================================= */
 
 async function loadTOTW() {
     const loadingBox = document.getElementById('totwLoadingBox');
@@ -338,14 +303,12 @@ async function loadTOTW() {
     if (errorBox) errorBox.style.display = 'none';
 
     try {
-        /* نجيب Top 20 من manager_history */
         const players = await getTOTWTop20FromHistory();
 
         if (!players || players.length === 0) {
             throw new Error('No data from manager_history');
         }
 
-        /* نختار أول 11 افتراضياً */
         const selected = players.slice(0, TOTW_SQUAD_SIZE).map(function(p) {
             return p.entry;
         });
@@ -355,7 +318,6 @@ async function loadTOTW() {
         currentTOTWSaved = false;
         currentTOTWRound = currentRound || 1;
 
-        /* حدّث اسم الجولة */
         const gwLabel = document.getElementById('totwGwLabel');
         if (gwLabel) {
             gwLabel.textContent = 'GW' + currentRound + ' · تراكمي';
@@ -382,10 +344,6 @@ async function loadTOTW() {
     }
 }
 
-/* =========================================================
-   Load Monthly TOTW
-========================================================= */
-
 async function loadMonthlyTOTW() {
     const loadingBox = document.getElementById('totwLoadingBox');
     const pitchWrapper = document.getElementById('totwPitchWrapper');
@@ -404,7 +362,6 @@ async function loadMonthlyTOTW() {
             throw new Error('getMonthlyTop11 not available');
         }
 
-        /* نجيب الشهر الحالي */
         const now = new Date();
         const monthKey = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
 
@@ -414,7 +371,6 @@ async function loadMonthlyTOTW() {
             throw new Error('No monthly data');
         }
 
-        /* إذا الشهر جاري — نعرض "قيد التطوير" */
         if (result.ok === false || !result.players || result.players.length === 0) {
             loadingBox.style.display = 'none';
             if (errorBox) {
@@ -430,7 +386,6 @@ async function loadMonthlyTOTW() {
             return;
         }
 
-        /* عرض النتائج */
         const players = result.players;
 
         currentTOTWData = players;
@@ -462,10 +417,6 @@ async function loadMonthlyTOTW() {
         }
     }
 }
-
-/* =========================================================
-   Window
-========================================================= */
 
 window.toggleTOTWSelection = toggleTOTWSelection;
 window.resetTOTWSelection = resetTOTWSelection;
