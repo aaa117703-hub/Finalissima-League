@@ -1,124 +1,59 @@
 /* =========================================================
-   trends.js — FINALISSIMA LEAGUE CHAT
+   trends.js — FINALISSIMA LEAGUE CHAT (v2)
+   يقرأ من manager_history
 ========================================================= */
 
-async function saveCurrentRanks(round) {
-    if (!window.sbClient) return false;
-    if (!round) return false;
+async function computeTrendsFromHistory() {
+    if (typeof loadAllManagerHistory !== 'function') return null;
 
-    try {
-        const allResults = await getAllManagersCached();
+    const history = await loadAllManagerHistory();
+    if (!history || history.length === 0) return null;
 
-        if (!allResults || allResults.length === 0) return false;
+    const rounds = [...new Set(history.map(r => r.event))].sort((a, b) => a - b);
+    if (rounds.length < 2) return null;
 
-        const sorted = [...allResults].sort(function(a, b) {
-            return (b.total || 0) - (a.total || 0);
-        });
+    const lastRound = rounds[rounds.length - 1];
+    const prevRound = rounds[rounds.length - 2];
 
-        const rows = sorted.map(function(m, idx) {
-            return {
-                round: round,
-                entry_id: m.entry,
-                player_name: m.player_name || '',
-                entry_name: m.entry_name || '',
-                rank: idx + 1,
-                total: m.total || 0,
-                event_total: m.event_total || 0
-            };
-        });
-
-        await window.sbClient
-            .from('weekly_ranks')
-            .delete()
-            .eq('round', round);
-
-        const { error } = await window.sbClient
-            .from('weekly_ranks')
-            .insert(rows);
-
-        if (error) {
-            console.error('Save ranks error:', error);
-            return false;
-        }
-
-        console.log('Ranks saved for round', round, rows.length);
-        return true;
-
-    } catch (e) {
-        console.error('saveCurrentRanks exception:', e);
-        return false;
+    /* جيب المديرين */
+    let managers = [];
+    if (typeof getManagersWithHistory === 'function') {
+        managers = await getManagersWithHistory();
     }
-}
+    const mMap = {};
+    managers.forEach(m => { mMap[m.entry] = m; });
 
-async function loadRanksForRound(round) {
-    if (!window.sbClient) return null;
-
-    try {
-        const { data, error } = await window.sbClient
-            .from('weekly_ranks')
-            .select('entry_id, player_name, entry_name, rank, total')
-            .eq('round', round);
-
-        if (error) {
-            console.error('Load ranks error:', error);
-            return null;
-        }
-
-        if (!data || data.length === 0) return null;
-
-        const map = {};
-        data.forEach(function(r) {
-            map[r.entry_id] = r;
-        });
-
-        return map;
-
-    } catch (e) {
-        console.error('loadRanksForRound exception:', e);
-        return null;
-    }
-}
-
-async function computeTrends(currentRound) {
-    if (currentRound < 2) return null;
-
-    const currentRanks = await loadRanksForRound(currentRound);
-    const prevRanks = await loadRanksForRound(currentRound - 1);
-
-    if (!currentRanks || !prevRanks) {
-        console.log('Missing ranks for trend calculation');
-        return null;
-    }
+    const last = {};
+    history.filter(r => r.event === lastRound).forEach(r => { last[r.entry] = r; });
+    const prev = {};
+    history.filter(r => r.event === prevRound).forEach(r => { prev[r.entry] = r; });
 
     const trends = [];
+    Object.keys(last).forEach(entryId => {
+        if (!prev[entryId]) return;
 
-    Object.keys(currentRanks).forEach(function(entryId) {
-        const current = currentRanks[entryId];
-        const prev = prevRanks[entryId];
-
-        if (!prev) return;
-
-        const diff = prev.rank - current.rank;
+        const diff = (prev[entryId].overall_rank || 0) - (last[entryId].overall_rank || 0);
+        const info = mMap[entryId] || {};
 
         trends.push({
-            entry_id: current.entry_id,
-            player_name: current.player_name,
-            entry_name: current.entry_name,
-            currentRank: current.rank,
-            previousRank: prev.rank,
+            entry_id: entryId,
+            player_name: info.player_name || '',
+            entry_name: info.entry_name || '',
+            currentRank: last[entryId].overall_rank || 0,
+            previousRank: prev[entryId].overall_rank || 0,
             diff: diff,
-            total: current.total
+            total: last[entryId].total_points || 0
         });
     });
 
     const risers = trends
-        .filter(function(t) { return t.diff > 0; })
-        .sort(function(a, b) { return b.diff - a.diff; })
+        .filter(t => t.diff > 0)
+        .sort((a, b) => b.diff - a.diff)
         .slice(0, 5);
 
     const fallers = trends
-        .filter(function(t) { return t.diff < 0; })
-        .sort(function(a, b) { return a.diff - b.diff; })
+        .filter(t => t.diff < 0)
+        .sort((a, b) => a.diff - b.diff)
         .slice(0, 5);
 
     return {
@@ -145,11 +80,7 @@ function createTrendRow(trend, type) {
     }
 
     const isRiser = type === 'riser';
-
-    const diffText = isRiser
-        ? '+' + trend.diff
-        : trend.diff;
-
+    const diffText = isRiser ? '+' + trend.diff : trend.diff;
     const diffClass = isRiser ? 'trend-diff-up' : 'trend-diff-down';
 
     return '<div class="trend-row">' +
@@ -175,29 +106,21 @@ function renderTrends(trends) {
     }
 
     if (risersEl) {
-        if (trends.risers.length === 0) {
-            risersEl.innerHTML = '<div class="stats-empty">لا توجد بيانات</div>';
-        } else {
-            risersEl.innerHTML = trends.risers.map(function(t) {
-                return createTrendRow(t, 'riser');
-            }).join('');
-        }
+        risersEl.innerHTML = trends.risers.length === 0
+            ? '<div class="stats-empty">لا توجد بيانات</div>'
+            : trends.risers.map(t => createTrendRow(t, 'riser')).join('');
     }
 
     if (fallersEl) {
-        if (trends.fallers.length === 0) {
-            fallersEl.innerHTML = '<div class="stats-empty">لا توجد بيانات</div>';
-        } else {
-            fallersEl.innerHTML = trends.fallers.map(function(t) {
-                return createTrendRow(t, 'faller');
-            }).join('');
-        }
+        fallersEl.innerHTML = trends.fallers.length === 0
+            ? '<div class="stats-empty">لا توجد بيانات</div>'
+            : trends.fallers.map(t => createTrendRow(t, 'faller')).join('');
     }
 }
 
 async function loadTrends(currentRound) {
     try {
-        const trends = await computeTrends(currentRound);
+        const trends = await computeTrendsFromHistory();
         renderTrends(trends);
         return trends;
     } catch (e) {
@@ -206,3 +129,13 @@ async function loadTrends(currentRound) {
         return null;
     }
 }
+
+/* keep saveCurrentRanks for backward compatibility */
+async function saveCurrentRanks(round) {
+    /* لا نستخدمها بعد الآن — البيانات من manager_history */
+    console.log('[Trends] saveCurrentRanks deprecated');
+    return true;
+}
+
+window.loadTrends = loadTrends;
+window.computeTrendsFromHistory = computeTrendsFromHistory;
