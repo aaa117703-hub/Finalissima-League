@@ -209,6 +209,284 @@ async function setRoundHidden(round, isHidden) {
     }
 }
 
+/* =========================================================
+   ⭐ دوال manager_history الجديدة
+========================================================= */
+
+/**
+ * يجيب كل تاريخ المديرين (كل الجولات)
+ * ترجع: [{ entry, event, points, total_points, overall_rank }, ...]
+ */
+async function loadAllManagerHistory() {
+    if (!window.sbClient) return null;
+
+    try {
+        const res = await window.sbClient
+            .from('manager_history')
+            .select('entry, event, points, total_points, overall_rank')
+            .order('event', { ascending: true });
+
+        if (res.error) {
+            console.error('[MH] load error:', res.error);
+            return null;
+        }
+
+        return res.data || [];
+    } catch (e) {
+        console.error('[MH] load exception:', e);
+        return null;
+    }
+}
+
+/**
+ * يجيب تاريخ مدير واحد
+ */
+async function loadManagerHistoryById(entryId) {
+    if (!window.sbClient) return null;
+
+    try {
+        const res = await window.sbClient
+            .from('manager_history')
+            .select('event, points, total_points, overall_rank')
+            .eq('entry', entryId)
+            .order('event', { ascending: true });
+
+        if (res.error) {
+            console.error('[MH] load error:', res.error);
+            return null;
+        }
+
+        return res.data || [];
+    } catch (e) {
+        console.error('[MH] load exception:', e);
+        return null;
+    }
+}
+
+/**
+ * يجيب المديرين من manager_history + معلوماتهم من getAllManagersCached
+ */
+async function getManagersWithHistory() {
+    if (!window.sbClient) return [];
+
+    try {
+        const [history, managers] = await Promise.all([
+            loadAllManagerHistory(),
+            (typeof getAllManagersCached === 'function') ? getAllManagersCached() : Promise.resolve([])
+        ]);
+
+        if (!history || history.length === 0) return [];
+
+        /* نبني map لكل مدير → نقاطه التراكمية */
+        const managersMap = {};
+        if (managers && managers.length > 0) {
+            managers.forEach(function(m) {
+                managersMap[m.entry] = m;
+            });
+        }
+
+        /* تجميع history لكل entry */
+        const grouped = {};
+        history.forEach(function(row) {
+            if (!grouped[row.entry]) {
+                grouped[row.entry] = {
+                    entry: row.entry,
+                    totalPoints: 0,
+                    totalGW: 0,
+                    events: [],
+                    lastRank: 0,
+                    lastTotal: 0
+                };
+            }
+
+            grouped[row.entry].totalPoints += (row.points || 0);
+            grouped[row.entry].totalGW += 1;
+            grouped[row.entry].events.push({
+                event: row.event,
+                points: row.points,
+                total_points: row.total_points,
+                overall_rank: row.overall_rank
+            });
+
+            /* آخر جولة */
+            if (row.event >= grouped[row.entry].events.length) {
+                grouped[row.entry].lastRank = row.overall_rank || 0;
+                grouped[row.entry].lastTotal = row.total_points || 0;
+            }
+        });
+
+        /* ندمج مع معلومات المدير */
+        const result = Object.keys(grouped).map(function(entryId) {
+            const g = grouped[entryId];
+            const info = managersMap[entryId] || {};
+
+            return {
+                entry: g.entry,
+                player_name: info.player_name || '',
+                entry_name: info.entry_name || '',
+                nation: info._nationCode || info.nation || '',
+                _team: info._team || '',
+                total: g.lastTotal,
+                totalPoints: g.totalPoints,
+                totalGW: g.totalGW,
+                avgPoints: g.totalGW > 0 ? Math.round(g.totalPoints / g.totalGW) : 0,
+                event_total: g.events.length > 0 ? g.events[g.events.length - 1].points : 0,
+                events: g.events
+            };
+        });
+
+        return result;
+    } catch (e) {
+        console.error('[MH] getManagersWithHistory error:', e);
+        return [];
+    }
+}
+
+/**
+ * تشكيلة الشهر — يجيب Top 11 من شهر معين
+ * monthKey = "2026-09"
+ */
+async function getMonthlyTop11(monthKey) {
+    if (!window.sbClient) return null;
+
+    try {
+        /* جيب كل history */
+        const history = await loadAllManagerHistory();
+        if (!history || history.length === 0) return null;
+
+        /* نحتاج نعرف تاريخ كل جولة → الشهر */
+        /* ⚠️ نستخدم currentRound كمرجع — الجولات 1-4 = أغسطس، 5-8 = سبتمبر، إلخ */
+        /* أو — نحتاج جدول gameweeks_deadlines من FPL (bootstrap) */
+        /* حالياً: نستخدم تاريخ today */
+
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;
+        const targetMonth = monthKey || (currentYear + '-' + String(currentMonth).padStart(2, '0'));
+
+        /* فلترة حسب الشهر — نحتاج معرفة أي جولة في أي شهر */
+        /* نستخدم FPL API bootstrap اللي فيه deadlines */
+        const bootstrap = await loadBootstrap();
+
+        if (!bootstrap || !bootstrap.events) {
+            console.warn('[Monthly] No bootstrap — using all events');
+            return null;
+        }
+
+        /* نجمع الجولات اللي في الشهر المطلوب */
+        const monthEvents = [];
+        bootstrap.events.forEach(function(ev) {
+            if (!ev.deadline_time) return;
+            const deadline = new Date(ev.deadline_time);
+            const key = deadline.getFullYear() + '-' + String(deadline.getMonth() + 1).padStart(2, '0');
+            if (key === targetMonth && ev.finished) {
+                monthEvents.push(ev.id);
+            }
+        });
+
+        if (monthEvents.length === 0) {
+            return { ok: false, error: 'no-events', month: targetMonth };
+        }
+
+        /* نجمّع نقاط كل مدير في جولات الشهر */
+        const managersTotals = {};
+        history.forEach(function(row) {
+            if (monthEvents.indexOf(row.event) === -1) return;
+
+            if (!managersTotals[row.entry]) {
+                managersTotals[row.entry] = {
+                    entry: row.entry,
+                    points: 0,
+                    gws: 0
+                };
+            }
+            managersTotals[row.entry].points += (row.points || 0);
+            managersTotals[row.entry].gws++;
+        });
+
+        /* نحسب المتوسط */
+        const arr = Object.keys(managersTotals).map(function(k) {
+            const m = managersTotals[k];
+            return {
+                entry: m.entry,
+                points: m.points,
+                gws: m.gws,
+                avg: m.gws > 0 ? (m.points / m.gws) : 0
+            };
+        });
+
+        /* ترتيب حسب المتوسط */
+        arr.sort(function(a, b) { return b.avg - a.avg; });
+
+        const top11 = arr.slice(0, 11);
+
+        /* نضيف معلومات المديرين */
+        const managers = await getAllManagersCached();
+        const managersMap = {};
+        if (managers) {
+            managers.forEach(function(m) { managersMap[m.entry] = m; });
+        }
+
+        const enriched = top11.map(function(m) {
+            const info = managersMap[m.entry] || {};
+            return {
+                entry: m.entry,
+                player_name: info.player_name || '',
+                entry_name: info.entry_name || '',
+                points: m.points,
+                gws: m.gws,
+                avg: Math.round(m.avg),
+                event_total: Math.round(m.avg)
+            };
+        });
+
+        return {
+            ok: true,
+            month: targetMonth,
+            monthName: getMonthName(targetMonth),
+            events: monthEvents,
+            players: enriched
+        };
+    } catch (e) {
+        console.error('[Monthly] error:', e);
+        return null;
+    }
+}
+
+/**
+ * اسم الشهر بالعربي
+ */
+function getMonthName(monthKey) {
+    const months = {
+        '01': 'يناير', '02': 'فبراير', '03': 'مارس',
+        '04': 'أبريل', '05': 'مايو', '06': 'يونيو',
+        '07': 'يوليو', '08': 'أغسطس', '09': 'سبتمبر',
+        '10': 'أكتوبر', '11': 'نوفمبر', '12': 'ديسمبر'
+    };
+    const parts = monthKey.split('-');
+    return (months[parts[1]] || parts[1]) + ' ' + parts[0];
+}
+
+/**
+ * يجيب FPL Bootstrap (deadlines)
+ */
+async function loadBootstrap() {
+    const WORKER = 'https://finalissima-api.aaa117703.workers.dev';
+    try {
+        const res = await fetchWithTimeout(WORKER + '/?type=bootstrap', {}, 10000);
+        if (!res.ok) return null;
+        const json = await res.json();
+        return json.data || null;
+    } catch (e) {
+        console.error('[Bootstrap] error:', e);
+        return null;
+    }
+}
+
 window.loadCustomMatchweeks = loadCustomMatchweeks;
 window.saveCustomMatchweek = saveCustomMatchweek;
 window.setRoundHidden = setRoundHidden;
+window.loadAllManagerHistory = loadAllManagerHistory;
+window.loadManagerHistoryById = loadManagerHistoryById;
+window.getManagersWithHistory = getManagersWithHistory;
+window.getMonthlyTop11 = getMonthlyTop11;
