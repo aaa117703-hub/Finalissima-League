@@ -1,5 +1,5 @@
 /* =========================================================
-   admin-matchweeks.js — إدارة المواجهات (تصميم جديد)
+   admin-matchweeks.js — إدارة المواجهات (مع منع التكرار)
 ========================================================= */
 
 window._editingRound = null;
@@ -177,7 +177,7 @@ function renderMatchCard(match, idx) {
     '</div>';
 }
 
-/* ===== فتح Modal اختيار المنتخب ===== */
+/* ===== فتح Modal اختيار المنتخب (مع استثناء المستخدمين) ===== */
 function openTeamPicker(matchIdx, side) {
     if (typeof teamsMap === 'undefined') {
         if (typeof showToast === 'function') showToast('teamsMap not loaded', false, 3000);
@@ -194,7 +194,11 @@ function openTeamPicker(matchIdx, side) {
         document.body.appendChild(modal);
     }
 
+    /* ⭐ تجميع المنتخبات المستخدمة في المباريات الأخرى */
+    const usedTeams = getUsedTeamsExcept(matchIdx, side);
+
     let itemsHtml = '';
+    let availableCount = 0;
     const teamsList = Object.keys(teamsMap).sort(function(a, b) {
         return (teamsMap[a].name || '').localeCompare(teamsMap[b].name || '');
     });
@@ -203,14 +207,26 @@ function openTeamPicker(matchIdx, side) {
         const t = teamsMap[code];
         if (!t) return;
 
+        const isUsed = usedTeams[code] === true;
+
         const logo = t.logo || '';
         const name = t.name || code;
 
-        itemsHtml +=
-            '<button class="mwm-picker-item" onclick="selectTeam(\'' + code + '\')" data-name="' + name.toLowerCase() + '">' +
-                '<img src="./' + logo + '" alt="" onerror="this.style.display=\'none\'">' +
-                '<div class="mwm-picker-item-name">' + name + '</div>' +
-            '</button>';
+        if (isUsed) {
+            itemsHtml +=
+                '<button class="mwm-picker-item mwm-picker-item-disabled" disabled>' +
+                    '<img src="./' + logo + '" alt="" onerror="this.style.display=\'none\'">' +
+                    '<div class="mwm-picker-item-name">' + name + '</div>' +
+                    '<div class="mwm-picker-item-used">مُستخدم</div>' +
+                '</button>';
+        } else {
+            availableCount++;
+            itemsHtml +=
+                '<button class="mwm-picker-item" onclick="selectTeam(\'' + code + '\')" data-name="' + name.toLowerCase() + '">' +
+                    '<img src="./' + logo + '" alt="" onerror="this.style.display=\'none\'">' +
+                    '<div class="mwm-picker-item-name">' + name + '</div>' +
+                '</button>';
+        }
     });
 
     modal.innerHTML =
@@ -222,12 +238,34 @@ function openTeamPicker(matchIdx, side) {
             '<div class="mwm-picker-search">' +
                 '<input type="text" id="mwmPickerSearch" placeholder="🔍 ابحث..." oninput="filterTeamPicker(this.value)" autocomplete="off">' +
             '</div>' +
+            '<div class="mwm-picker-info">' +
+                'متاح: ' + availableCount + ' / ' + teamsList.length +
+            '</div>' +
             '<div class="mwm-picker-list" id="mwmPickerList">' +
                 itemsHtml +
             '</div>' +
         '</div>';
 
     modal.style.display = 'flex';
+}
+
+/* ===== حساب المنتخبات المستخدمة (باستثناء الجانب الحالي) ===== */
+function getUsedTeamsExcept(matchIdx, side) {
+    const used = {};
+    if (!window._editingMatches) return used;
+
+    window._editingMatches.forEach(function(m, idx) {
+        if (!m) return;
+
+        /* تجاهل الجهة الحالية — نسمح بإعادة اختيار نفس المنتخب */
+        const skipHome = (idx === matchIdx && side === 0);
+        const skipAway = (idx === matchIdx && side === 1);
+
+        if (!skipHome && m[0]) used[m[0]] = true;
+        if (!skipAway && m[1]) used[m[1]] = true;
+    });
+
+    return used;
 }
 
 function closeTeamPicker() {
@@ -241,7 +279,7 @@ function filterTeamPicker(query) {
     if (!list) return;
 
     const q = query.toLowerCase().trim();
-    const items = list.querySelectorAll('.mwm-picker-item');
+    const items = list.querySelectorAll('.mwm-picker-item:not(.mwm-picker-item-disabled)');
 
     items.forEach(function(item) {
         const name = item.getAttribute('data-name') || '';
@@ -305,6 +343,23 @@ async function saveRoundMatches() {
         return;
     }
 
+    /* ⭐ فحص نهائي — ما فيه تكرار */
+    const used = {};
+    let hasDupe = false;
+    matches.forEach(function(m) {
+        if (used[m[0]]) hasDupe = true;
+        if (used[m[1]]) hasDupe = true;
+        used[m[0]] = true;
+        used[m[1]] = true;
+    });
+
+    if (hasDupe) {
+        if (typeof showToast === 'function') {
+            showToast('⚠️ فيه منتخب مكرر! تأكد من المباريات', false, 4000);
+        }
+        return;
+    }
+
     if (typeof showToast === 'function') {
         showToast('جاري الحفظ...', false, 10000);
     }
@@ -351,3 +406,4 @@ window.openTeamPicker = openTeamPicker;
 window.closeTeamPicker = closeTeamPicker;
 window.filterTeamPicker = filterTeamPicker;
 window.selectTeam = selectTeam;
+window.getUsedTeamsExcept = getUsedTeamsExcept;
