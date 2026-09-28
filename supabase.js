@@ -37,7 +37,7 @@ async function loadScoresFromSupabase(matchweeks) {
             }
 
             if (row.home_score !== null && row.home_score !== undefined) {
-                result['r' const + round + '_m' + idx + '_home'] = String(row.home_score);
+                result['r' + round + '_m' + idx + '_home'] = String(row.home_score);
             }
 
             if (row.away_score !== null && row.away_score !== undefined) {
@@ -58,7 +58,7 @@ async function saveRoundToSupabase(round, matchweeks, scoresStorage) {
         const rows = [];
 
         matches.forEach(function(match, idx) {
-            hVal = scoresStorage['r' + round + '_m' + idx + '_home'];
+            const hVal = scoresStorage['r' + round + '_m' + idx + '_home'];
             const aVal = scoresStorage['r' + round + '_m' + idx + '_away'];
 
             const hasHome = hVal !== undefined && hVal !== '';
