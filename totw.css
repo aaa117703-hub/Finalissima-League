@@ -1,608 +1,441 @@
 /* =========================================================
-   totw.css — v30
-   - إصلاح: حذف الحافة الخضراء المضيئة
-   - إصلاح: List grid (6 columns متطابقة)
-   - إصلاح: شعارات List بحجم صحيح
+   totw.css — FINALISSIMA LEAGUE (عنابي + ذهبي)
 ========================================================= */
 
-.totw-tabs{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:8px;
-    margin-bottom:12px;
-    padding:0 4px;
+.totw-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0;
+    padding: 0 8px;
 }
 
-.totw-tab-btn{
-    padding:6px 22px;
-    background:#FFFFFF;
-    color:#6B7280;
-    border:2px solid #EDE9FE;
-    border-radius:50px;
-    font-size:11px;
-    font-weight:900;
-    letter-spacing:1.5px;
-    text-transform:uppercase;
-    cursor:pointer;
-    transition:all .3s ease;
-    font-family:inherit;
-    outline:none;
+.totw-tab-btn {
+    padding: 10px 24px;
+    border-radius: 24px;
+    border: 2px solid #C8A95F;
+    background: #FFFFFF;
+    color: #8B1A2F;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s ease;
+    text-transform: uppercase;
 }
 
-.totw-tab-btn.active{
-    background:linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
-    color:#FFFFFF;
-    border-color:#7C3AED;
-    box-shadow:0 4px 14px rgba(124,58,237,.35);
+.totw-tab-btn.active {
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #FFFFFF;
+    box-shadow: 0 4px 12px rgba(139, 26, 47, 0.35);
 }
 
-.totw-tab-btn:hover{
-    transform:translateY(-2px);
-    border-color:#A78BFA;
-    color:#7C3AED;
+.totw-tab-btn:hover:not(.active) {
+    background: #FAF6F0;
+    transform: translateY(-1px);
 }
 
-.totw-pitch-wrapper{
-    width:100%;
-    display:flex;
-    justify-content:center;
-    margin-bottom:16px;
+/* ===== Loading ===== */
+.totw-loading {
+    text-align: center;
+    padding: 60px 20px;
+    color: #8B1A2F;
+    font-weight: 900;
 }
 
-/* =========================================================
-   الملعب — حذفنا الحافة الخضراء المضيئة
-========================================================= */
-
-.totw-pitch{
-    position:relative;
-    width:100%;
-    max-width:480px;
-    aspect-ratio:860/1160;
-    background-image:url('./pitch-bg.png');
-    background-size:100% 100%;
-    background-position:center;
-    background-repeat:no-repeat;
-    border:3px solid #5B21B6;
-    border-radius:18px;
-    box-shadow:0 10px 40px rgba(0,0,0,.25);
-    overflow:hidden;
+.totw-loading .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #E5D4A5;
+    border-top-color: #8B1A2F;
+    border-radius: 50%;
+    margin: 0 auto 16px;
+    animation: totwSpin 0.8s linear infinite;
 }
 
-/* =========================================================
-   عنوان TEAM OF THE WEEK — بنفسجي متلاشي
-========================================================= */
-
-.totw-pitch-title{
-    position:absolute;
-    top:12.5%;
-    left:50%;
-    transform:translateX(-50%);
-    color:#ffffff;
-    font-size:13px;
-    font-weight:900;
-    letter-spacing:3px;
-    text-transform:uppercase;
-    z-index:5;
-    white-space:nowrap;
-    font-family:inherit;
-    text-align:center;
-    padding:6px 40px;
-    border-radius:0;
-    background:linear-gradient(90deg,
-        rgba(123, 63, 245, 0)    0%,
-        rgba(123, 63, 245, 0.35) 8%,
-        rgba(123, 63, 245, 0.85) 20%,
-        rgba(123, 63, 245, 1)    50%,
-        rgba(123, 63, 245, 0.85) 80%,
-        rgba(123, 63, 245, 0.35) 92%,
-        rgba(123, 63, 245, 0)    100%);
-    box-shadow:none;
-    text-shadow:
-        0 1px 3px rgba(0,0,0,.65),
-        0 0 10px rgba(123, 63, 245, .7);
+@keyframes totwSpin {
+    to { transform: rotate(360deg); }
 }
 
-.totw-pitch-title .gw-label{
-    display:none !important;
+/* ===== Error ===== */
+.totw-error {
+    text-align: center;
+    padding: 40px 20px;
+    background: #FFF5F5;
+    border: 2px solid #8B1A2F;
+    border-radius: 16px;
+    margin: 16px;
+    color: #8B1A2F;
+    font-weight: 800;
+    line-height: 1.7;
 }
 
-.totw-players{
-    position:absolute;
-    inset:0;
-    z-index:2;
+/* ===== Pitch ===== */
+.totw-pitch-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 8px;
 }
 
-/* =========================================================
-   الصفوف
-========================================================= */
-
-.totw-row{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    width:100%;
-    position:absolute;
-    left:0;
-    right:0;
+.totw-pitch {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    aspect-ratio: 3 / 4.2;
+    background: url('./pitch-bg.png') center / cover no-repeat;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 4px solid #8B1A2F;
+    box-shadow: 0 12px 32px rgba(139, 26, 47, 0.35);
 }
 
-.totw-row-gk{
-    top:22%;
-    justify-content:center;
+.totw-pitch-title {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #FFFFFF;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    border: 2px solid #C8A95F;
+    z-index: 5;
 }
 
-.totw-row-def{
-    top:38%;
-    justify-content:space-evenly;
-    padding:0 14%;
+.totw-pitch-title .gw-label {
+    color: #C8A95F;
+    font-family: 'Inter', sans-serif;
 }
 
-.totw-row-mid{
-    top:56%;
-    justify-content:space-evenly;
-    padding:0 4%;
+/* ===== Players grid ===== */
+.totw-players {
+    position: absolute;
+    inset: 60px 8px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 8px;
 }
 
-.totw-row-fwd{
-    top:74%;
-    justify-content:space-evenly;
-    padding:0 22%;
+.totw-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
 }
 
-/* =========================================================
-   الكرت
-========================================================= */
+.totw-row-gk { margin-top: 20px; }
+.totw-row-def { margin-top: 20px; }
+.totw-row-mid { margin-top: 20px; }
+.totw-row-fwd { margin-bottom: 10px; }
 
-.totw-card{
-    width:60px;
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    justify-content:flex-start;
-    padding:0;
-    margin:0;
-    position:relative;
-    transition:transform .3s ease;
-    border-radius:4px;
-    overflow:hidden;
-    box-shadow:0 2px 6px rgba(0,0,0,.35);
-    box-sizing:border-box;
+/* ===== Card ===== */
+.totw-card {
+    width: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    animation: totwCardIn 0.4s ease backwards;
 }
 
-.totw-card:hover{
-    transform:scale(1.08);
-    z-index:100;
+.totw-card:nth-child(1) { animation-delay: 0.05s; }
+.totw-card:nth-child(2) { animation-delay: 0.10s; }
+.totw-card:nth-child(3) { animation-delay: 0.15s; }
+.totw-card:nth-child(4) { animation-delay: 0.20s; }
+
+@keyframes totwCardIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
-.totw-card .tc-shirt{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:60px;
-    height:54px;
-    position:relative;
-    z-index:3;
-    flex-shrink:0;
-    background:rgba(30, 90, 50, 0.55);
-    padding:4px 6px 0 6px;
-    box-sizing:border-box;
-    margin:0;
+.tc-shirt {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.4));
+    margin-bottom: 3px;
 }
 
-.totw-card .tc-shirt img{
-    max-width:100%;
-    max-height:100%;
-    width:auto;
-    height:auto;
-    object-fit:contain;
-    display:block;
-    filter:drop-shadow(0 1px 2px rgba(0,0,0,.4));
+.tc-shirt img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
-.totw-card .tc-shirt-fallback{
-    background:rgba(255,255,255,.95);
-    border-radius:50%;
-    padding:4px;
+.tc-shirt-fallback {
+    background: rgba(255,255,255,0.9);
+    border-radius: 50%;
+    padding: 4px;
 }
 
-.totw-card .tc-shirt-empty{
-    background:transparent;
+.tc-shirt-empty {
+    background: rgba(255,255,255,0.4);
+    border-radius: 50%;
+    border: 2px dashed #C8A95F;
 }
 
-.totw-card .tc-name{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:60px;
-    height:14px;
-    padding:0 3px;
-    margin-top:-6px;
-    background:#ffffff;
-    color:#37003c;
-    font-size:7px;
-    font-weight:900;
-    text-align:center;
-    line-height:1;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    position:relative;
-    z-index:10;
-    flex-shrink:0;
-    box-sizing:border-box;
-    border:none;
-    border-radius:0;
+.tc-name {
+    font-size: 9px;
+    font-weight: 900;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    padding: 2px 6px;
+    border-radius: 6px;
+    max-width: 60px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    border: 1px solid #C8A95F;
+    letter-spacing: 0.3px;
 }
 
-.totw-card .tc-points{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:60px;
-    height:14px;
-    padding:0 6px;
-    margin:0;
-    background:#37003c;
-    color:#ffffff;
-    font-size:9px;
-    font-weight:900;
-    text-align:center;
-    letter-spacing:0.5px;
-    position:relative;
-    z-index:4;
-    flex-shrink:0;
-    box-sizing:border-box;
-    border:none;
-    border-radius:0;
+.tc-points {
+    font-size: 11px;
+    font-weight: 900;
+    color: #FFFFFF;
+    background: #C8A95F;
+    padding: 1px 8px;
+    border-radius: 10px;
+    margin-top: 2px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    font-family: 'Inter', sans-serif;
+    border: 1px solid #8B1A2F;
 }
 
-/* =========================================================
-   عرض القائمة — ⭐ محدّث ومصلّح
-========================================================= */
-
-.totw-list-view{
-    width:100%;
-    max-width:520px;
-    margin:0 auto 16px;
-    background:#FFFFFF;
-    border:1.5px solid #EDE9FE;
-    border-radius:14px;
-    overflow:hidden;
-    box-shadow:0 4px 16px rgba(124,58,237,.1);
+/* ===== List View ===== */
+.totw-list-view {
+    padding: 8px;
 }
 
-.totw-count-bar{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding:12px 16px;
-    background:#F5F3FF;
-    border-bottom:1.5px solid #EDE9FE;
-    font-size:13px;
-    font-weight:800;
-    color:#6D28D9;
+.totw-count-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #FFFFFF;
+    border-radius: 14px;
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 12px;
+    border: 2px solid #C8A95F;
 }
 
-.totw-count-bar .count-num{
-    color:#7C3AED;
-    font-weight:900;
-    font-size:16px;
-    margin:0 2px;
+.totw-count-bar .count-num {
+    color: #C8A95F;
+    font-size: 15px;
+    margin: 0 3px;
 }
 
-.totw-actions{
-    display:flex;
-    gap:6px;
+.totw-count-bar .count-num.full {
+    color: #27AE60;
 }
 
-.totw-actions button{
-    padding:6px 12px;
-    border-radius:8px;
-    font-size:10px;
-    font-weight:900;
-    letter-spacing:0.5px;
-    text-transform:uppercase;
-    cursor:pointer;
-    border:none;
-    font-family:inherit;
-    transition:all .2s ease;
+.totw-actions {
+    display: flex;
+    gap: 6px;
 }
 
-.totw-actions .save-btn{
-    background:linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
-    color:#fff;
+.save-btn,
+.reset-btn {
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: none;
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 1px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s ease;
 }
 
-.totw-actions .save-btn.saved{
-    background:linear-gradient(135deg, #10B981 0%, #059669 100%);
+.save-btn {
+    background: #C8A95F;
+    color: #8B1A2F;
+}
+.save-btn.saved {
+    background: #27AE60;
+    color: #FFFFFF;
 }
 
-.totw-actions .reset-btn{
-    background:#F3F4F6;
-    color:#6B7280;
+.reset-btn {
+    background: rgba(255,255,255,0.2);
+    color: #FFFFFF;
+    border: 1px solid #C8A95F;
 }
 
-.totw-actions button:active{
-    transform:scale(0.95);
+.save-btn:active,
+.reset-btn:active { transform: scale(0.95); }
+
+/* List header */
+.totw-list-header {
+    display: grid;
+    grid-template-columns: 30px 30px 40px 1fr 40px 50px;
+    gap: 6px;
+    padding: 10px 12px;
+    background: #FAF6F0;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 900;
+    color: #8B1A2F;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    border: 1px solid #E5D4A5;
 }
 
-/* Header — 6 columns مطابقة للـ items */
-.totw-list-header{
-    display:grid;
-    grid-template-columns:26px 26px 32px 1fr 46px 50px;
-    gap:6px;
-    align-items:center;
-    padding:10px 12px;
-    border-bottom:1.5px solid #EDE9FE;
-    background:#F5F3FF;
-    color:#5B21B6;
-    font-size:9px;
-    font-weight:900;
-    text-transform:uppercase;
-    letter-spacing:1px;
+.totw-list-header > div {
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.totw-list-h-check{text-align:center;font-size:11px;}
-.totw-list-h-rank{text-align:center;}
-.totw-list-h-logo{width:32px;}
-.totw-list-h-team{text-align:right;padding-right:2px;}
-.totw-list-h-gw{text-align:center;}
-.totw-list-h-total{text-align:center;}
+.totw-list-h-team { justify-content: flex-start !important; text-align: left; }
 
-.totw-list-item{
-    display:grid;
-    grid-template-columns:26px 26px 32px 1fr 46px 50px;
-    gap:6px;
-    align-items:center;
-    padding:8px 12px;
-    border-bottom:1px solid #F3F4F6;
-    color:#111827;
-    min-height:52px;
-    background:#FFFFFF;
-    cursor:pointer;
-    transition:background .2s ease;
+/* List items */
+.totw-list-item {
+    display: grid;
+    grid-template-columns: 30px 30px 40px 1fr 40px 50px;
+    gap: 6px;
+    align-items: center;
+    padding: 10px 12px;
+    background: #FFFFFF;
+    border: 2px solid #E5D4A5;
+    border-radius: 12px;
+    margin-bottom: 6px;
+    cursor: pointer;
+    transition: all .2s ease;
 }
 
-.totw-list-item:last-child{border-bottom:none;}
-.totw-list-item:hover{background:#F5F3FF;}
-.totw-list-item.selected{background:#F5F3FF;}
-
-.totw-list-check{
-    width:20px;
-    height:20px;
-    border:1.5px solid #A78BFA;
-    border-radius:6px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:11px;
-    font-weight:900;
-    color:transparent;
-    margin:0 auto;
-    background:#FFFFFF;
-    transition:all .2s ease;
+.totw-list-item:hover {
+    border-color: #C8A95F;
+    background: #FAF6F0;
 }
 
-.totw-list-check.checked{
-    background:#7C3AED;
-    border-color:#7C3AED;
-    color:#FFFFFF;
+.totw-list-item.selected {
+    border-color: #8B1A2F;
+    border-width: 3px;
+    background: linear-gradient(135deg, #FFF8E7 0%, #FAF6F0 100%);
+    box-shadow: 0 4px 12px rgba(139, 26, 47, 0.15);
 }
 
-.totw-list-rank{
-    text-align:center;
-    font-size:12px;
-    font-weight:800;
-    color:#9CA3AF;
+.totw-list-check {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 2px solid #C8A95F;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 900;
+    color: #FFFFFF;
+    background: #FFFFFF;
+    transition: all .2s ease;
 }
 
-.totw-list-logo{
-    width:32px;
-    height:32px;
-    min-width:32px;
-    min-height:32px;
-    max-width:32px;
-    max-height:32px;
-    position:relative;
-    overflow:hidden;
-    flex-shrink:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:transparent;
-    border:none;
-    border-radius:0;
+.totw-list-check.checked {
+    background: #27AE60;
+    border-color: #27AE60;
 }
 
-.totw-list-logo img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-    filter:drop-shadow(0 1px 2px rgba(0,0,0,.15));
+.totw-list-rank {
+    font-size: 12px;
+    font-weight: 900;
+    color: #8B1A2F;
+    text-align: center;
 }
 
-.totw-list-logo-empty{
-    background:#F5F3FF;
-    color:#A78BFA;
-    font-size:14px;
-    border-radius:50%;
+.totw-list-logo {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.totw-list-names{
-    display:flex;
-    flex-direction:column;
-    gap:2px;
-    min-width:0;
-    overflow:hidden;
-    text-align:right;
+.totw-list-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
 }
 
-.totw-list-entry{
-    font-size:12px;
-    font-weight:900;
-    color:#111827;
-    text-align:right;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    line-height:1.2;
+.totw-list-logo-empty {
+    background: #E5D4A5;
+    border-radius: 50%;
+    color: #8B1A2F;
+    font-size: 16px;
+    font-weight: 900;
 }
 
-.totw-list-player{
-    font-size:10px;
-    font-weight:600;
-    color:#9CA3AF;
-    text-align:right;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    line-height:1.2;
+.totw-list-names {
+    overflow: hidden;
+    min-width: 0;
 }
 
-.totw-list-gw{
-    text-align:center;
-    font-size:13px;
-    font-weight:900;
-    color:#7C3AED;
-    letter-spacing:0.5px;
+.totw-list-entry {
+    font-size: 12px;
+    font-weight: 900;
+    color: #8B1A2F;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.totw-list-total{
-    text-align:center;
-    font-size:13px;
-    font-weight:900;
-    color:#111827;
-    letter-spacing:0.5px;
+.totw-list-player {
+    font-size: 10px;
+    color: #666;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-/* =========================================================
-   Loading + Error
-========================================================= */
-
-.totw-loading{
-    text-align:center;
-    padding:40px 20px;
-    color:#7C3AED;
-    font-size:15px;
-    font-weight:900;
+.totw-list-gw {
+    font-size: 13px;
+    font-weight: 900;
+    color: #27AE60;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
 }
 
-.totw-loading .spinner{
-    display:inline-block;
-    width:36px;
-    height:36px;
-    border:4px solid rgba(124,58,237,.2);
-    border-top-color:#7C3AED;
-    border-radius:50%;
-    animation:spinTOTW .8s linear infinite;
-    margin-bottom:14px;
+.totw-list-total {
+    font-size: 13px;
+    font-weight: 900;
+    color: #8B1A2F;
+    text-align: center;
+    font-family: 'Inter', sans-serif;
 }
 
-@keyframes spinTOTW{
-    0%{transform:rotate(0)}
-    100%{transform:rotate(360deg)}
-}
-
-.totw-error{
-    text-align:center;
-    padding:24px 16px;
-    background:rgba(255,0,90,.15);
-    border:2px solid #ff005a;
-    border-radius:12px;
-    color:#ff005a;
-    font-size:13px;
-    font-weight:800;
-}
-
-/* =========================================================
-   الموبايل
-========================================================= */
-
-@media(max-width:480px){
-
-    .totw-tab-btn{
-        padding:5px 18px;
-        font-size:10px;
-        letter-spacing:1.2px;
+/* Mobile */
+@media (max-width:400px){
+    .totw-card { width: 54px; }
+    .tc-shirt { width: 42px; height: 42px; }
+    .tc-name { font-size: 8px; max-width: 54px; }
+    .tc-points { font-size: 10px; }
+    .totw-list-header,
+    .totw-list-item {
+        grid-template-columns: 26px 26px 34px 1fr 34px 44px;
+        gap: 4px;
+        padding: 8px;
     }
-
-    .totw-pitch{max-width:100%;}
-
-    .totw-pitch-title{
-        font-size:11px;
-        letter-spacing:2px;
-        top:12.5%;
-        padding:5px 30px;
-    }
-
-    .totw-card{width:50px;}
-
-    .totw-card .tc-shirt{
-        width:50px;
-        height:44px;
-        padding:3px 4px 0 4px;
-    }
-
-    .totw-card .tc-name{
-        width:50px;
-        height:12px;
-        font-size:6px;
-        margin-top:-5px;
-    }
-
-    .totw-card .tc-points{
-        width:50px;
-        height:12px;
-        font-size:8px;
-    }
-
-    .totw-row-def{padding:0 10%;}
-    .totw-row-mid{padding:0 3%;}
-    .totw-row-fwd{padding:0 18%;}
-
-    /* List — mobile */
-    .totw-list-view{
-        max-width:100%;
-    }
-
-    .totw-list-header{
-        grid-template-columns:22px 22px 28px 1fr 38px 42px;
-        padding:8px;
-        gap:5px;
-        font-size:8px;
-    }
-
-    .totw-list-item{
-        grid-template-columns:22px 22px 28px 1fr 38px 42px;
-        padding:8px;
-        gap:5px;
-        min-height:48px;
-    }
-
-    .totw-list-check{
-        width:18px;
-        height:18px;
-        font-size:10px;
-    }
-
-    .totw-list-rank{
-        font-size:11px;
-    }
-
-    .totw-list-logo{
-        width:28px;
-        height:28px;
-        min-width:28px;
-        min-height:28px;
-        max-width:28px;
-        max-height:28px;
-    }
-
-    .totw-list-entry{font-size:11px;}
-    .totw-list-player{font-size:9px;}
+    .totw-list-entry { font-size: 11px; }
+    .totw-list-player { font-size: 9px; }
     .totw-list-gw,
-    .totw-list-total{font-size:12px;}
+    .totw-list-total { font-size: 11px; }
 }
