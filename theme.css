@@ -1,882 +1,610 @@
 /* =========================================================
-   theme.css — v7
-   - إصلاح: Scroll داخل الإعدادات
+   theme.css — FINALISSIMA LEAGUE
+   Qatar 2022 Colors + Settings + Matchweek Manager
 ========================================================= */
 
-/* ========== 1. VARIABLES ========== */
-
-:root {
-    --purple-500: #7C3AED;
-    --purple-600: #6D28D9;
-    --purple-700: #5B21B6;
-    --purple-300: #A78BFA;
-    --purple-100: #EDE9FE;
-    --purple-50:  #F5F3FF;
-
-    --text-primary:   #111827;
-    --text-secondary: #6B7280;
-    --text-tertiary:  #9CA3AF;
-
-    --green-600: #059669;
-    --red-600: #DC2626;
-    --amber-600: #D97706;
-
-    --bg-light: #F8F7FC;
-    --border-light: #E5E7EB;
-
-    --font-ar: 'Cairo', 'Tajawal', sans-serif;
-    --font-en: 'EnglishCustom', 'Cairo', sans-serif;
+:root{
+    --maroon-500: #8B1A2F;
+    --maroon-600: #6B0F1F;
+    --maroon-700: #4A0A15;
+    --gold-500:   #C8A95F;
+    --gold-600:   #8B7340;
+    --sand:       #F5E6D3;
+    --cream:      #FAF6F0;
 }
 
-/* ========== 2. BODY ========== */
+/* =========================================================
+   BASE
+========================================================= */
 
-body {
-    background: linear-gradient(180deg, #F8F7FC 0%, #FFFFFF 100%);
-    background-attachment: fixed;
-    min-height: 100vh;
-    color: var(--text-primary);
-    font-family: var(--font-en);
+body{
+    background:#FAF6F0;
+    color:#333;
 }
 
-/* ========== 3. ERROR BOX ========== */
+/* =========================================================
+   SETTINGS MODAL — Finalissima Theme
+========================================================= */
 
-#errorBox {
-    background: #DC2626;
-    box-shadow: 0 4px 20px rgba(220, 38, 38, 0.3);
+.settings-modal{
+    display:none;
+    position:fixed;inset:0;
+    z-index:99998;
+    align-items:center;justify-content:center;
+    padding:12px;
+    background:rgba(0,0,0,0.6);
 }
-#errorBox .err-close {
-    color: #DC2626;
-    background: #fff;
+.settings-modal.show{display:flex;}
+
+.settings-modal-box{
+    width:100%;max-width:100%;
+    height:92vh;
+    border-radius:20px;
+    overflow:hidden;
+    animation:settingsIn .25s ease;
+    direction:rtl;
+    display:flex;flex-direction:column;
+    background:#FFFFFF;
+    border:3px solid #C8A95F;
+    box-shadow:0 20px 60px rgba(139, 26, 47, 0.4);
+}
+@keyframes settingsIn{
+    from{opacity:0;transform:scale(.95) translateY(20px);}
+    to{opacity:1;transform:scale(1) translateY(0);}
 }
 
-/* ========== 4. TOAST ========== */
+.settings-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;
+    font-size:16px;font-weight:900;letter-spacing:1.2px;
+    flex-shrink:0;
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color:#FFFFFF;
+    border-bottom:3px solid #C8A95F;
+}
+.settings-close{
+    width:32px;height:32px;border-radius:50%;
+    border:2px solid #C8A95F;
+    background:#FFFFFF;
+    color:#8B1A2F;
+    font-size:15px;font-weight:900;
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    padding:0;
+    transition:all .2s ease;
+    font-family:inherit;
+}
+.settings-close:hover{background:#C8A95F;color:#FFFFFF;}
 
-#toast {
+.settings-body{
+    padding:16px;
+    display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    flex:1;
+    background:#FAF6F0;
+}
+
+.settings-item{
+    display:flex;align-items:center;gap:12px;
+    padding:16px 18px;
+    border-radius:14px;
+    font-size:14px;font-weight:800;letter-spacing:.3px;
+    cursor:pointer;text-align:right;
+    transition:all .2s ease;
+    font-family:inherit;
+    background:#FFFFFF;
+    border:2px solid #E5D4A5;
+    color:#333;
+    width:100%;
+}
+.settings-item:hover{
+    background:#FAF6F0;
+    border-color:#C8A95F;
+}
+.settings-item .si-icon{
+    font-size:22px;width:32px;text-align:center;flex-shrink:0;
+}
+.settings-item .si-label{flex:1;text-align:right;}
+
+.settings-item.settings-back{
+    background:linear-gradient(135deg, #FAF6F0 0%, #FFFFFF 100%);
+    border:2px solid #8B1A2F;
+    color:#8B1A2F;
+    font-weight:900;
+}
+
+.settings-hint{
+    font-size:12px;text-align:center;
+    padding:10px 4px;letter-spacing:.3px;line-height:1.7;
+    color:#8B1A2F;
+    font-weight:700;
+}
+
+.settings-embed{
+    width:100%;padding:0;margin:0;
+    border-radius:14px;overflow:hidden;
+}
+
+/* =========================================================
+   LOCKS
+========================================================= */
+
+.locks-grid{display:flex;flex-direction:column;gap:10px;}
+
+.lock-item{
+    display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding:14px 16px;
+    border-radius:12px;
+    font-size:13px;font-weight:800;
+    background:#FFFFFF;
+    border:2px solid #E5D4A5;
+}
+.lock-item-label{display:flex;align-items:center;gap:10px;flex:1;color:#333;}
+.lock-item-icon{font-size:20px;width:28px;text-align:center;}
+
+.lock-item-btn{
+    padding:9px 16px;
+    border:none;border-radius:10px;
+    font-size:12px;font-weight:900;letter-spacing:.5px;
+    cursor:pointer;font-family:inherit;
+    transition:transform .2s ease;
+    min-width:100px;
+    color:#fff;
+}
+.lock-item-btn.locked{background:#8B1A2F;}
+.lock-item-btn.unlocked{background:#27AE60;}
+.lock-item-btn:active:not(:disabled){transform:scale(.95);}
+.lock-item-btn:disabled{opacity:.5;cursor:not-allowed;}
+
+.maint-all-btn,
+.maint-open-btn{
+    padding:15px 18px;
+    border:none;border-radius:14px;
+    font-size:14px;font-weight:900;letter-spacing:1px;
+    cursor:pointer;font-family:inherit;
+    transition:transform .2s ease;
+    margin-top:6px;
+    color:#fff;
+}
+.maint-all-btn{background:#8B1A2F;}
+.maint-open-btn{background:#27AE60;}
+.maint-all-btn:active,
+.maint-open-btn:active{transform:scale(.97);}
+
+/* =========================================================
+   MAINTENANCE SCREEN
+========================================================= */
+
+#sectionMaintenance{
+    display:none;
+    position:fixed;inset:0;
+    z-index:99997;
+    align-items:center;justify-content:center;
+    padding:20px;
+    background:rgba(139, 26, 47, 0.95);
+}
+#sectionMaintenance.show{display:flex;}
+#sectionMaintenance .maint-box{
+    border-radius:22px;
+    padding:44px 32px;
+    text-align:center;
+    max-width:400px;width:100%;
+    background:#FFFFFF;
+    border:3px solid #C8A95F;
+}
+#sectionMaintenance h2{font-size:24px;font-weight:900;margin-bottom:14px;letter-spacing:1px;color:#8B1A2F;}
+#sectionMaintenance p{font-size:14px;line-height:1.8;margin-bottom:6px;color:#333;}
+#sectionMaintenance .maint-team{
+    font-size:13px;font-weight:900;
+    letter-spacing:4px;
+    padding-top:18px;margin-top:20px;
+    color:#C8A95F;
+    border-top:2px solid #E5D4A5;
+}
+#sectionMaintenance .maint-icon{font-size:48px;margin-bottom:16px;}
+
+/* =========================================================
+   MATCHWEEK MANAGER — تصميم جديد
+========================================================= */
+
+.mwm-rounds-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mwm-round-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
     background: #FFFFFF;
-    color: var(--text-primary);
-    border: 2px solid var(--purple-500);
-    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.25);
+    border: 2px solid #E5D4A5;
+    border-radius: 14px;
+    gap: 10px;
+    transition: all .2s ease;
 }
-#toast.error {
-    border: 2px solid var(--red-600);
-    box-shadow: 0 8px 24px rgba(220, 38, 38, 0.25);
-}
-.toast-spinner {
-    border: 3px solid rgba(124, 58, 237, 0.2);
-    border-top-color: var(--purple-500);
+.mwm-round-row:hover {
+    border-color: #C8A95F;
+    background: #FAF6F0;
 }
 
-/* ========== 5. CAROUSEL ========== */
+.mwm-round-info { flex: 1; text-align: right; }
 
-.carousel {
-    border: 2px solid var(--purple-100);
-    background: #FFFFFF;
-    box-shadow: 0 6px 24px rgba(124, 58, 237, 0.12);
-}
-.carousel-dot {
-    background: rgba(124, 58, 237, 0.25);
-}
-.carousel-dot.active {
-    background: var(--purple-500);
-    box-shadow: 0 0 8px rgba(124, 58, 237, 0.5);
+.mwm-round-num {
+    font-size: 15px;
+    font-weight: 900;
+    color: #8B1A2F;
+    margin-bottom: 4px;
+    font-family: 'Cairo', sans-serif;
 }
 
-/* ========== 6. ROUND SELECTOR ========== */
-
-.round-select-pill {
-    background-color: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--purple-600) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08) !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%237C3AED' d='M5 6L0 0h10z'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 12px center !important;
+.mwm-round-meta {
+    font-size: 11px;
+    color: #666;
+    font-weight: 700;
 }
-.round-select-pill option {
-    background: #FFFFFF;
-    color: var(--text-primary);
+.mwm-hidden { color: #C0392B; font-weight: 900; }
+.mwm-visible { color: #27AE60; font-weight: 900; }
+
+.mwm-round-actions {
+    display: flex;
+    gap: 8px;
 }
 
-/* ========== 7. HEADER / NAV ========== */
-
-.round-indicator { color: var(--purple-700) !important; }
-.nav-arrow-btn {
-    background: #FFFFFF !important;
-    color: var(--purple-600) !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08) !important;
-    transition: transform .15s ease;
+.mwm-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all .2s ease;
 }
-.nav-arrow-btn:hover { transform: scale(1.06); }
-.nav-arrow-btn:active { transform: scale(0.94); }
-
-/* ========== 8. EDIT PANEL ========== */
-
-.edit-panel {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06) !important;
+.mwm-btn:active { transform: scale(0.92); }
+.mwm-toggle {
+    background: #FAF6F0;
+    border: 2px solid #C8A95F;
 }
-.save-round-btn {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
-}
-.clear-round-btn {
-    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
-}
-.download-action-btn {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-}
-
-/* ========== 9. DOWNLOAD BUTTON + MENU ========== */
-
-.download-btn {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-    border: none !important;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35) !important;
-}
-.download-menu {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 12px 36px rgba(124, 58, 237, 0.15) !important;
-}
-.download-menu-item { color: var(--text-primary) !important; }
-.download-menu-item:hover { background: var(--purple-50) !important; }
-.download-menu-item .q-scale { color: var(--purple-500) !important; }
-
-/* ========== 10. SETTINGS BUTTON ========== */
-
-.settings-btn-inline {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--purple-600) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.08) !important;
-}
-
-/* ========== 11. SETTINGS MODAL ========== */
-
-.settings-modal {
-    background: rgba(17, 24, 39, 0.5);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-}
-.settings-modal-box {
-    background: #FFFFFF;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(17, 24, 39, 0.25);
-}
-.settings-header {
-    background: linear-gradient(135deg, #7C3AED 0%, #A855F7 100%) !important;
-    color: #fff !important;
-    font-family: var(--font-ar);
-}
-.settings-close {
-    background: rgba(255, 255, 255, 0.2);
+.mwm-edit {
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color: #fff;
 }
-.settings-close:hover { background: rgba(255, 255, 255, 0.35); }
-.settings-body { background: #F8F7FC; }
 
-.settings-item {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-primary) !important;
-    font-family: var(--font-ar);
-    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.04);
-}
-.settings-item:hover {
-    background: var(--purple-50) !important;
-    border-color: var(--purple-300) !important;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.12);
-}
-.settings-back {
-    background: #F3F4F6 !important;
-    border-color: #E5E7EB !important;
-    color: var(--text-secondary) !important;
-}
-.settings-back:hover {
-    background: #E5E7EB !important;
-    color: var(--text-primary) !important;
-}
-.settings-hint {
-    color: var(--text-tertiary);
-    font-family: var(--font-ar);
-}
-.settings-embed { background: #F8F7FC; }
+/* ===== محرر الجولة ===== */
 
-.lock-item {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-primary) !important;
-    font-family: var(--font-ar);
-    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.04);
-}
-.lock-item-btn.unlocked {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
-    color: #fff !important;
-}
-.lock-item-btn.locked {
-    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important;
-    color: #fff !important;
-}
-.maint-all-btn {
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
-    color: #fff !important;
-    font-family: var(--font-ar);
-}
-.maint-open-btn {
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important;
-    color: #fff !important;
-    font-family: var(--font-ar);
+.mwm-editor-header {
+    text-align: center;
+    padding: 16px 0 12px;
+    border-bottom: 3px solid #C8A95F;
+    margin-bottom: 16px;
 }
 
-/* ========== 12. MAINTENANCE ========== */
-
-#sectionMaintenance {
-    background: rgba(248, 247, 252, 0.95);
-    backdrop-filter: blur(8px);
-}
-#sectionMaintenance .maint-box {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 20px 60px rgba(124, 58, 237, 0.15) !important;
-    font-family: var(--font-ar);
-}
-#sectionMaintenance h2 {
-    color: var(--purple-700) !important;
-    font-family: var(--font-ar);
-}
-#sectionMaintenance p {
-    color: var(--text-secondary) !important;
-    font-family: var(--font-ar);
-}
-#sectionMaintenance .maint-team {
-    color: var(--purple-500) !important;
-    border-top: 1.5px solid var(--purple-100) !important;
-    font-family: var(--font-en);
+.mwm-editor-title {
+    font-size: 22px;
+    font-weight: 900;
+    color: #8B1A2F;
+    font-family: 'Cairo', sans-serif;
+    margin-bottom: 4px;
 }
 
-/* =========================================================
-   13. STATS
-========================================================= */
-
-.stats-tab-btn {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-secondary) !important;
-    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.06) !important;
-}
-.stats-tab-btn:hover {
-    border-color: var(--purple-300) !important;
-    color: var(--purple-600) !important;
-}
-.stats-tab-btn.active {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-    border-color: var(--purple-500) !important;
-    color: #fff !important;
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.35) !important;
+.mwm-editor-sub {
+    font-size: 12px;
+    color: #666;
+    font-weight: 700;
 }
 
-.stats-loading { color: var(--purple-600) !important; }
-.stats-loading .spinner {
-    border: 3px solid rgba(124, 58, 237, 0.2) !important;
-    border-top-color: var(--purple-500) !important;
+.mwm-edit-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
 }
 
-.stats-kpi-card {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06) !important;
-}
-.stats-kpi-card:hover {
-    border-color: var(--purple-300) !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15) !important;
-}
-.stats-kpi-value {
-    color: var(--purple-600) !important;
-    text-shadow: none !important;
-    font-family: var(--font-en);
-}
-.stats-kpi-label { color: var(--text-secondary) !important; }
+/* ===== بطاقة المباراة ===== */
 
-.stats-section {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06) !important;
+.mwm-match-card {
+    background: #FFFFFF;
+    border: 2px solid #E5D4A5;
+    border-radius: 16px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    transition: all .2s ease;
 }
-.stats-section-title {
-    color: var(--purple-700) !important;
-    border-bottom: 1.5px solid var(--purple-100) !important;
-    text-shadow: none !important;
+.mwm-match-card:hover {
+    border-color: #C8A95F;
+    box-shadow: 0 4px 12px rgba(139, 26, 47, 0.1);
 }
 
-.stats-row {
-    background: #FFFFFF !important;
-    border-bottom: 1px solid #F3F4F6 !important;
-}
-.stats-row:hover { background: var(--purple-50) !important; }
+/* ===== زر اختيار منتخب ===== */
 
-.stats-row-gold {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.12) 0%, rgba(124, 58, 237, 0.02) 60%, transparent 100%) !important;
-    border-left: 4px solid var(--purple-500) !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: none !important;
+.mwm-team-pick {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 6px;
+    background: #FAF6F0;
+    border: 2px solid #E5D4A5;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .2s ease;
+    min-height: 80px;
+    font-family: inherit;
+    gap: 6px;
 }
-.stats-row-silver {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.08) 0%, rgba(124, 58, 237, 0.02) 60%, transparent 100%) !important;
-    border-left: 4px solid var(--purple-300) !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: none !important;
+.mwm-team-pick:hover {
+    background: #F5E6D3;
+    border-color: #C8A95F;
 }
-.stats-row-bronze {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.05) 0%, transparent 60%) !important;
-    border-left: 4px solid var(--purple-100) !important;
-    border-right: none !important;
-    border-top: none !important;
-    border-bottom: none !important;
+.mwm-team-pick:active {
+    transform: scale(0.97);
 }
-
-.stats-rank { color: var(--text-primary) !important; }
-.stats-rank-gold {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-    color: #fff !important;
-    text-shadow: none !important;
-}
-.stats-rank-silver {
-    background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%) !important;
-    color: #fff !important;
-    text-shadow: none !important;
-}
-.stats-rank-bronze {
-    background: linear-gradient(135deg, #C4B5FD 0%, #A78BFA 100%) !important;
-    color: #4C1D95 !important;
-    text-shadow: none !important;
+.mwm-team-pick.picked {
+    background: linear-gradient(135deg, #FFF8E7 0%, #FAF6F0 100%);
+    border-color: #C8A95F;
+    border-width: 3px;
 }
 
-.stats-row-entry { color: var(--text-primary) !important; }
-.stats-row-player { color: var(--text-tertiary) !important; }
-.stats-row-value-num { color: var(--purple-600) !important; text-shadow: none !important; }
-.stats-row-value-label { color: var(--text-tertiary) !important; }
-
-.stats-row-logo {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    overflow: visible !important;
-}
-.stats-row-logo img {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    display: block !important;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1)) !important;
-}
-.stats-row-logo-empty {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
+.mwm-team-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    display: block;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.15));
 }
 
-.stats-search-input {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-primary) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06) !important;
-}
-.stats-search-input::placeholder { color: var(--text-tertiary) !important; }
-.stats-search-input:focus {
-    border-color: var(--purple-500) !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
-}
-.stats-search-item {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.stats-search-item:hover {
-    border-color: var(--purple-300) !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15) !important;
-}
-.stats-search-rank, .stats-search-total {
-    color: var(--purple-600) !important;
-    text-shadow: none !important;
-}
-.stats-search-entry { color: var(--text-primary) !important; }
-.stats-search-player { color: var(--text-tertiary) !important; }
-
-.stats-profile-card {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 8px 30px rgba(124, 58, 237, 0.15) !important;
-}
-.stats-profile-rank-badge {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-    color: #fff !important;
-}
-.stats-profile-entry { color: var(--text-primary) !important; }
-.stats-profile-player { color: var(--text-secondary) !important; }
-.stats-profile-team {
-    background: var(--purple-50) !important;
-    border: 1px solid var(--purple-100) !important;
-    color: var(--purple-600) !important;
-    box-shadow: none !important;
-}
-.stats-stat-label { color: var(--text-tertiary) !important; }
-.stats-stat-value {
-    color: var(--purple-600) !important;
-    text-shadow: none !important;
-}
-.stats-detail-label { color: var(--text-secondary) !important; }
-.stats-detail-value { color: var(--text-primary) !important; }
-.stats-green { color: var(--green-600) !important; }
-.stats-yellow { color: var(--amber-600) !important; }
-
-.stats-record-card {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06) !important;
-}
-.stats-record-label { color: var(--text-secondary) !important; }
-.stats-record-value {
-    color: var(--purple-600) !important;
-    text-shadow: none !important;
-}
-.stats-record-name { color: var(--text-tertiary) !important; }
-.stats-record-gold {
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.10) 0%, #FFFFFF 100%) !important;
-    border-color: var(--purple-300) !important;
-}
-.stats-record-red {
-    background: linear-gradient(135deg, rgba(220, 38, 38, 0.08) 0%, #FFFFFF 100%) !important;
-    border-color: #FCA5A5 !important;
-}
-.stats-record-red .stats-record-value { color: var(--red-600) !important; }
-.stats-record-green {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, #FFFFFF 100%) !important;
-    border-color: #6EE7B7 !important;
-}
-.stats-record-green .stats-record-value { color: var(--green-600) !important; }
-
-/* =========================================================
-   14. TOTW — الملعب يدار بواسطة totw.css
-========================================================= */
-
-.totw-pitch-wrapper {
-    background: transparent !important;
+.mwm-team-placeholder {
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #E5D4A5;
+    border-radius: 50%;
+    color: #8B1A2F;
+    font-size: 20px;
+    font-weight: 900;
 }
 
-/* =========================================================
-   15. CLUBS
-========================================================= */
-
-.club-item {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06) !important;
-}
-.club-item:hover {
-    border-color: var(--purple-300) !important;
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15) !important;
-}
-.club-item-name { color: var(--text-primary) !important; }
-.club-item-count {
-    color: var(--purple-600) !important;
-    text-shadow: none !important;
-}
-.club-item-arrow { color: var(--purple-500) !important; }
-.clubs-edit-btn {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--purple-600) !important;
-}
-.clubs-edit-btn.active {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-    border-color: var(--purple-500) !important;
-    color: #fff !important;
+.mwm-team-name {
+    font-size: 12px;
+    font-weight: 900;
+    color: #8B1A2F;
+    text-align: center;
+    line-height: 1.2;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-/* =========================================================
-   16. TRENDS (يبقى احتياطاً)
-========================================================= */
-
-.trend-row {
-    background: #FFFFFF !important;
-    border-bottom: 1px solid #F3F4F6 !important;
-}
-.trend-row:hover { background: var(--purple-50) !important; }
-.trend-row-entry { color: var(--text-primary) !important; }
-.trend-row-player { color: var(--text-tertiary) !important; }
-.trend-diff-up {
-    background: rgba(16, 185, 129, 0.12) !important;
-    color: var(--green-600) !important;
-    border: 1px solid rgba(16, 185, 129, 0.3) !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
-}
-.trend-diff-down {
-    background: rgba(220, 38, 38, 0.12) !important;
-    color: var(--red-600) !important;
-    border: 1px solid rgba(220, 38, 38, 0.3) !important;
-    box-shadow: none !important;
-    text-shadow: none !important;
+.mwm-vs-badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #C8A95F;
+    border-radius: 50%;
+    font-size: 13px;
+    font-weight: 900;
+    font-family: 'Inter', sans-serif;
+    flex-shrink: 0;
+    box-shadow: 0 3px 8px rgba(139, 26, 47, 0.3);
+    border: 2px solid #C8A95F;
 }
 
-/* =========================================================
-   17. MANAGER HUB
-========================================================= */
+.mwm-del-btn {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    background: #C0392B;
+    color: #FFFFFF;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 3px 8px rgba(192, 57, 43, 0.4);
+    transition: all .2s ease;
+    z-index: 10;
+    font-weight: 900;
+}
+.mwm-del-btn:active { transform: scale(0.9); }
 
-.mh-controls {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06) !important;
-    backdrop-filter: none !important;
+/* ===== أزرار الإضافة والحفظ ===== */
+
+.mwm-add-btn {
+    width: 100%;
+    padding: 16px;
+    margin-top: 14px;
+    background: #FFFFFF;
+    color: #8B1A2F;
+    border: 3px dashed #C8A95F;
+    border-radius: 14px;
+    font-size: 14px;
+    font-weight: 900;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all .2s ease;
 }
-.mh-stats { color: var(--text-secondary) !important; }
-.mh-stats span {
-    color: var(--purple-600) !important;
-    text-shadow: none !important;
+.mwm-add-btn:hover {
+    background: #FAF6F0;
+    border-color: #8B1A2F;
 }
-.mh-edit-btn {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+.mwm-add-btn:active { transform: scale(0.98); }
+
+.mwm-save-btn {
+    width: 100%;
+    padding: 16px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #FFFFFF;
+    border: 3px solid #C8A95F;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    font-family: inherit;
+    letter-spacing: 1px;
+    transition: all .2s ease;
+    box-shadow: 0 6px 16px rgba(139, 26, 47, 0.3);
 }
-.mh-edit-btn.active {
-    background: linear-gradient(135deg, #10B981 0%, #047857 100%) !important;
+.mwm-save-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(139, 26, 47, 0.4);
 }
-.mh-refresh-btn {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
+.mwm-save-btn:active { transform: translateY(0) scale(0.98); }
+
+/* ===== Modal اختيار المنتخب ===== */
+
+.mwm-picker-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 99999;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    animation: fadeIn .2s ease;
 }
-.mh-search-input {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-primary) !important;
-    backdrop-filter: none !important;
-}
-.mh-search-input::placeholder { color: var(--text-tertiary) !important; }
-.mh-search-input:focus {
-    border-color: var(--purple-500) !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
-}
-.mh-search-box::before {
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237C3AED' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") center/contain no-repeat !important;
-}
-.mh-list-container {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.mh-list-container.edit-mode {
-    border-color: rgba(16, 185, 129, 0.4) !important;
-}
-.mh-list-header {
-    background: var(--purple-50) !important;
-    border-bottom: 1.5px solid var(--purple-100) !important;
-    color: var(--purple-700) !important;
-    backdrop-filter: none !important;
-}
-.mh-list-row { border-bottom: 1px solid #F3F4F6 !important; }
-.mh-list-row:hover { background: var(--purple-50) !important; }
-.mh-list-row::before {
-    background: linear-gradient(180deg, #7C3AED 0%, #A78BFA 100%) !important;
-}
-.mh-lr-num { color: var(--text-tertiary) !important; }
-.mh-lr-logo {
-    background: var(--purple-50) !important;
-    border: 1px solid var(--purple-100) !important;
-}
-.mh-lr-name { color: var(--text-primary) !important; }
-.mh-lr-team {
-    color: var(--purple-600) !important;
-    background: var(--purple-50) !important;
-    border: 1px solid var(--purple-100) !important;
-}
-.mh-lr-team-none {
-    color: var(--text-tertiary) !important;
-    background: #F3F4F6 !important;
-    border-color: #E5E7EB !important;
-}
-.mh-lr-move { background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important; }
-.mh-lr-delete { background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%) !important; }
-.mh-add-row {
-    background: rgba(16, 185, 129, 0.06) !important;
-    border: 1.5px solid rgba(16, 185, 129, 0.25) !important;
-    backdrop-filter: none !important;
-}
-.mh-add-input, .mh-add-select {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-primary) !important;
-}
-.mh-add-input:focus, .mh-add-select:focus {
-    border-color: var(--purple-500) !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
-}
-.mh-add-btn { background: linear-gradient(135deg, #10B981 0%, #059669 100%) !important; }
-.mh-manual-row {
-    background: rgba(245, 158, 11, 0.06) !important;
-    border: 1.5px solid rgba(245, 158, 11, 0.3) !important;
-    backdrop-filter: none !important;
-}
-.mh-manual-label { color: var(--amber-600) !important; }
-.mh-manual-input {
-    background: #FFFFFF !important;
-    border: 1.5px solid rgba(245, 158, 11, 0.4) !important;
-    color: var(--text-primary) !important;
-}
-.mh-manual-add-btn {
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
-    color: #fff !important;
-}
-.mh-row-manual {
-    background: linear-gradient(90deg, rgba(245, 158, 11, 0.06) 0%, transparent 60%) !important;
-    border-left: 2px solid rgba(245, 158, 11, 0.4) !important;
-}
-.mh-lr-logo-manual {
-    background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%) !important;
-    color: #fff !important;
-}
-.mh-lr-team-manual {
-    color: var(--amber-600) !important;
-    background: rgba(245, 158, 11, 0.08) !important;
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
-#mhModal {
-    background: rgba(17, 24, 39, 0.6);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+.mwm-picker-box {
+    width: 100%;
+    max-width: 500px;
+    max-height: 85vh;
+    background: #FFFFFF;
+    border-radius: 24px 24px 0 0;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp .3s ease;
+    border-top: 4px solid #C8A95F;
+    overflow: hidden;
 }
-.mh-modal-box {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 20px 60px rgba(17, 24, 39, 0.25) !important;
-}
-.mh-modal-title {
-    color: var(--purple-700) !important;
-    border-bottom: 1.5px solid var(--purple-100) !important;
-    background: none !important;
-    -webkit-text-fill-color: var(--purple-700) !important;
-}
-.mh-pass-input {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-primary) !important;
-}
-.mh-pass-input:focus {
-    border-color: var(--purple-500) !important;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15) !important;
-}
-.mh-modal-cancel {
-    background: #F3F4F6 !important;
-    color: var(--text-secondary) !important;
-    border: 1.5px solid #E5E7EB !important;
-}
-.mh-modal-confirm {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%) !important;
-    color: #fff !important;
-}
-.mh-modal-error { color: var(--red-600) !important; }
-.mh-move-option {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    color: var(--text-primary) !important;
-}
-.mh-move-option:hover {
-    background: var(--purple-50) !important;
-    border-color: var(--purple-300) !important;
-    color: var(--purple-700) !important;
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
 }
 
-/* =========================================================
-   18. FPL DATABASE
-========================================================= */
-
-.fpl-player-row {
-    background: #FFFFFF !important;
-    border-bottom: 1px solid #F3F4F6 !important;
-}
-.fpl-player-row:hover { background: var(--purple-50) !important; }
-.fpl-player-name { color: var(--text-primary) !important; }
-.fpl-player-sub { color: var(--text-tertiary) !important; }
-.fpl-player-price { color: var(--purple-600) !important; }
-.fpl-player-points { color: var(--text-primary) !important; }
-.fpl-team-card {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.fpl-team-card:hover { border-color: var(--purple-300) !important; }
-.fpl-team-card-name { color: var(--text-primary) !important; }
-.fpl-team-card-count { color: var(--purple-600) !important; }
-.fpl-modal-box {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.fpl-modal-name { color: var(--text-primary) !important; }
-.fpl-stat-box {
-    background: var(--purple-50) !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.fpl-stat-label { color: var(--text-secondary) !important; }
-.fpl-stat-value { color: var(--purple-600) !important; }
-.fpl-stat-value.green { color: var(--green-600) !important; }
-.fpl-stat-value.red { color: var(--red-600) !important; }
-.fpl-stat-value.gold { color: var(--amber-600) !important; }
-
-/* =========================================================
-   19. SQUAD MODAL
-========================================================= */
-
-.squad-modal-box {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-    box-shadow: 0 20px 60px rgba(17, 24, 39, 0.25) !important;
-}
-.squad-modal-manager { color: var(--text-primary) !important; }
-.squad-modal-subtitle { color: var(--text-secondary) !important; }
-.squad-section-title {
-    color: var(--purple-700) !important;
-    border-bottom: 1.5px solid var(--purple-100) !important;
-}
-.squad-player {
-    background: #FFFFFF !important;
-    border-bottom: 1px solid #F3F4F6 !important;
-}
-.squad-player:hover { background: var(--purple-50) !important; }
-.squad-player-name { color: var(--text-primary) !important; }
-.squad-player-team { color: var(--text-tertiary) !important; }
-.squad-player-points {
-    color: var(--purple-600) !important;
-    text-shadow: none !important;
+.mwm-picker-header {
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #fff;
+    border-bottom: 3px solid #C8A95F;
 }
 
-.squad-player-badge {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    max-width: 32px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important;
-    overflow: visible !important;
-}
-.squad-player-badge img {
-    width: 100% !important;
-    height: 100% !important;
-    max-width: 100% !important;
-    max-height: 100% !important;
-    object-fit: contain !important;
-    display: block !important;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15)) !important;
+.mwm-picker-title {
+    font-size: 16px;
+    font-weight: 900;
+    font-family: 'Cairo', sans-serif;
+    letter-spacing: 1px;
 }
 
-.squad-stat-box {
-    background: var(--purple-50) !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.squad-stat-label { color: var(--text-secondary) !important; }
-.squad-stat-value { color: var(--purple-600) !important; text-shadow: none !important; }
-.squad-stat-value.green { color: var(--green-600) !important; }
-.squad-stat-value.gold { color: var(--amber-600) !important; }
-
-/* =========================================================
-   20. TEAM MODAL
-========================================================= */
-
-.team-modal-box {
-    background: #FFFFFF !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.team-modal-title { color: var(--text-primary) !important; }
-.team-modal-loading { color: var(--text-secondary) !important; }
-.team-modal-kpi {
-    background: var(--purple-50) !important;
-    border: 1.5px solid var(--purple-100) !important;
-}
-.team-modal-kpi-label { color: var(--text-secondary) !important; }
-.team-modal-kpi-value { color: var(--purple-600) !important; text-shadow: none !important; }
-.team-player-row {
-    background: #FFFFFF !important;
-    border-bottom: 1px solid #F3F4F6 !important;
-}
-.team-player-row.top {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.08) 0%, transparent 60%) !important;
-    border-right: 4px solid var(--purple-500) !important;
-}
-.team-player-row.bottom {
-    background: linear-gradient(90deg, rgba(220, 38, 38, 0.06) 0%, transparent 60%) !important;
-    border-right: 4px solid var(--red-600) !important;
-}
-.team-player-name { color: var(--text-primary) !important; }
-.team-player-points { color: var(--purple-600) !important; text-shadow: none !important; }
-.team-player-rank { color: var(--text-tertiary) !important; }
-
-/* =========================================================
-   21. SETTINGS EMBED — إصلاح Scroll
-========================================================= */
-
-.settings-body {
-    overflow-y: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    overscroll-behavior: contain !important;
-    max-height: 100% !important;
-    touch-action: pan-y !important;
+.mwm-picker-close {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid #C8A95F;
+    background: transparent;
+    color: #C8A95F;
+    font-size: 16px;
+    font-weight: 900;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.settings-embed {
-    width: 100% !important;
-    max-height: none !important;
-    overflow: visible !important;
-    display: block !important;
-    padding: 0 !important;
-    margin: 0 !important;
+.mwm-picker-search {
+    padding: 12px 16px;
+    background: #FAF6F0;
+    border-bottom: 2px solid #E5D4A5;
 }
 
-.settings-embed .clubs-list,
-.settings-embed #clubsList {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 8px !important;
-    width: 100% !important;
-    max-height: none !important;
-    overflow: visible !important;
+.mwm-picker-search input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #E5D4A5;
+    border-radius: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    background: #FFFFFF;
+    color: #333;
+    outline: none;
+    transition: all .2s ease;
+}
+.mwm-picker-search input:focus {
+    border-color: #C8A95F;
+    box-shadow: 0 0 0 3px rgba(200, 169, 95, 0.2);
 }
 
-.settings-embed .clubs-controls {
-    display: flex !important;
-    justify-content: center !important;
-    margin-bottom: 12px !important;
-    padding: 8px 0 !important;
+.mwm-picker-list {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
 }
 
-/* منع أي عنصر من محاولة التمرير بشكل مستقل */
-#clubsList.clubs-list {
-    overflow: visible !important;
-    max-height: none !important;
+.mwm-picker-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 8px;
+    background: #FFFFFF;
+    border: 2px solid #E5D4A5;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all .2s ease;
+    gap: 6px;
+    font-family: inherit;
+    min-height: 90px;
+}
+.mwm-picker-item:hover,
+.mwm-picker-item:active {
+    background: linear-gradient(135deg, #FAF6F0 0%, #F5E6D3 100%);
+    border-color: #8B1A2F;
+    transform: scale(0.97);
 }
 
-/* زر الرجوع بعرض كامل */
-.settings-back {
-    width: 100% !important;
-    justify-content: center !important;
-    padding: 12px !important;
+.mwm-picker-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
 }
 
-.clubs-edit-btn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+.mwm-picker-item-name {
+    font-size: 11px;
+    font-weight: 900;
+    color: #8B1A2F;
+    text-align: center;
+    line-height: 1.2;
+    text-transform: uppercase;
 }
+
 /* =========================================================
    ROUND HIDDEN MESSAGE
 ========================================================= */
@@ -893,6 +621,7 @@ body {
     font-size: 18px;
     font-weight: 900;
     margin-bottom: 8px;
+    font-family: 'Cairo', sans-serif;
 }
 .round-hidden-sub {
     font-size: 13px;
@@ -901,49 +630,13 @@ body {
 }
 
 /* =========================================================
-   MATCHWEEK MANAGER
+   Mobile
 ========================================================= */
-.mwm-rounds-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+@media (max-width:400px){
+    .mwm-team-logo { width: 32px; height: 32px; }
+    .mwm-team-placeholder { width: 32px; height: 32px; font-size: 18px; }
+    .mwm-team-name { font-size: 11px; }
+    .mwm-picker-item img { width: 36px; height: 36px; }
+    .mwm-picker-item-name { font-size: 10px; }
+    .mwm-vs-badge { width: 34px; height: 34px; font-size: 11px; }
 }
-.mwm-round-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 14px;
-    background: #FAF6F0;
-    border: 2px solid #E5D4A5;
-    border-radius: 12px;
-    gap: 10px;
-}
-.mwm-round-info { flex: 1; text-align: right; }
-.mwm-round-num {
-    font-size: 15px;
-    font-weight: 900;
-    color: #8B1A2F;
-    margin-bottom: 3px;
-}
-.mwm-round-meta {
-    font-size: 11px;
-    color: #666;
-    font-weight: 700;
-}
-.mwm-hidden { color: #C0392B; }
-.mwm-visible { color: #27AE60; }
-
-.mwm-round-actions {
-    display: flex;
-    gap: 6px;
-}
-.mwm-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
