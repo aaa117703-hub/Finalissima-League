@@ -640,3 +640,40 @@ body{
     .mwm-picker-item-name { font-size: 10px; }
     .mwm-vs-badge { width: 34px; height: 34px; font-size: 11px; }
 }
+/* ===== Product disabled in picker ===== */
+
+.mwm-picker-item-disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    position: relative;
+    background: #F5F5F5 !important;
+    border-color: #DDD !important;
+}
+.mwm-picker-item-disabled:hover,
+.mwm-picker-item-disabled:active {
+    transform: none !important;
+    background: #F5F5F5 !important;
+}
+
+.mwm-picker-item-used {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: #C0392B;
+    color: #FFFFFF;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 2px 6px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.mwm-picker-info {
+    padding: 8px 16px;
+    background: #FAF6F0;
+    font-size: 12px;
+    font-weight: 900;
+    color: #8B1A2F;
+    text-align: center;
+    border-bottom: 1px solid #E5D4A5;
+}
