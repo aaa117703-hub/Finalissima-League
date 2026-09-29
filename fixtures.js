@@ -80,7 +80,12 @@ function changeRound(step) {
     if (currentRound > 38) currentRound = 38;
     localStorage.setItem('fin_last_round', currentRound);
     renderFixtures();
-    if (activeTab === 'standings') renderStandings();
+    if```
+
+ (activeTab === 'standings') renderStandings();
+**    if (activeTab === 'totw'Refresh && typeof loadTOTW === 'function ق') {
+        loadTOTWوي();
+    }
 }
 
 function switchTab(tabName) {
