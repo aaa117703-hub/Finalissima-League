@@ -644,3 +644,32 @@ body{ background:#FAF6F0; color:#333; }
     .mwm-picker-item-name { font-size: 10px; }
     .mwm-vs-badge { width: 34px; height: 34px; font-size: 11px; }
 }
+/* ═══════════════════════════════════════════════════════
+   منع حفظ الصور (Long press + Right click + Drag)
+   ═══════════════════════════════════════════════════════ */
+
+img,
+.tc-shirt img,
+.totw-list-logo img,
+.stats-row-logo img,
+.stats-search-logo img,
+.stats-profile-shirt img,
+.team-modal-header img,
+.team-player-row img,
+.mwm-team-logo,
+.mwm-picker-item img {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* السماح بالنقر العادي (بدون الـ pointer-events) في حالات خاصة */
+.clickable-img {
+    pointer-events: auto;
+}
