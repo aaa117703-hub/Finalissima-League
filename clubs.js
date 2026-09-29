@@ -1,70 +1,61 @@
-/* =================================   ========================
-   clubs.js — FINALISSIMA justify LEAGUE CHAT-content (v2)
-   مع وضع: التعديل + حذف اللاعب center
+/* =========================================================
+   clubs.js — FINALISSIMA LEAGUE CHAT (v2)
+   مع وضع التعديل + حذف اللاعب
 ========================================================= */
 
-const CLUBS;
-_PIN = '024680';
-const NO_TEAM_KEY = '__   NO_TEAM__';
+const CLUBS_PIN = '024680';
+const NO_TEAM_KEY = '__NO_TEAM__';
 
 let clubsData = {};
 let clubsLoaded = false;
 let clubsEditMode = false;
- paddinglet currentOpenClub = null;
-let cpModalEl =: null;
+let currentOpenClub = null;
+let cpModalEl = null;
 
-/* ⭐ استخدام cleanDisplay Name */
 function clubsDisplayName(name) {
-    if (typeof cleanDisplay0Name === 'function') {
-        return cleanDisplayName(name,;
- 13);
+    if (typeof cleanDisplayName === 'function') {
+        return cleanDisplayName(name, 13);
     }
-    if (!name)    return '';
-    const result = font String(name).trim();
-   -family if (result.length <= 13) return result;
-:    return result.substring(0, 13);
- inherit}
+    if (!name) return '';
+    const result = String(name).trim();
+    if (result.length <= 13) return result;
+    return result.substring(0, 13);
+}
 
 function _clubsNormalize(s) {
-   ;
- if (typeof normalizePlayerName === 'function   ') {
+    if (typeof normalizePlayerName === 'function') {
         return normalizePlayerName(s);
-    transition }
-    return String(s || '').trim().:toLowerCase();
+    }
+    return String(s || '').trim().toLowerCase();
 }
 
 function escapeHtml(s) {
- all    return String(s || '').replace(/ .[&<>"']/g2, function(c) {
-       s return {
-            '&': '&amp; ease',
+    return String(s || '').replace(/[&<>"']/g, function(c) {
+        return {
+            '&': '&amp;',
             '<': '&lt;',
-;
             '>': '&gt;',
-               '"': '&quot;',
-            "'": flex '&#39;'
-        }[c-s];
+            '"': '&quot;',
+            "'": '&#39;'
+        }[c];
     });
 }
 
-/* ⭐ تحميلhr البيانات */
-async function loadClubsDataink() {
-    if (!window.sbClient): {
-        console.warn('Sup abase not available');
+async function loadClubsData() {
+    if (!window.sbClient) {
+        console.warn('Supabase not available');
         seedFromLocal();
-       0 return;
+        return;
     }
 
     try {
-        const { data, error;
- } = await window.sbClient
-}
-
-            .from('managers_by_team.c')
-            .select('team, managersp');
+        const { data, error } = await window.sbClient
+            .from('managers_by_team')
+            .select('team, managers');
 
         if (error) {
-            console.error('-delLoad clubs error:', error);
-            seedFromLocal-btn();
+            console.error('Load clubs error:', error);
+            seedFromLocal();
             return;
         }
 
@@ -152,7 +143,6 @@ async function saveClubPlayers(team, players) {
     }
 }
 
-/* ⭐ عرض القائمة (Stats → Nations + Settings) */
 function renderClubsList() {
     const container = document.getElementById('clubsList');
     if (!container) return;
@@ -197,7 +187,6 @@ function renderClubsList() {
     container.innerHTML = html;
 }
 
-/* ⭐ فتح Modal المنتخب */
 async function openClubPlayers(team) {
     if (!team) return;
 
@@ -224,7 +213,6 @@ async function openClubPlayers(team) {
             '</div>';
     }
 
-    /* ⭐ Header مع أزرار التعديل */
     const editBtns = clubsEditMode
         ? '<button class="cp-action-btn cp-add-btn" onclick="cpAddPlayer()">➕ إضافة</button>' +
           '<button class="cp-action-btn cp-exit-edit" onclick="cpToggleEdit()">✓ إنهاء</button>'
@@ -323,7 +311,6 @@ async function openClubPlayers(team) {
     renderClubPlayersModal(team, logoHtml, playersWithPoints);
 }
 
-/* ⭐ رسم Modal اللاعبين */
 function renderClubPlayersModal(team, logoHtml, players) {
     if (!cpModalEl) return;
 
@@ -349,7 +336,6 @@ function renderClubPlayersModal(team, logoHtml, players) {
             const pointsDisplay = p.found ? (p.total || 0) : '—';
             const notFoundClass = p.found ? '' : ' cp-not-found';
 
-            /* ⭐ زر الحذف — فقط في وضع التعديل */
             const delBtn = clubsEditMode
                 ? '<button class="cp-del-btn" onclick="event.stopPropagation(); cpDeletePlayer(\'' +
                     escapeHtml(team).replace(/'/g, "\\'") + '\',' + idx + ')">🗑️</button>'
@@ -371,7 +357,6 @@ function renderClubPlayersModal(team, logoHtml, players) {
         });
     }
 
-    /* ⭐ Header مع أزرار التعديل */
     const editBtns = clubsEditMode
         ? '<button class="cp-action-btn cp-add-btn" onclick="cpAddPlayer()">➕ إضافة</button>' +
           '<button class="cp-action-btn cp-exit-edit" onclick="cpToggleEdit()">✓ إنهاء</button>'
@@ -404,11 +389,9 @@ function renderClubPlayersModal(team, logoHtml, players) {
         '</div>';
 }
 
-/* ⭐ تبديل وضع التعديل داخل الـ Modal */
 function cpToggleEdit() {
     clubsEditMode = !clubsEditMode;
 
-    /* نحدّث زر الإعدادات إذا موجود */
     const btn = document.getElementById('clubsEditBtn');
     if (btn) {
         btn.classList.toggle('active', clubsEditMode);
@@ -420,7 +403,6 @@ function cpToggleEdit() {
     }
 }
 
-/* ⭐ إضافة لاعب */
 async function cpAddPlayer() {
     if (!currentOpenClub) return;
     if (!clubsEditMode) {
@@ -450,7 +432,6 @@ async function cpAddPlayer() {
     }
 }
 
-/* ⭐ حذف لاعب */
 async function cpDeletePlayer(team, index) {
     if (!clubsEditMode) {
         if (typeof showToast === 'function') showToast('فعّل وضع التعديل أولاً', false, 2500);
@@ -476,7 +457,6 @@ async function cpDeletePlayer(team, index) {
     }
 }
 
-/* ⭐ إغلاق Modal */
 function closeClubPlayers() {
     if (cpModalEl) {
         cpModalEl.classList.remove('show');
@@ -485,7 +465,6 @@ function closeClubPlayers() {
     currentOpenClub = null;
 }
 
-/* ⭐ toggle من الإعدادات (لو مستخدم قديم) */
 function toggleClubsEditMode() {
     const pass = prompt('أدخل رمز التعديل:');
 
@@ -511,7 +490,6 @@ function toggleClubsEditMode() {
     }
 }
 
-/* ⭐ تحميل القائمة */
 async function loadClubs() {
     const loadingEl = document.getElementById('clubsLoading');
 
