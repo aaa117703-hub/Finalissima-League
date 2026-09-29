@@ -497,6 +497,30 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 @media (max-width:400px){
     .text-carousel{min-height:120px;}
 }
+
+/* =========================================================
+   منع حفظ الصور (Long press + Right click + Drag)
+========================================================= */
+
+img,
+.tc-shirt img,
+.totw-list-logo img,
+.stats-row-logo img,
+.stats-search-logo img,
+.stats-profile-shirt img,
+.team-modal-header img,
+.team-player-row img,
+.mwm-team-logo,
+.mwm-picker-item img {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    pointer-events: none;
+    -webkit-tap-highlight-color: transparent;
+}
 </style>
 
 <link rel="stylesheet" href="mobile.css?v=2">
@@ -508,7 +532,7 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 <link rel="stylesheet" href="fpl-database.css?v=2">
 <link rel="stylesheet" href="manager-squad.css?v=2">
 <link rel="stylesheet" href="manager-hub.css?v=2">
-<link rel="stylesheet" href="theme.css?v=6">
+<link rel="stylesheet" href="theme.css?v=7">
 
 </head>
 
@@ -649,17 +673,15 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 
     <div id="totwTab" class="tab-content">
 
-        <!-- Mode Tabs (Week / Month) -->
         <div class="totw-mode-tabs">
             <button id="totwWeekBtn" class="totw-mode-btn active" onclick="switchTOTWMode('week')">
-              تشكيلة الأسبوع
+                ⚽ تشكيلة الأسبوع
             </button>
             <button id="totwMonthBtn" class="totw-mode-btn" onclick="switchTOTWMode('month')">
-                 تشكيلة الشهر
+                🏆 تشكيلة الشهر
             </button>
         </div>
 
-        <!-- View Tabs (Squad / List) -->
         <div class="totw-tabs">
             <button id="totwSquadBtn" class="totw-tab-btn active" onclick="switchTOTWView('squad')">Squad</button>
             <button id="totwListBtn" class="totw-tab-btn" onclick="switchTOTWView('list')">List</button>
@@ -859,6 +881,64 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 })();
 </script>
 
+<!-- منع حفظ الصور -->
+<script>
+(function() {
+    'use strict';
+
+    document.addEventListener('contextmenu', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+            e.preventDefault();
+            return false;
+        }
+    }, { passive: false });
+
+    let longPressTimer = null;
+    let longPressTriggered = false;
+
+    document.addEventListener('touchstart', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+            longPressTriggered = false;
+            longPressTimer = setTimeout(function() {
+                longPressTriggered = true;
+            }, 500);
+        }
+    }, { passive: true });
+
+    document.addEventListener('touchend', function(e) {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+        if (longPressTriggered && e.target && e.target.tagName === 'IMG') {
+            e.preventDefault();
+            return false;
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchcancel', function() {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    });
+
+    document.addEventListener('dragstart', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    document.addEventListener('copy', function(e) {
+        if (e.target && e.target.tagName === 'IMG') {
+            e.preventDefault();
+            return false;
+        }
+    });
+})();
+</script>
+
 <script src="config.js?v=4"></script>
 <script src="text-carousel.js?v=4"></script>
 <script src="locks.js?v=3"></script>
@@ -866,7 +946,7 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 <script src="matchweeks.js?v=3"></script>
 <script src="supabase.js?v=7"></script>
 <script src="fixtures.js?v=8"></script>
-<script src="standings.js?v=3"></script>
+<script src="standings.js?v=2"></script>
 <script src="download.js?v=3"></script>
 <script src="players-teams.js?v=3"></script>
 <script src="totw.js?v=121"></script>
