@@ -1,5 +1,5 @@
 /* =========================================================
-   fixtures.js — FINALISSIMA LEAGUE CHAT
+   fixtures.js — FINALISSIMA LEAGUE CHAT (v4)
 ========================================================= */
 
 /* ===== ذاكرة مؤقتة للجولات المخصصة ===== */
@@ -32,7 +32,6 @@ async function loadCustomMatchweeksIntoMemory() {
         if (data) {
             window.customMatchweeks = data;
 
-            /* ندمجها مع window.matchweeks */
             Object.keys(data).forEach(function(rStr) {
                 const r = parseInt(rStr, 10);
                 const custom = data[r];
@@ -72,6 +71,9 @@ function selectRound(value) {
     localStorage.setItem('fin_last_round', currentRound);
     renderFixtures();
     if (activeTab === 'standings') renderStandings();
+    if (activeTab === 'totw' && typeof loadTOTW === 'function') {
+        loadTOTW();
+    }
 }
 
 function changeRound(step) {
@@ -80,11 +82,9 @@ function changeRound(step) {
     if (currentRound > 38) currentRound = 38;
     localStorage.setItem('fin_last_round', currentRound);
     renderFixtures();
-    if```
-
- (activeTab === 'standings') renderStandings();
-**    if (activeTab === 'totw'Refresh && typeof loadTOTW === 'function ق') {
-        loadTOTWوي();
+    if (activeTab === 'standings') renderStandings();
+    if (activeTab === 'totw' && typeof loadTOTW === 'function') {
+        loadTOTW();
     }
 }
 
@@ -190,13 +190,12 @@ function renderFixtures() {
 
         list.innerHTML = '';
 
-        /* ===== هل الجولة مخفية للمستخدم؟ ===== */
         if (!canUserSeeRound(currentRound)) {
             list.innerHTML =
                 '<div class="round-hidden-msg">' +
                     '<div class="round-hidden-icon">🔒</div>' +
                     '<div class="round-hidden-title">المواجهات غير متاحة حالياً</div>' +
-                    '<div class="round-hidden-sub">سيتم الإعلان عن مباريات هذه الجولة قريباً</div>' +
+                    '<div class="round-hidden-sub">سيتم الإعلان عن مباريات هذه الجولة عند إغلاق الديدلاين</div>' +
                 '</div>';
             return;
         }
@@ -285,13 +284,6 @@ async function saveCurrentRound() {
         result = { ok: false, error: e };
     }
 
-    if (result.ok && typeof saveManualTOTW === 'function') {
-        try { await saveManualTOTW(currentRound); } catch (e) { console.warn('TOTW snapshot failed:', e); }
-    }
-    if (result.ok && typeof saveCurrentRanks === 'function') {
-        try { await saveCurrentRanks(currentRound); } catch (e) { console.warn('Save ranks failed:', e); }
-    }
-
     isSaving = false;
     if (saveBtn) saveBtn.disabled = false;
     if (clearBtn) clearBtn.disabled = false;
@@ -377,7 +369,6 @@ function setupEruda() {
     });
 }
 
-/* ===== ربط الدوال بـ window ===== */
 window.loadCustomMatchweeksIntoMemory = loadCustomMatchweeksIntoMemory;
 window.isRoundHidden = isRoundHidden;
 window.canUserSeeRound = canUserSeeRound;
