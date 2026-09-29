@@ -1,77 +1,39 @@
 /* =========================================================
-   charts.css — v1
-   قسم الرسوم البيانية — Light Purple Theme
+   charts.css — FINALISSIMA LEAGUE (Qatar 2022 Colors)
 ========================================================= */
 
-/* ========== TABS — Horizontal Scroll (يسمح بالتبويب الجديد) ========== */
-
-.stats-tabs {
-    display: flex !important;
-    gap: 6px !important;
-    overflow-x: auto !important;
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-    padding: 4px 2px 8px !important;
-    scroll-behavior: smooth !important;
-    -webkit-overflow-scrolling: touch !important;
-    flex-wrap: nowrap !important;
-    justify-content: flex-start !important;
-}
-
-.stats-tabs::-webkit-scrollbar {
-    display: none !important;
-}
-
-.stats-tab-btn {
-    flex-shrink: 0 !important;
-}
-
-/* ========== CHARTS CONTAINER ========== */
-
-#statsView-charts {
-    padding: 4px 0 20px;
-}
-
-/* ========== INTRO BAR ========== */
-
+/* ===== Intro ===== */
 .charts-intro {
-    padding: 14px 18px;
-    background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(0, 184, 255, 0.06) 100%);
-    border: 1.5px solid var(--purple-100, #EDE9FE);
+    text-align: center;
+    padding: 16px;
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color: #FFFFFF;
     border-radius: 14px;
     margin-bottom: 16px;
-    font-size: 12px;
-    color: var(--text-secondary, #6B7280);
-    text-align: center;
-    line-height: 1.7;
-    font-weight: 700;
-    letter-spacing: 0.2px;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.6;
+    border: 2px solid #C8A95F;
+    box-shadow: 0 4px 12px rgba(139, 26, 47, 0.3);
 }
-
 .charts-intro strong {
-    color: var(--purple-600, #6D28D9);
-    font-weight: 900;
-    font-size: 14px;
+    font-size: 15px;
+    color: #C8A95F;
+    letter-spacing: 1px;
 }
 
-/* ========== CHART CARD ========== */
-
+/* ===== Chart Card ===== */
 .chart-card {
-    background: #FFFFFF;
-    border: 1.5px solid var(--purple-100, #EDE9FE);
-    border-radius: 18px;
-    padding: 18px 14px 14px;
-    margin-bottom: 16px;
-    box-shadow: 0 2px 12px rgba(124, 58, 237, 0.06);
-    animation: chartFadeIn 0.5s ease both;
-    overflow: hidden;
     position: relative;
+    background: #FFFFFF;
+    border: 2px solid #E5D4A5;
+    border-radius: 18px;
+    padding: 16px 12px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(139, 26, 47, 0.08);
+    overflow: hidden;
+    transition: all .25s ease;
 }
-
-.chart-card:nth-child(2) { animation-delay: 0.05s; }
-.chart-card:nth-child(3) { animation-delay: 0.10s; }
-.chart-card:nth-child(4) { animation-delay: 0.15s; }
-.chart-card:nth-child(5) { animation-delay: 0.20s; }
 
 .chart-card::before {
     content: '';
@@ -80,160 +42,126 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: linear-gradient(90deg, #7C3AED 0%, #A855F7 50%, #00B8FF 100%);
-    border-radius: 18px 18px 0 0;
+    background: linear-gradient(90deg, #8B1A2F 0%, #C8A95F 50%, #8B1A2F 100%);
+    opacity: 0.9;
 }
 
-@keyframes chartFadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.chart-card:hover {
+    border-color: #C8A95F;
+    box-shadow: 0 8px 24px rgba(139, 26, 47, 0.15);
 }
 
-/* ========== CHART TITLE ========== */
-
+/* ===== Chart Title ===== */
 .chart-title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin-bottom: 16px;
-    padding: 0 4px;
+    justify-content: center;
+    gap: 8px;
     font-size: 13px;
     font-weight: 900;
-    color: var(--text-primary, #111827);
-    letter-spacing: 0.5px;
+    color: #8B1A2F;
+    letter-spacing: 1.2px;
     text-transform: uppercase;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid rgba(139, 26, 47, 0.15);
+    font-family: 'Cairo', sans-serif;
 }
 
-.chart-title .chart-icon {
-    font-size: 20px;
-    filter: drop-shadow(0 2px 4px rgba(124, 58, 237, 0.3));
-    flex-shrink: 0;
+.chart-icon {
+    font-size: 18px;
 }
 
-.chart-title .chart-sub {
-    margin-left: auto;
-    color: var(--purple-500, #7C3AED);
-    font-size: 10px;
-    font-weight: 900;
+.chart-sub {
+    font-size: 9px;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    padding: 3px 8px;
+    border-radius: 10px;
     letter-spacing: 1px;
-    padding: 3px 10px;
-    background: var(--purple-50, #F5F3FF);
-    border: 1px solid var(--purple-100, #EDE9FE);
-    border-radius: 20px;
-    white-space: nowrap;
+    font-weight: 900;
+    border: 1px solid #C8A95F;
 }
 
-/* ========== CHART WRAP ========== */
-
+/* ===== Chart Wrap ===== */
 .chart-wrap {
     position: relative;
-    width: 100%;
-    height: 280px;
+    height: 260px;
+    background: #FAF6F0;
+    border-radius: 12px;
+    padding: 8px;
+    border: 1px solid #E5D4A5;
 }
 
 .chart-wrap.chart-tall {
-    height: 340px;
+    height: 420px;
 }
 
-.chart-wrap canvas {
-    width: 100% !important;
-    height: 100% !important;
+/* ===== Chart Empty ===== */
+.chart-empty {
+    text-align: center;
+    padding: 40px 20px;
+    color: #8B7340;
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.8;
+    background: #FAF6F0;
+    border-radius: 12px;
+    border: 2px dashed #E5D4A5;
 }
 
-/* ========== LOADING ========== */
+.chart-empty-icon {
+    display: block;
+    font-size: 42px;
+    margin-bottom: 12px;
+    opacity: 0.7;
+}
 
+/* ===== Charts Loading ===== */
 .charts-loading {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 80px 20px;
-    gap: 14px;
-    color: var(--purple-600, #6D28D9);
-    font-size: 14px;
-    font-weight: 700;
+    text-align: center;
+    padding: 60px 20px;
+    color: #8B1A2F;
+    font-weight: 900;
+    letter-spacing: 1px;
 }
 
 .charts-loading .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(124, 58, 237, 0.2);
-    border-top-color: var(--purple-500, #7C3AED);
+    display: inline-block;
+    width: 44px;
+    height: 44px;
+    border: 4px solid rgba(139, 26, 47, 0.15);
+    border-top-color: #8B1A2F;
     border-radius: 50%;
-    animation: chartsSpin 0.8s linear infinite;
+    animation: chartSpin 0.8s linear infinite;
+    margin-bottom: 16px;
+    box-shadow: 0 0 20px rgba(139, 26, 47, 0.2);
 }
 
-@keyframes chartsSpin {
+@keyframes chartSpin {
     to { transform: rotate(360deg); }
 }
 
-/* ========== ERROR ========== */
-
+/* ===== Charts Error ===== */
 .charts-error {
-    padding: 20px;
-    background: rgba(220, 38, 38, 0.08);
-    border: 1.5px solid rgba(220, 38, 38, 0.3);
+    text-align: center;
+    padding: 30px 20px;
+    background: rgba(139, 26, 47, 0.08);
+    border: 2px solid #8B1A2F;
     border-radius: 14px;
-    color: var(--red-600, #DC2626);
-    font-size: 13px;
-    font-weight: 700;
-    text-align: center;
+    color: #8B1A2F;
+    font-weight: 900;
+    margin: 16px;
+    line-height: 1.6;
 }
 
-/* ========== EMPTY ========== */
-
-.chart-empty {
-    padding: 40px 20px;
-    text-align: center;
-    color: var(--text-tertiary, #9CA3AF);
-    font-size: 13px;
-    font-weight: 700;
-    background: var(--purple-50, #F5F3FF);
-    border-radius: 12px;
-    line-height: 1.8;
-    border: 1px dashed var(--purple-100, #EDE9FE);
-}
-
-.chart-empty .chart-empty-icon {
-    font-size: 42px;
-    display: block;
-    margin-bottom: 12px;
-    opacity: 0.6;
-}
-
-/* ========== MOBILE ========== */
-
-@media (max-width: 400px) {
-    .chart-wrap {
-        height: 240px;
-    }
-
-    .chart-wrap.chart-tall {
-        height: 300px;
-    }
-
-    .chart-title {
-        font-size: 12px;
-        gap: 8px;
-    }
-
-    .chart-title .chart-icon {
-        font-size: 18px;
-    }
-
-    .chart-title .chart-sub {
-        font-size: 9px;
-        padding: 2px 8px;
-    }
-
-    .chart-card {
-        padding: 14px 10px 10px;
-        margin-bottom: 12px;
-    }
+/* ===== Mobile ===== */
+@media (max-width: 480px) {
+    .chart-wrap { height: 220px; }
+    .chart-wrap.chart-tall { height: 360px; }
+    .chart-title { font-size: 12px; letter-spacing: 1px; }
+    .chart-sub { font-size: 8px; padding: 2px 6px; }
+    .chart-icon { font-size: 16px; }
+    .charts-intro { font-size: 12px; padding: 12px; }
+    .charts-intro strong { font-size: 14px; }
 }
