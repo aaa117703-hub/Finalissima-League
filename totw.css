@@ -648,3 +648,21 @@
 .totw-mode-btn:active {
     transform: translateY(0) scale(0.97);
 }
+/* ═══════════════════════════════════════
+   منع حفظ الصور
+   ═══════════════════════════════════════ */
+
+img,
+.tc-shirt img,
+.totw-list-logo img,
+.stats-row-logo img,
+.stats-search-logo img,
+.team-modal-header img,
+.team-player-row img {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+    pointer-events: none;
+    /* ⚠️ مهم: pointer-events: none تعطل الضغط عليه */
+}
