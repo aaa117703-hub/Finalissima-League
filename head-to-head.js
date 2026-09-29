@@ -289,14 +289,14 @@ function h2hRenderResults(data) {
 
     /* مصفوفة الصفوف */
     const rows = [
-        { icon: '📊', label: 'مجموع النقاط', valA: a.totalPoints, valB: b.totalPoints, format: 'number' },
-        { icon: '📈', label: 'متوسط الجولة', valA: a.avgPoints, valB: b.avgPoints, format: 'number' },
-        { icon: '🏆', label: 'مرات في تشكيلة الأسبوع', valA: a.totwWeekCount, valB: b.totwWeekCount, format: 'count' },
-        { icon: '🥇', label: 'مرات في تشكيلة الشهر', valA: a.totwMonthCount, valB: b.totwMonthCount, format: 'count' },
-        { icon: '🌍', label: 'المركز العالمي', valA: a.overallRank, valB: b.overallRank, format: 'rank', invert: true },
-        { icon: '🏅', label: 'المركز في الدوري', valA: a.leagueRank, valB: b.leagueRank, format: 'rank', invert: true },
-        { icon: '⭐', label: 'أفضل جولة', valA: a.bestGW.points + ' (GW' + a.bestGW.event + ')', valB: b.bestGW.points + ' (GW' + b.bestGW.event + ')', format: 'text' },
-        { icon: '📉', label: 'أسوأ جولة', valA: a.worstGW.points + ' (GW' + a.worstGW.event + ')', valB: b.worstGW.points + ' (GW' + b.worstGW.event + ')', format: 'text', invert: true }
+        { icon: '', label: 'مجموع النقاط', valA: a.totalPoints, valB: b.totalPoints, format: 'number' },
+        { icon: '', label: 'متوسط الجولة', valA: a.avgPoints, valB: b.avgPoints, format: 'number' },
+        { icon: '', label: 'مرات في تشكيلة الأسبوع', valA: a.totwWeekCount, valB: b.totwWeekCount, format: 'count' },
+        { icon: '', label: 'مرات في تشكيلة الشهر', valA: a.totwMonthCount, valB: b.totwMonthCount, format: 'count' },
+        { icon: '', label: 'المركز العالمي', valA: a.overallRank, valB: b.overallRank, format: 'rank', invert: true },
+        { icon: '', label: 'المركز في الدوري', valA: a.leagueRank, valB: b.leagueRank, format: 'rank', invert: true },
+        { icon: '', label: 'أفضل جولة', valA: a.bestGW.points + ' (GW' + a.bestGW.event + ')', valB: b.bestGW.points + ' (GW' + b.bestGW.event + ')', format: 'text' },
+        { icon: '', label: 'أسوأ جولة', valA: a.worstGW.points + ' (GW' + a.worstGW.event + ')', valB: b.worstGW.points + ' (GW' + b.worstGW.event + ')', format: 'text', invert: true }
     ];
 
     let html = '';
@@ -358,15 +358,15 @@ function h2hRenderResults(data) {
 
     /* الرسم البياني — تطور النقاط التراكمية */
     html += '<div class="h2h-chart-section">';
-    html += '<div class="h2h-chart-title">📊 تطور النقاط التراكمية</div>';
+    html += '<div class="h2h-chart-title"> تطور النقاط التراكمية</div>';
     html += '<div class="h2h-chart-wrap"><canvas id="h2hChart"></canvas></div>';
     html += '</div>';
 
     /* زر التحميل */
-    html += '<button class="h2h-download-btn" onclick="h2hDownload()">📥 تحميل المقارنة</button>';
+    html += '<button class="h2h-download-btn" onclick="h2hDownload()"> تحميل المقارنة</button>';
 
     /* زر تبديل */
-    html += '<button class="h2h-swap-btn" onclick="h2hSwap()">🔄 تبديل المديرين</button>';
+    html += '<button class="h2h-swap-btn" onclick="h2hSwap()"> تبديل المديرين</button>';
 
     container.innerHTML = html;
 
