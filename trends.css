@@ -1,5 +1,5 @@
 /* =========================================================
-   trends.css — Cosmic Amethyst Theme
+   trends.css — Finalissima Theme (عنابي + ذهبي + صحراوي)
 ========================================================= */
 
 /* =========================================================
@@ -12,7 +12,7 @@
     gap:10px;
     align-items:center;
     padding:11px 8px;
-    border-bottom:1px solid rgba(124,77,255,.12);
+    border-bottom:1px solid rgba(139, 26, 47, 0.12);
     border-radius:10px;
     transition:all .25s ease;
     min-height:60px;
@@ -21,7 +21,7 @@
 .trend-row:last-child{border-bottom:none;}
 
 .trend-row:hover{
-    background:rgba(124,77,255,.12);
+    background:rgba(200, 169, 95, 0.12);
     transform:translateX(-4px);
 }
 
@@ -51,12 +51,12 @@
     object-fit:contain;
     object-position:center;
     display:block;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.3));
 }
 
 .trend-row-logo-empty{
     font-size:20px;
-    color:#a89cc8;
+    color:#C8A95F;
 }
 
 /* الأسماء */
@@ -72,7 +72,7 @@
 .trend-row-entry{
     font-size:13px;
     font-weight:900;
-    color:#ffffff;
+    color:#8B1A2F;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
@@ -83,7 +83,7 @@
 .trend-row-player{
     font-size:10px;
     font-weight:600;
-    color:#a89cc8;
+    color:#8B7340;
     overflow:hidden;
     text-overflow:ellipsis;
     white-space:nowrap;
@@ -106,20 +106,20 @@
     justify-self:center;
 }
 
-/* الصعود — تركوازي */
+/* الصعود — ذهبي */
 .trend-diff-up{
-    color:#00e5ff;
-    background:rgba(0, 229, 255, 0.15);
-    border:1px solid rgba(0, 229, 255, 0.4);
-    text-shadow:0 0 10px rgba(0, 229, 255, 0.5);
+    color:#8B7340;
+    background:rgba(200, 169, 95, 0.2);
+    border:1px solid rgba(200, 169, 95, 0.5);
+    text-shadow:0 0 10px rgba(200, 169, 95, 0.3);
 }
 
-/* الهبوط — أحمر */
+/* الهبوط — عنابي */
 .trend-diff-down{
-    color:#ff5252;
-    background:rgba(229, 57, 53, 0.18);
-    border:1px solid rgba(229, 57, 53, 0.45);
-    text-shadow:0 0 10px rgba(255, 82, 82, 0.4);
+    color:#8B1A2F;
+    background:rgba(139, 26, 47, 0.12);
+    border:1px solid rgba(139, 26, 47, 0.35);
+    text-shadow:0 0 10px rgba(139, 26, 47, 0.2);
 }
 
 /* =========================================================
