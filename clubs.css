@@ -1,8 +1,19 @@
 /* =========================================================
-   clubs.css — v7
+   clubs.css — v8
    - قائمة الأندية
    - Modal لاعبين مرتبين بالنقاط
+   - ألوان Finalissima (عنابي + ذهبي)
 ========================================================= */
+
+/* ⭐ CSS Variables — Qatar 2022 */
+:root {
+    --purple-50:   #FAF6F0;
+    --purple-100:  #E5D4A5;
+    --purple-300:  #C8A95F;
+    --purple-500:  #8B1A2F;
+    --purple-600:  #6B0F1F;
+    --purple-700:  #4A0A15;
+}
 
 /* ========== Controls ========== */
 
@@ -16,26 +27,26 @@
 .clubs-edit-btn {
     padding: 8px 16px;
     background: #FFFFFF;
-    border: 1.5px solid var(--purple-100, #EDE9FE);
+    border: 1.5px solid var(--purple-100, #E5D4A5);
     border-radius: 10px;
-    color: var(--purple-600, #6D28D9);
+    color: var(--purple-600, #6B0F1F);
     font-size: 12px;
     font-weight: 900;
     letter-spacing: 0.5px;
     cursor: pointer;
     font-family: inherit;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06);
+    box-shadow: 0 2px 8px rgba(139, 26, 47, 0.06);
 }
 
 .clubs-edit-btn:hover {
-    border-color: var(--purple-300, #A78BFA);
-    box-shadow: 0 4px 14px rgba(124, 58, 237, 0.15);
+    border-color: var(--purple-300, #C8A95F);
+    box-shadow: 0 4px 14px rgba(139, 26, 47, 0.15);
 }
 
 .clubs-edit-btn.active {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
-    border-color: var(--purple-500, #7C3AED);
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    border-color: var(--purple-500, #8B1A2F);
     color: #fff;
 }
 
@@ -53,9 +64,9 @@
     color: var(--text-tertiary, #9CA3AF);
     font-size: 13px;
     font-weight: 700;
-    background: var(--purple-50, #F5F3FF);
+    background: var(--purple-50, #FAF6F0);
     border-radius: 12px;
-    border: 1px dashed var(--purple-100, #EDE9FE);
+    border: 1px dashed var(--purple-100, #E5D4A5);
 }
 
 .club-item {
@@ -64,16 +75,16 @@
     gap: 12px;
     padding: 12px 16px;
     background: #FFFFFF;
-    border: 1.5px solid var(--purple-100, #EDE9FE);
+    border: 1.5px solid var(--purple-100, #E5D4A5);
     border-radius: 14px;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.06);
+    box-shadow: 0 2px 8px rgba(139, 26, 47, 0.06);
 }
 
 .club-item:hover {
-    border-color: var(--purple-300, #A78BFA);
-    box-shadow: 0 6px 20px rgba(124, 58, 237, 0.15);
+    border-color: var(--purple-300, #C8A95F);
+    box-shadow: 0 6px 20px rgba(139, 26, 47, 0.15);
     transform: translateY(-2px);
 }
 
@@ -97,9 +108,9 @@
 }
 
 .club-item-logo-empty {
-    background: var(--purple-50, #F5F3FF);
+    background: var(--purple-50, #FAF6F0);
     border-radius: 50%;
-    border: 1px solid var(--purple-100, #EDE9FE);
+    border: 1px solid var(--purple-100, #E5D4A5);
 }
 
 .club-item-info {
@@ -123,14 +134,14 @@
 .club-item-count {
     font-size: 11px;
     font-weight: 800;
-    color: var(--purple-600, #6D28D9);
+    color: var(--purple-600, #6B0F1F);
     letter-spacing: 0.5px;
 }
 
 .club-item-arrow {
     font-size: 22px;
     font-weight: 900;
-    color: var(--purple-500, #7C3AED);
+    color: var(--purple-500, #8B1A2F);
     flex-shrink: 0;
     transition: transform 0.2s ease;
 }
@@ -184,10 +195,11 @@
     align-items: center;
     gap: 12px;
     padding: 16px 18px;
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color: #fff;
     position: relative;
     flex-shrink: 0;
+    border-bottom: 3px solid #C8A95F;
 }
 
 .cp-header-logo {
@@ -197,7 +209,7 @@
     align-items: center;
     justify-content: center;
     background: rgba(255, 255, 255, 0.15);
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
+    border: 1.5px solid rgba(200, 169, 95, 0.5);
     border-radius: 50%;
     flex-shrink: 0;
     overflow: hidden;
@@ -230,7 +242,7 @@
 .cp-header-sub {
     font-size: 11px;
     font-weight: 700;
-    color: rgba(255, 255, 255, 0.8);
+    color: #E5D4A5;
     margin-top: 2px;
     letter-spacing: 0.5px;
 }
@@ -240,8 +252,8 @@
     height: 32px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: #fff;
+    border: 2px solid #C8A95F;
+    color: #C8A95F;
     font-size: 15px;
     font-weight: 900;
     cursor: pointer;
@@ -255,7 +267,8 @@
 }
 
 .cp-close:hover {
-    background: rgba(255, 255, 255, 0.35);
+    background: #C8A95F;
+    color: #8B1A2F;
 }
 
 /* List Header */
@@ -265,9 +278,9 @@
     gap: 8px;
     align-items: center;
     padding: 10px 16px;
-    background: var(--purple-50, #F5F3FF);
-    border-bottom: 1.5px solid var(--purple-100, #EDE9FE);
-    color: var(--purple-700, #5B21B6);
+    background: var(--purple-50, #FAF6F0);
+    border-bottom: 1.5px solid var(--purple-100, #E5D4A5);
+    color: var(--purple-700, #4A0A15);
     font-size: 9px;
     font-weight: 900;
     text-transform: uppercase;
@@ -305,21 +318,22 @@
 }
 
 .cp-player-row:hover {
-    background: var(--purple-50, #F5F3FF);
+    background: var(--purple-50, #FAF6F0);
 }
 
 /* Top 3 */
 .cp-player-row.cp-top-1 {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.12) 0%, transparent 60%);
-    border-left: 4px solid #7C3AED;
+    background: linear-gradient(90deg, rgba(200, 169, 95, 0.20) 0%, transparent 60%);
+    border-left: 4px solid #C8A95F;
 }
 .cp-player-row.cp-top-2 {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.08) 0%, transparent 60%);
-    border-left: 4px solid #A78BFA;
+    background: linear-gradient(90deg, rgba(200, 169, 95, 0.12) 0%, transparent 60%);
+    border-left: 4px solid #C8A95F;
+    opacity: 0.95;
 }
 .cp-player-row.cp-top-3 {
-    background: linear-gradient(90deg, rgba(124, 58, 237, 0.05) 0%, transparent 60%);
-    border-left: 4px solid #C4B5FD;
+    background: linear-gradient(90deg, rgba(139, 26, 47, 0.08) 0%, transparent 60%);
+    border-left: 4px solid #8B1A2F;
 }
 
 /* Rank */
@@ -338,19 +352,19 @@
 }
 
 .cp-top-1 .cp-rank {
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
-    color: #fff;
-    box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+    background: linear-gradient(135deg, #C8A95F 0%, #8B7340 100%);
+    color: #FFFFFF;
+    box-shadow: 0 2px 8px rgba(200, 169, 95, 0.5);
 }
 
 .cp-top-2 .cp-rank {
-    background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%);
-    color: #fff;
+    background: linear-gradient(135deg, #E5E5E5 0%, #A8A8A8 100%);
+    color: #333;
 }
 
 .cp-top-3 .cp-rank {
-    background: linear-gradient(135deg, #C4B5FD 0%, #A78BFA 100%);
-    color: #4C1D95;
+    background: linear-gradient(135deg, #CD7F32 0%, #8B4513 100%);
+    color: #FFFFFF;
 }
 
 /* Logo */
@@ -374,9 +388,9 @@
 }
 
 .cp-logo-empty {
-    background: var(--purple-50, #F5F3FF);
+    background: var(--purple-50, #FAF6F0);
     border-radius: 50%;
-    border: 1px solid var(--purple-100, #EDE9FE);
+    border: 1px solid var(--purple-100, #E5D4A5);
 }
 
 /* Names */
@@ -413,7 +427,7 @@
     text-align: right;
     font-size: 15px;
     font-weight: 900;
-    color: var(--purple-600, #6D28D9);
+    color: #8B1A2F;
     letter-spacing: 0.5px;
 }
 
@@ -436,7 +450,7 @@
     justify-content: center;
     padding: 60px 20px;
     gap: 14px;
-    color: var(--purple-600, #6D28D9);
+    color: #8B1A2F;
     font-size: 13px;
     font-weight: 700;
 }
@@ -444,8 +458,8 @@
 .cp-loading .spinner {
     width: 36px;
     height: 36px;
-    border: 3px solid rgba(124, 58, 237, 0.2);
-    border-top-color: var(--purple-500, #7C3AED);
+    border: 3px solid rgba(139, 26, 47, 0.2);
+    border-top-color: #8B1A2F;
     border-radius: 50%;
     animation: cpSpin 0.8s linear infinite;
 }
@@ -510,8 +524,9 @@
     align-items: center;
     gap: 12px;
     padding: 16px 18px;
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color: #fff;
+    border-bottom: 3px solid #C8A95F;
 }
 
 .club-modal-logo {
@@ -544,8 +559,8 @@
     height: 32px;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.2);
-    border: none;
-    color: #fff;
+    border: 2px solid #C8A95F;
+    color: #C8A95F;
     font-size: 14px;
     font-weight: 900;
     cursor: pointer;
@@ -561,8 +576,8 @@
     font-size: 12px;
     font-weight: 800;
     color: var(--text-secondary, #6B7280);
-    background: var(--purple-50, #F5F3FF);
-    border-bottom: 1.5px solid var(--purple-100, #EDE9FE);
+    background: var(--purple-50, #FAF6F0);
+    border-bottom: 1.5px solid var(--purple-100, #E5D4A5);
 }
 
 .club-players-list {
@@ -583,7 +598,7 @@
     width: 24px;
     font-size: 11px;
     font-weight: 900;
-    color: var(--purple-600, #6D28D9);
+    color: #6B0F1F;
     text-align: center;
 }
 
@@ -614,7 +629,7 @@
 .club-add-btn {
     margin: 8px 18px 14px;
     padding: 10px 16px;
-    background: linear-gradient(135deg, #7C3AED 0%, #6D28D9 100%);
+    background: linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -627,7 +642,7 @@
 .club-stats-btn {
     margin: 12px 18px 4px;
     padding: 10px 16px;
-    background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+    background: linear-gradient(135deg, #C8A95F 0%, #8B7340 100%);
     color: #fff;
     border: none;
     border-radius: 10px;
@@ -676,6 +691,7 @@
         font-size: 10px;
     }
 }
+
 /* ⭐ للاعبين بدون نقاط (مو في FPL) */
 .cp-player-row.cp-not-found {
     opacity: 0.75;
