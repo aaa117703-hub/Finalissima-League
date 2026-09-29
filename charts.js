@@ -1,6 +1,6 @@
 /* =========================================================
-   charts.js — FINALISSIMA LEAGUE CHAT (v2)
-   يقرأ من manager_history
+   charts.js — FINALISSIMA LEAGUE CHAT (v3)
+   نسخة فخمة — 4 رسوم جديدة
 ========================================================= */
 
 (function(){
@@ -65,7 +65,7 @@ if (typeof Chart !== 'undefined') {
 }
 
 /* =========================================================
-   جيب history
+   Fetch
 ========================================================= */
 
 async function fetchHistoryForCharts() {
@@ -82,26 +82,22 @@ async function fetchManagersForCharts() {
    Builders
 ========================================================= */
 
+/* 1) Rank Progression — Top 10 */
 function buildRankProgression(history, managers) {
     if (!history || history.length === 0) return null;
 
-    /* جيب كل الجولات */
     const rounds = [...new Set(history.map(r => r.event))].sort((a, b) => a - b);
     if (rounds.length === 0) return null;
 
-    /* آخر جولة */
     const lastRound = rounds[rounds.length - 1];
 
-    /* Top 10 في آخر جولة */
     const lastRoundEntries = history
         .filter(r => r.event === lastRound)
         .sort((a, b) => (a.overall_rank || 0) - (b.overall_rank || 0))
         .slice(0, 10);
 
-    /* نعرض آخر 8 جولات كحد أقصى */
     const displayRounds = rounds.slice(-8);
 
-    /* managers map */
     const mMap = {};
     managers.forEach(m => { mMap[m.entry] = m; });
 
@@ -137,68 +133,37 @@ function buildRankProgression(history, managers) {
     };
 }
 
-function buildTop15Total(managers) {
+/* 2) Top 10 by Average GW */
+function buildTop10Avg(managers) {
     if (!managers || managers.length === 0) return null;
 
-    const sorted = [...managers]
-        .sort((a, b) => (b.total || 0) - (a.total || 0))
-        .slice(0, 15);
+    const withAvg = managers
+        .filter(m => (m.totalGW || 0) > 0)
+        .map(m => ({
+            name: m.player_name || m.entry_name || 'Unknown',
+            avg: Math.round((m.totalPoints || 0) / (m.totalGW || 1)),
+            total: m.totalPoints || 0,
+            gw: m.totalGW
+        }))
+        .sort((a, b) => b.avg - a.avg)
+        .slice(0, 10);
 
     return {
-        labels: sorted.map(m => shortenName(m.player_name || m.entry_name, 14)),
+        labels: withAvg.map(m => shortenName(m.name, 14)),
         datasets: [{
-            label: 'Total Points',
-            data: sorted.map(m => m.total || 0),
-            backgroundColor: sorted.map((m, i) => hexToRgba(CHART_COLORS[i % CHART_COLORS.length], 0.75)),
-            borderColor: sorted.map((m, i) => CHART_COLORS[i % CHART_COLORS.length]),
+            label: 'Avg Points',
+            data: withAvg.map(m => m.avg),
+            backgroundColor: withAvg.map((m, i) => hexToRgba(CHART_COLORS[i % CHART_COLORS.length], 0.8)),
+            borderColor: withAvg.map((m, i) => CHART_COLORS[i % CHART_COLORS.length]),
             borderWidth: 2,
-            borderRadius: 8,
-            borderSkipped: false,
-            maxBarThickness: 40
-        }]
-    };
-}
-
-function buildPointsDistribution(managers) {
-    if (!managers || managers.length === 0) return null;
-
-    const totals = managers.map(m => m.total || 0).filter(t => t > 0);
-    if (totals.length === 0) return null;
-
-    const min = Math.min(...totals);
-    const max = Math.max(...totals);
-    const bucketCount = 10;
-    const step = Math.ceil((max - min + 1) / bucketCount);
-
-    const buckets = new Array(bucketCount).fill(0);
-    const bucketLabels = [];
-
-    for (let i = 0; i < bucketCount; i++) {
-        const from = min + (i * step);
-        const to = from + step - 1;
-        bucketLabels.push(from + '-' + to);
-    }
-
-    totals.forEach(t => {
-        const idx = Math.min(Math.floor((t - min) / step), bucketCount - 1);
-        buckets[idx]++;
-    });
-
-    return {
-        labels: bucketLabels,
-        datasets: [{
-            label: 'Managers',
-            data: buckets,
-            backgroundColor: 'rgba(139, 26, 47, 0.7)',
-            borderColor: '#8B1A2F',
-            borderWidth: 2,
-            borderRadius: 8,
+            borderRadius: 10,
             borderSkipped: false,
             maxBarThickness: 44
         }]
     };
 }
 
+/* 3) Risers & Fallers — آخر جولة */
 function buildRisersFallers(history, managers) {
     if (!history || history.length === 0) return null;
 
@@ -233,6 +198,39 @@ function buildRisersFallers(history, managers) {
     return { risers, fallers };
 }
 
+/* 4) Top 5 per GW — للاختيار من Dropdown */
+function buildTop5PerGW(history, managers, selectedGW) {
+    if (!history || history.length === 0) return null;
+
+    const rounds = [...new Set(history.map(r => r.event))].sort((a, b) => a - b);
+    if (rounds.length === 0) return null;
+
+    /* إذا ما محدد → آخر جولة */
+    const gw = selectedGW || rounds[rounds.length - 1];
+
+    const mMap = {};
+    managers.forEach(m => { mMap[m.entry] = m; });
+
+    const roundData = history
+        .filter(r => r.event === gw)
+        .sort((a, b) => (b.points || 0) - (a.points || 0))
+        .slice(0, 5);
+
+    return {
+        gw: gw,
+        allRounds: rounds,
+        players: roundData.map(r => {
+            const info = mMap[r.entry] || {};
+            return {
+                name: info.player_name || info.entry_name || ('#' + r.entry),
+                points: r.points || 0,
+                total: r.total_points || 0,
+                entry: r.entry
+            };
+        })
+    };
+}
+
 /* =========================================================
    Chart Creators
 ========================================================= */
@@ -253,18 +251,31 @@ function createRankProgressionChart(canvasId, data) {
                 tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.dataset.label + ': #' + ctx.parsed.y; } } }
             },
             scales: {
-                y: { reverse: true, beginAtZero: false, grid: { color: 'rgba(139, 26, 47, 0.08)' }, ticks: { callback: v => '#' + v, font: { size: 10, weight: '800' }, color: '#666' } },
+                y: {
+                    reverse: true,
+                    beginAtZero: false,
+                    grid: { color: 'rgba(139, 26, 47, 0.08)' },
+                    ticks: {
+                        callback: function(v) {
+                            if (v >= 1000000) return '#' + (v/1000000).toFixed(1) + 'M';
+                            if (v >= 1000) return '#' + (v/1000).toFixed(0) + 'K';
+                            return '#' + v;
+                        },
+                        font: { size: 10, weight: '800' },
+                        color: '#666'
+                    }
+                },
                 x: { grid: { display: false }, ticks: { font: { size: 10, weight: '800' }, color: '#666' } }
             }
         }
     });
 }
 
-function createTop15Chart(canvasId, data) {
+function createTop10AvgChart(canvasId, data) {
     const el = document.getElementById(canvasId);
     if (!el) return;
 
-    chartInstances.top15 = new Chart(el, {
+    chartInstances.top10Avg = new Chart(el, {
         type: 'bar',
         data: data,
         options: {
@@ -273,33 +284,22 @@ function createTop15Chart(canvasId, data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.parsed.x + ' pts'; } } }
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) { return ' ' + ctx.parsed.x + ' avg pts'; }
+                    }
+                }
             },
             scales: {
-                x: { beginAtZero: true, grid: { color: 'rgba(139, 26, 47, 0.08)' }, ticks: { font: { size: 10, weight: '800' }, color: '#666' } },
-                y: { grid: { display: false }, ticks: { font: { size: 10, weight: '800' }, color: '#1F1F1F' } }
-            }
-        }
-    });
-}
-
-function createDistributionChart(canvasId, data) {
-    const el = document.getElementById(canvasId);
-    if (!el) return;
-
-    chartInstances.distribution = new Chart(el, {
-        type: 'bar',
-        data: data,
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.parsed.y + ' managers'; } } }
-            },
-            scales: {
-                y: { beginAtZero: true, grid: { color: 'rgba(139, 26, 47, 0.08)' }, ticks: { precision: 0, font: { size: 10, weight: '800' }, color: '#666' } },
-                x: { grid: { display: false }, ticks: { font: { size: 9, weight: '800' }, color: '#666', maxRotation: 45, minRotation: 45 } }
+                x: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(139, 26, 47, 0.08)' },
+                    ticks: { font: { size: 10, weight: '800' }, color: '#666' }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: '900' }, color: '#8B1A2F' }
+                }
             }
         }
     });
@@ -321,10 +321,10 @@ function createRisersFallersChart(canvasId, data) {
             datasets: [{
                 label: 'Rank Change',
                 data: combined.map(c => c.diff),
-                backgroundColor: combined.map(c => c.diff > 0 ? hexToRgba('#C8A95F', 0.75) : hexToRgba('#8B1A2F', 0.75)),
+                backgroundColor: combined.map(c => c.diff > 0 ? hexToRgba('#C8A95F', 0.8) : hexToRgba('#8B1A2F', 0.8)),
                 borderColor: combined.map(c => c.diff > 0 ? '#C8A95F' : '#8B1A2F'),
                 borderWidth: 2,
-                borderRadius: 6,
+                borderRadius: 8,
                 borderSkipped: false
             }]
         },
@@ -334,15 +334,98 @@ function createRisersFallersChart(canvasId, data) {
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: { callbacks: { label: function(ctx) { const v = ctx.parsed.x; return v > 0 ? ' ▲ ' + v : ' ▼ ' + Math.abs(v); } } }
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const v = ctx.parsed.x;
+                            return v > 0 ? ' ▲ ' + v + ' ranks' : ' ▼ ' + Math.abs(v) + ' ranks';
+                        }
+                    }
+                }
             },
             scales: {
-                x: { grid: { color: 'rgba(139, 26, 47, 0.08)' }, ticks: { font: { size: 10, weight: '800' }, color: '#666' } },
-                y: { grid: { display: false }, ticks: { font: { size: 10, weight: '800' }, color: '#1F1F1F' } }
+                x: {
+                    grid: { color: 'rgba(139, 26, 47, 0.08)' },
+                    ticks: { font: { size: 10, weight: '800' }, color: '#666' }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, weight: '900' }, color: '#8B1A2F' }
+                }
             }
         }
     });
 }
+
+/* ⭐ Chart جديد: Top 5 per GW */
+function createTop5PerGWChart(canvasId, data) {
+    const el = document.getElementById(canvasId);
+    if (!el) return;
+
+    chartInstances.top5gw = new Chart(el, {
+        type: 'bar',
+        data: {
+            labels: data.players.map(p => shortenName(p.name, 14)),
+            datasets: [{
+                label: 'GW' + data.gw + ' Points',
+                data: data.players.map(p => p.points),
+                backgroundColor: data.players.map((p, i) => hexToRgba(CHART_COLORS[i % CHART_COLORS.length], 0.85)),
+                borderColor: data.players.map((p, i) => CHART_COLORS[i % CHART_COLORS.length]),
+                borderWidth: 3,
+                borderRadius: 12,
+                borderSkipped: false,
+                maxBarThickness: 55
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(ctx) {
+                            const p = data.players[ctx.dataIndex];
+                            return ' ' + ctx.parsed.y + ' pts · Total: ' + p.total;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: 'rgba(139, 26, 47, 0.08)' },
+                    ticks: { font: { size: 10, weight: '800' }, color: '#666' }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10, weight: '900' }, color: '#8B1A2F' }
+                }
+            }
+        }
+    });
+}
+
+/* ⭐ Handler لتغيير GW في Top 5 */
+window.changeTop5GW = async function(gw) {
+    const container = document.getElementById('top5ChartWrap');
+    if (!container) return;
+
+    container.innerHTML = '<canvas id="chartTop5"></canvas>';
+
+    const history = await fetchHistoryForCharts();
+    const managers = await fetchManagersForCharts();
+    const data = buildTop5PerGW(history, managers, gw);
+
+    if (data) {
+        setTimeout(function() {
+            if (chartInstances.top5gw) {
+                try { chartInstances.top5gw.destroy(); } catch(e) {}
+            }
+            createTop5PerGWChart('chartTop5', data);
+        }, 30);
+    }
+};
 
 /* =========================================================
    Render Page
@@ -366,29 +449,61 @@ async function renderChartsPage() {
         ]);
 
         const rankData = buildRankProgression(history, managers);
-        const top15Data = buildTop15Total(managers);
-        const distData = buildPointsDistribution(managers);
+        const top10Avg = buildTop10Avg(managers);
         const risersData = buildRisersFallers(history, managers);
+        const top5Data = buildTop5PerGW(history, managers);
+
+        /* نبني Dropdown للجولات */
+        let gwOptions = '';
+        if (top5Data && top5Data.allRounds) {
+            top5Data.allRounds.forEach(function(r) {
+                const selected = (r === top5Data.gw) ? ' selected' : '';
+                gwOptions += '<option value="' + r + '"' + selected + '>GW ' + r + '</option>';
+            });
+        }
 
         let html = '';
         html += '<div class="charts-intro"><strong>📊 League Analytics</strong><br>نظرة شاملة على أداء المديرين — الرتب، النقاط، والتوزيع</div>';
 
+        /* 1) Rank Progression */
         if (rankData) {
-            html += '<div class="chart-card"><div class="chart-title"><span class="chart-icon">📈</span><span>Rank Progression</span><span class="chart-sub">TOP 10</span></div><div class="chart-wrap chart-tall"><canvas id="chartRankProg"></canvas></div></div>';
+            html += '<div class="chart-card">' +
+                '<div class="chart-title"><span class="chart-icon">📈</span><span>Rank Progression</span><span class="chart-sub">TOP 10</span></div>' +
+                '<div class="chart-wrap chart-tall"><canvas id="chartRankProg"></canvas></div>' +
+            '</div>';
         } else {
-            html += '<div class="chart-card"><div class="chart-title"><span class="chart-icon">📈</span><span>Rank Progression</span></div><div class="chart-empty"><span class="chart-empty-icon">📊</span>Not enough rounds saved yet.</div></div>';
+            html += '<div class="chart-card">' +
+                '<div class="chart-title"><span class="chart-icon">📈</span><span>Rank Progression</span></div>' +
+                '<div class="chart-empty"><span class="chart-empty-icon">📊</span>Not enough rounds saved yet.</div>' +
+            '</div>';
         }
 
+        /* 2) Top 10 Average */
+        if (top10Avg) {
+            html += '<div class="chart-card">' +
+                '<div class="chart-title"><span class="chart-icon">🎯</span><span>Top 10 — Best Average</span><span class="chart-sub">PER GW</span></div>' +
+                '<div class="chart-wrap chart-tall"><canvas id="chartTop10Avg"></canvas></div>' +
+            '</div>';
+        }
+
+        /* 3) Risers & Fallers */
         if (risersData && (risersData.risers.length > 0 || risersData.fallers.length > 0)) {
-            html += '<div class="chart-card"><div class="chart-title"><span class="chart-icon">⚡</span><span>Risers & Fallers</span><span class="chart-sub">LAST GW</span></div><div class="chart-wrap"><canvas id="chartRisers"></canvas></div></div>';
+            html += '<div class="chart-card">' +
+                '<div class="chart-title"><span class="chart-icon">⚡</span><span>Risers & Fallers</span><span class="chart-sub">LAST GW</span></div>' +
+                '<div class="chart-wrap"><canvas id="chartRisers"></canvas></div>' +
+            '</div>';
         }
 
-        if (top15Data) {
-            html += '<div class="chart-card"><div class="chart-title"><span class="chart-icon">🏆</span><span>Top 15 Total Points</span><span class="chart-sub">SEASON</span></div><div class="chart-wrap chart-tall"><canvas id="chartTop15"></canvas></div></div>';
-        }
-
-        if (distData) {
-            html += '<div class="chart-card"><div class="chart-title"><span class="chart-icon">📊</span><span>Points Distribution</span><span class="chart-sub">' + managers.length + ' MGRS</span></div><div class="chart-wrap"><canvas id="chartDist"></canvas></div></div>';
+        /* 4) Top 5 per GW — مع Dropdown */
+        if (top5Data) {
+            html += '<div class="chart-card">' +
+                '<div class="chart-title">' +
+                    '<span class="chart-icon">🏆</span>' +
+                    '<span>Top 5 — By GW</span>' +
+                    '<select class="chart-select" onchange="changeTop5GW(this.value)">' + gwOptions + '</select>' +
+                '</div>' +
+                '<div class="chart-wrap" id="top5ChartWrap"><canvas id="chartTop5"></canvas></div>' +
+            '</div>';
         }
 
         container.innerHTML = html;
@@ -396,9 +511,9 @@ async function renderChartsPage() {
 
         setTimeout(function() {
             if (rankData) createRankProgressionChart('chartRankProg', rankData);
+            if (top10Avg) createTop10AvgChart('chartTop10Avg', top10Avg);
             if (risersData && document.getElementById('chartRisers')) createRisersFallersChart('chartRisers', risersData);
-            if (top15Data) createTop15Chart('chartTop15', top15Data);
-            if (distData) createDistributionChart('chartDist', distData);
+            if (top5Data) createTop5PerGWChart('chartTop5', top5Data);
         }, 60);
 
         chartsLoaded = true;
