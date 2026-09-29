@@ -392,6 +392,10 @@ async function loadStats() {
     }
 }
 
+/* =========================================================
+   ⭐ switchStatsTab — محدّث (مع Compare)
+========================================================= */
+
 function switchStatsTab(tabName) {
     document.querySelectorAll('.stats-tab-btn').forEach(function(btn) {
         btn.classList.toggle('active', btn.dataset.tab === tabName);
@@ -406,6 +410,11 @@ function switchStatsTab(tabName) {
 
     if (tabName === 'charts' && typeof initCharts === 'function') {
         initCharts();
+    }
+
+    /* ⭐ جديد: Compare (مقارنة المديرين) */
+    if (tabName === 'compare' && typeof h2hInit === 'function') {
+        h2hInit();
     }
 
     setTimeout(function() {
