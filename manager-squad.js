@@ -1,5 +1,6 @@
 /* =========================================================
-   manager-squad.js — FINALISSIMA LEAGUE CHAT
+   manager-squad.js — FINALISSIMA LEAGUE CHAT (v2)
+   مع حماية من bootstrap الفاضي
 ========================================================= */
 
 (function(){
@@ -101,8 +102,51 @@ async function fetchLive(gw){
     return await res.json();
 }
 
-function getCurrentGw(){
-    const bootstrap = window.fplDbGetData && window.fplDbGetData();
+/* ⭐ نجيب bootstrap من Worker مباشرة */
+async function getBootstrapData(){
+    /* 1) نحاول من الذاكرة أولاً */
+    if (window.fplDbGetData) {
+        try {
+            const cached = window.fplDbGetData();
+            if (cached && cached.elements && Array.isArray(cached.elements) && cached.elements.length > 0) {
+                console.log('[SQUAD] Using cached bootstrap');
+                return cached;
+            }
+        } catch (e) {
+            console.warn('[SQUAD] fplDbGetData failed:', e);
+        }
+    }
+
+    /* 2) نجيب من Worker مباشرة */
+    try {
+        console.log('[SQUAD] Fetching bootstrap from worker...');
+        const res = await fetchWithTimeout(
+            'https://finalissima-api.aaa117703.workers.dev/?type=bootstrap',
+            {},
+            15000
+        );
+
+        if (!res.ok) {
+            throw new Error('Bootstrap HTTP ' + res.status);
+        }
+
+        const json = await res.json();
+
+        if (json && json.ok && json.data && json.data.elements) {
+            console.log('[SQUAD] Bootstrap loaded from worker:', json.data.elements.length, 'players');
+            return json.data;
+        }
+
+        throw new Error('Invalid bootstrap shape');
+    } catch (e) {
+        console.error('[SQUAD] Bootstrap fetch failed:', e);
+        return null;
+    }
+}
+
+/* ⭐ getCurrentGw — مع حماية */
+async function getCurrentGw(){
+    const bootstrap = await getBootstrapData();
     if(!bootstrap || !bootstrap.events) return 1;
     const ev = bootstrap.events.find(function(e){ return e.is_current; })
             || bootstrap.events.find(function(e){ return e.is_previous; })
@@ -110,26 +154,49 @@ function getCurrentGw(){
     return ev ? ev.id : 1;
 }
 
-function renderSquad(managerName, gw, picksData, liveData){
-    const bootstrap = window.fplDbGetData && window.fplDbGetData();
+/* ⭐ renderSquad — مع حماية قوية */
+function renderSquad(managerName, gw, picksData, liveData, bootstrapData){
+    const bootstrap = bootstrapData;
+
+    /* حماية 1: bootstrap مفقود */
     if(!bootstrap){
-        return '<div class="squad-error">FPL data not loaded yet. Wait a moment and try again.</div>';
+        return '<div class="squad-error">⚠️ FPL data not loaded.<br><small>Try again in a few seconds.</small></div>';
     }
 
-    const teamsById = window.fplDbGetTeamsById ? window.fplDbGetTeamsById() : {};
+    /* حماية 2: elements مفقود */
+    if(!bootstrap.elements || !Array.isArray(bootstrap.elements)){
+        return '<div class="squad-error">⚠️ Invalid FPL data (no elements).<br><small>Try again later.</small></div>';
+    }
+
+    /* حماية 3: picks مفقود */
+    if(!picksData || !picksData.picks || picksData.picks.length === 0){
+        return '<div class="squad-error">⚠️ No squad available for GW ' + gw + '</div>';
+    }
+
+    /* 1) نبني teamsById */
+    const teamsById = {};
+    if (bootstrap.teams && Array.isArray(bootstrap.teams)) {
+        bootstrap.teams.forEach(function(t){
+            teamsById[t.id] = t;
+        });
+    }
+
+    /* 2) نبني elementsById */
     const elementsById = {};
-    bootstrap.elements.forEach(function(p){ elementsById[p.id] = p; });
+    bootstrap.elements.forEach(function(p){
+        elementsById[p.id] = p;
+    });
 
+    /* 3) نبني liveById */
     const liveById = {};
-    if(liveData && liveData.elements){
-        liveData.elements.forEach(function(el){ liveById[el.id] = el; });
+    if(liveData && liveData.elements && Array.isArray(liveData.elements)){
+        liveData.elements.forEach(function(el){
+            liveById[el.id] = el;
+        });
     }
 
-    const picks = (picksData && picksData.picks) ? picksData.picks : [];
-    if(picks.length === 0){
-        return '<div class="squad-error">No squad available for GW ' + gw + '</div>';
-    }
-
+    /* 4) نجيب picks */
+    const picks = picksData.picks;
     const starters = picks.filter(function(p){ return p.position <= 11; });
     const bench = picks.filter(function(p){ return p.position > 11; });
 
@@ -143,9 +210,19 @@ function renderSquad(managerName, gw, picksData, liveData){
     };
     const benchArr = [];
 
+    /* 5) نرسم كل لاعب */
     function buildPlayerHTML(slot){
         const el = elementsById[slot.element];
-        if(!el) return '';
+        if(!el){
+            return '<div class="squad-player">' +
+                '<div class="squad-player-badge"></div>' +
+                '<div class="squad-player-names">' +
+                    '<div class="squad-player-name">Unknown Player</div>' +
+                    '<div class="squad-player-team">ID: ' + slot.element + '</div>' +
+                '</div>' +
+                '<div class="squad-player-points">0</div>' +
+            '</div>';
+        }
 
         const team = teamsById[el.team];
         const posKey = POS_MAP[el.element_type] || 'MID';
@@ -191,6 +268,7 @@ function renderSquad(managerName, gw, picksData, liveData){
         benchArr.push(buildPlayerHTML(slot));
     });
 
+    /* 6) بناء الـ HTML */
     let html = '';
 
     const history = picksData.entry_history || {};
@@ -224,11 +302,11 @@ function renderSquad(managerName, gw, picksData, liveData){
     return html;
 }
 
+/* ⭐ openSquadModal — مع جلب bootstrap */
 async function openSquadModal(entryId, managerName){
     const modal = document.getElementById('squadModal');
     if(!modal) return;
 
-    /* ⭐ عرض الاسم المختصر */
     const displayName = (typeof cleanDisplayName === 'function')
         ? cleanDisplayName(managerName, 13)
         : (managerName || 'Squad');
@@ -250,7 +328,21 @@ async function openSquadModal(entryId, managerName){
     };
 
     try {
-        const currentGw = getCurrentGw();
+        /* ⭐ نجيب bootstrap أول */
+        const bootstrap = await getBootstrapData();
+
+        if (!bootstrap) {
+            throw new Error('FPL data not available');
+        }
+
+        /* ⭐ نحسب GW الحالي */
+        let currentGw = 1;
+        if (bootstrap.events && Array.isArray(bootstrap.events)) {
+            const ev = bootstrap.events.find(function(e){ return e.is_current; })
+                    || bootstrap.events.find(function(e){ return e.is_previous; })
+                    || bootstrap.events.find(function(e){ return e.is_next; });
+            currentGw = ev ? ev.id : 1;
+        }
 
         let picksData = null;
         let usedGw = currentGw;
@@ -273,7 +365,8 @@ async function openSquadModal(entryId, managerName){
             console.warn('[SQUAD] Live data unavailable:', e.message);
         }
 
-        const content = renderSquad(displayName, usedGw, picksData, liveData);
+        /* ⭐ نمرر bootstrap لـ renderSquad */
+        const content = renderSquad(displayName, usedGw, picksData, liveData, bootstrap);
 
         modal.innerHTML =
             '<div class="squad-modal-box">' +
