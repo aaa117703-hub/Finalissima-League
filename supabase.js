@@ -1,10 +1,10 @@
 /* =========================================================
-   supabase.js — FINALISSIMA LEAGUE CHAT (v3)
-   يدعم: match_results + custom_matchweeks + manager_history
+   supabase.js — FINALISSIMA LEAGUE CHAT (v8)
+   يدعم: match_results + custom_matchweeks + manager_history + head-to-head
 ========================================================= */
 
 /* =========================================================
-   1) MATCH RESULTS (المواجهات)
+   1) MATCH RESULTS
 ========================================================= */
 
 async function loadScoresFromSupabase(matchweeks) {
@@ -129,7 +129,7 @@ async function clearRoundFromSupabase(round) {
 }
 
 /* =========================================================
-   2) CUSTOM MATCHWEEKS (إدارة الجولات)
+   2) CUSTOM MATCHWEEKS
 ========================================================= */
 
 async function loadCustomMatchweeks() {
@@ -215,7 +215,7 @@ async function setRoundHidden(round, isHidden) {
 }
 
 /* =========================================================
-   3) MANAGER HISTORY (تاريخ المديرين)
+   3) MANAGER HISTORY
 ========================================================= */
 
 async function loadAllManagerHistory() {
@@ -261,15 +261,10 @@ async function loadManagerHistoryById(entryId) {
     }
 }
 
-/**
- * ⭐ جيب المديرين لجولة واحدة فقط
- * النقاط = نقاط تلك الجولة
- */
 async function getManagersForRound(round) {
     if (!window.sbClient) return [];
 
     try {
-        /* 1) جيب history الجولة المحددة فقط */
         const res = await window.sbClient
             .from('manager_history')
             .select('entry, event, points, total_points, overall_rank')
@@ -280,12 +275,8 @@ async function getManagersForRound(round) {
             return [];
         }
 
-        if (!res.data || res.data.length === 0) {
-            console.warn('[MH-Round] No data for round ' + round);
-            return [];
-        }
+        if (!res.data || res.data.length === 0) return [];
 
-        /* 2) جيب معلومات المديرين */
         const managers = (typeof getAllManagersCached === 'function')
             ? await getAllManagersCached()
             : [];
@@ -293,7 +284,6 @@ async function getManagersForRound(round) {
         const mMap = {};
         managers.forEach(function(m) { mMap[m.entry] = m; });
 
-        /* 3) دمج */
         return res.data.map(function(row) {
             const info = mMap[row.entry] || {};
             return {
@@ -314,11 +304,6 @@ async function getManagersForRound(round) {
     }
 }
 
-/**
- * ⭐ جيب المديرين لشهر كامل (5 جولات)
- * monthNum: 1 → GW 1-5، 2 → GW 6-10، ...
- * النقاط = مجموع نقاط الشهر
- */
 async function getManagersForMonth(monthNum) {
     if (!window.sbClient) return [];
 
@@ -326,7 +311,6 @@ async function getManagersForMonth(monthNum) {
         const start = (monthNum - 1) * 5 + 1;
         const end = monthNum * 5;
 
-        /* 1) جيب history الجولات المطلوبة */
         const res = await window.sbClient
             .from('manager_history')
             .select('entry, event, points, total_points, overall_rank')
@@ -339,12 +323,8 @@ async function getManagersForMonth(monthNum) {
             return [];
         }
 
-        if (!res.data || res.data.length === 0) {
-            console.warn('[MH-Month] No data for month ' + monthNum);
-            return [];
-        }
+        if (!res.data || res.data.length === 0) return [];
 
-        /* 2) تجميع حسب المدير */
         const grouped = {};
         res.data.forEach(function(row) {
             if (!grouped[row.entry]) {
@@ -367,7 +347,6 @@ async function getManagersForMonth(monthNum) {
             }
         });
 
-        /* 3) جيب معلومات المديرين */
         const managers = (typeof getAllManagersCached === 'function')
             ? await getAllManagersCached()
             : [];
@@ -375,7 +354,6 @@ async function getManagersForMonth(monthNum) {
         const mMap = {};
         managers.forEach(function(m) { mMap[m.entry] = m; });
 
-        /* 4) دمج */
         return Object.keys(grouped).map(function(entryId) {
             const g = grouped[entryId];
             const info = mMap[entryId] || {};
@@ -401,9 +379,6 @@ async function getManagersForMonth(monthNum) {
     }
 }
 
-/**
- * جيب كل المديرين مع تاريخهم (لـ Stats و Charts)
- */
 async function getManagersWithHistory() {
     if (!window.sbClient) return [];
 
@@ -478,9 +453,162 @@ async function getManagersWithHistory() {
     }
 }
 
+/* =========================================================
+   ⭐ 4) HEAD-TO-HEAD — إحصائيات كاملة لمدير واحد
+========================================================= */
+
 /**
- * اسم الشهر بالعربي
+ * يجيب كل إحصائيات مدير واحد (للمقارنة)
+ * - مجموع النقاط
+ * - متوسط الجولة
+ * - مرات في تشكيلة الأسبوع
+ * - مرات في تشكيلة الشهر
+ * - المركز العالمي (آخر جولة)
+ * - المركز في الدوري
+ * - أفضل جولة
+ * - أسوأ جولة
+ * - المنتخب
  */
+async function getManagerFullStats(entryId) {
+    if (!window.sbClient) return null;
+
+    try {
+        /* 1) تاريخ المدير */
+        const historyRes = await window.sbClient
+            .from('manager_history')
+            .select('event, points, total_points, overall_rank')
+            .eq('entry', entryId)
+            .order('event', { ascending: true });
+
+        if (historyRes.error || !historyRes.data || historyRes.data.length === 0) {
+            console.warn('[H2H] No history for entry ' + entryId);
+            return null;
+        }
+
+        const history = historyRes.data;
+
+        /* 2) معلومات المدير */
+        const managers = (typeof getAllManagersCached === 'function')
+            ? await getAllManagersCached()
+            : [];
+
+        const info = managers.find(function(m) { return m.entry === entryId; }) || {};
+
+        /* 3) حساب الإحصائيات */
+        let totalPoints = 0;
+        let gwCount = 0;
+        let bestGW = { event: 0, points: 0 };
+        let worstGW = { event: 0, points: Infinity };
+        let lastRank = 0;
+        let lastEvent = 0;
+
+        history.forEach(function(row) {
+            totalPoints += (row.points || 0);
+            gwCount++;
+
+            if (row.points > bestGW.points) {
+                bestGW = { event: row.event, points: row.points || 0 };
+            }
+            if (row.points < worstGW.points) {
+                worstGW = { event: row.event, points: row.points || 0 };
+            }
+
+            if (row.event >= lastEvent) {
+                lastEvent = row.event;
+                lastRank = row.overall_rank || 0;
+            }
+        });
+
+        const avgPoints = gwCount > 0 ? Math.round(totalPoints / gwCount) : 0;
+
+        /* 4) المركز في الدوري */
+        const allManagers = await getManagersWithHistory();
+        const sortedByTotal = allManagers.sort(function(a, b) {
+            return (b.totalPoints || 0) - (a.totalPoints || 0);
+        });
+        const leagueRank = sortedByTotal.findIndex(function(m) {
+            return m.entry === entryId;
+        }) + 1;
+
+        /* 5) عدد مرات تشكيلة الأسبوع */
+        let totwWeekCount = 0;
+        const allRounds = [...new Set(history.map(h => h.event))];
+        for (let i = 0; i < allRounds.length; i++) {
+            const round = allRounds[i];
+            const roundData = await getManagersForRound(round);
+            const roundSorted = roundData.sort(function(a, b) {
+                return (b.event_total || 0) - (a.event_total || 0);
+            });
+            const top11 = roundSorted.slice(0, 11);
+            const isIn = top11.find(function(m) { return m.entry === entryId; });
+            if (isIn) totwWeekCount++;
+        }
+
+        /* 6) عدد مرات تشكيلة الشهر */
+        let totwMonthCount = 0;
+        const allMonths = [...new Set(history.map(h => Math.ceil(h.event / 5)))];
+        for (let i = 0; i < allMonths.length; i++) {
+            const monthNum = allMonths[i];
+            const monthData = await getManagersForMonth(monthNum);
+            const monthSorted = monthData.sort(function(a, b) {
+                return (b.event_total || 0) - (a.event_total || 0);
+            });
+            const top11 = monthSorted.slice(0, 11);
+            const isIn = top11.find(function(m) { return m.entry === entryId; });
+            if (isIn) totwMonthCount++;
+        }
+
+        /* 7) المنتخب */
+        const nation = info._nationCode || info.nation || '';
+        const nationName = info._team || '';
+
+        return {
+            entry: entryId,
+            player_name: info.player_name || 'Unknown',
+            entry_name: info.entry_name || '',
+            nation: nation,
+            nationName: nationName,
+            totalPoints: totalPoints,
+            avgPoints: avgPoints,
+            gwCount: gwCount,
+            totwWeekCount: totwWeekCount,
+            totwMonthCount: totwMonthCount,
+            overallRank: lastRank,
+            leagueRank: leagueRank,
+            bestGW: bestGW,
+            worstGW: worstGW.points === Infinity ? { event: 0, points: 0 } : worstGW,
+            history: history
+        };
+
+    } catch (e) {
+        console.error('[H2H] getManagerFullStats error:', e);
+        return null;
+    }
+}
+
+/**
+ * للمقارنة — ترجع نتائج مديرين
+ */
+async function getComparisonData(entry1, entry2) {
+    try {
+        const [stats1, stats2] = await Promise.all([
+            getManagerFullStats(entry1),
+            getManagerFullStats(entry2)
+        ]);
+
+        if (!stats1 || !stats2) return null;
+
+        return { a: stats1, b: stats2 };
+    } catch (e) {
+        console.error('[H2H] getComparisonData error:', e);
+        return null;
+    }
+}
+
+/* =========================================================
+   Helpers
+========================================================= */
+
 function getMonthName(monthNum) {
     const names = {
         1: 'الشهر 1',
@@ -495,16 +623,10 @@ function getMonthName(monthNum) {
     return names[monthNum] || ('الشهر ' + monthNum);
 }
 
-/**
- * الشهر من رقم الجولة
- */
 function getMonthFromRound(round) {
     return Math.ceil(round / 5);
 }
 
-/**
- * جولات شهر معين
- */
 function getRoundsForMonth(monthNum) {
     const start = (monthNum - 1) * 5 + 1;
     const end = Math.min(monthNum * 5, 38);
@@ -523,6 +645,8 @@ window.loadManagerHistoryById = loadManagerHistoryById;
 window.getManagersForRound = getManagersForRound;
 window.getManagersForMonth = getManagersForMonth;
 window.getManagersWithHistory = getManagersWithHistory;
+window.getManagerFullStats = getManagerFullStats;
+window.getComparisonData = getComparisonData;
 window.getMonthName = getMonthName;
 window.getMonthFromRound = getMonthFromRound;
 window.getRoundsForMonth = getRoundsForMonth;
