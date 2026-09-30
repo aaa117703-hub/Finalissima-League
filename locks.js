@@ -1,6 +1,6 @@
 /* =========================================================
-   locks.js — FINALISSIMA LEAGUE CHAT (v4)
-   مع إضافة قسم "month"
+   locks.js — FINALISSIMA LEAGUE CHAT (v5)
+   Phosphor Icons + قسم "month"
 ========================================================= */
 
 window.sectionLocks = {
@@ -8,7 +8,7 @@ window.sectionLocks = {
     standings: false,
     totw:      false,
     stats:     false,
-    month:     false   /* ⭐ جديد */
+    month:     false
 };
 
 window.pendingLocks = {
@@ -23,12 +23,13 @@ const LOCK_PIN = '024680';
 const EDIT_PIN = '1999';
 const SETTINGS_PIN = '024680';
 
+/* ⭐ الأقسام — بأيقونات Phosphor */
 const SECTIONS = [
-    { key: 'fixtures',  label: 'المواجهات',        icon: '⚽' },
-    { key: 'standings', label: 'الترتيب',          icon: '📊' },
-    { key: 'totw',      label: 'التشكيلة',         icon: '⭐' },
-    { key: 'stats',     label: 'الإحصائيات',       icon: '📈' },
-    { key: 'month',     label: 'تشكيلة الشهر',     icon: '🏆' }  /* ⭐ جديد */
+    { key: 'fixtures',  label: 'المواجهات',        icon: 'soccer-ball' },
+    { key: 'standings', label: 'الترتيب',          icon: 'chart-bar' },
+    { key: 'totw',      label: 'التشكيلة',         icon: 'star' },
+    { key: 'stats',     label: 'الإحصائيات',       icon: 'chart-line-up' },
+    { key: 'month',     label: 'تشكيلة الشهر',     icon: 'trophy' }
 ];
 
 /* =========================================================
@@ -45,6 +46,16 @@ function isLocker() {
 
 function canBypassLocks() {
     return isLocker() || isAdmin();
+}
+
+/* ⭐ Helper: أيقونة Phosphor */
+function phIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
 }
 
 /* =========================================================
@@ -123,11 +134,11 @@ function showSectionMaintenance(sectionName) {
 
     overlay.innerHTML =
         '<div class="maint-box">' +
-            '<div class="maint-icon">🔧</div>' +
+            '<div class="maint-icon">' + phIcon('wrench', 'fill') + '</div>' +
             '<h2>الموقع في حالة صيانة</h2>' +
             '<p>قسم ' + sectionName + ' قيد الصيانة حالياً</p>' +
             '<p style="font-size:12px;color:#888;margin-top:8px;">نرجع لكم قريباً</p>' +
-            '<div class="maint-team">FINALISSIMA LEAGUE 🏆</div>' +
+            '<div class="maint-team">FINALISSIMA LEAGUE ' + phIcon('trophy', 'fill') + '</div>' +
         '</div>';
 
     overlay.classList.add('show');
@@ -218,30 +229,30 @@ function openSettingsMain() {
 
     body.innerHTML =
         '<button class="settings-item" onclick="openSettingsManagers()">' +
-            '<span class="si-icon">👥</span>' +
+            '<span class="si-icon">' + phIcon('users', 'fill') + '</span>' +
             '<span class="si-label">إدارة المديرين</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsClubs()">' +
-            '<span class="si-icon">🏆</span>' +
+            '<span class="si-icon">' + phIcon('shield-star', 'fill') + '</span>' +
             '<span class="si-label">إدارة المنتخبات</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsMatchweeks()">' +
-            '<span class="si-icon">📋</span>' +
+            '<span class="si-icon">' + phIcon('clipboard-text', 'fill') + '</span>' +
             '<span class="si-label">إدارة المواجهات</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsMonth()">' +
-            '<span class="si-icon">🏆</span>' +
+            '<span class="si-icon">' + phIcon('trophy', 'fill') + '</span>' +
             '<span class="si-label">تشكيلة الشهر</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsLocks()">' +
-            '<span class="si-icon">🔐</span>' +
+            '<span class="si-icon">' + phIcon('lock-key', 'fill') + '</span>' +
             '<span class="si-label">قفل الأقسام</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsMaintenance()">' +
-            '<span class="si-icon">🔧</span>' +
+            '<span class="si-icon">' + phIcon('wrench', 'fill') + '</span>' +
             '<span class="si-label">وضع الصيانة</span>' +
         '</button>' +
-        '<div class="settings-hint">FINALISSIMA LEAGUE CHAT 🏆</div>';
+        '<div class="settings-hint">FINALISSIMA LEAGUE CHAT ' + phIcon('trophy', 'fill') + '</div>';
 
     openSettingsModal();
 }
@@ -258,7 +269,7 @@ function openSettingsManagers() {
 
     body.innerHTML =
         '<button class="settings-item settings-back" onclick="openSettingsMain()">' +
-            '<span class="si-icon">←</span>' +
+            '<span class="si-icon">' + phIcon('arrow-right', 'bold') + '</span>' +
             '<span class="si-label">رجوع</span>' +
         '</button>' +
         '<div id="settings-managers-content" class="settings-embed"></div>';
@@ -302,7 +313,7 @@ function openSettingsClubs() {
 
     body.innerHTML =
         '<button class="settings-item settings-back" onclick="openSettingsMain()">' +
-            '<span class="si-icon">←</span>' +
+            '<span class="si-icon">' + phIcon('arrow-right', 'bold') + '</span>' +
             '<span class="si-label">رجوع</span>' +
         '</button>' +
         '<div id="settings-clubs-content" class="settings-embed"></div>';
@@ -337,7 +348,7 @@ function openSettingsClubs() {
 }
 
 /* =========================================================
-   ⭐ SETTINGS — تشكيلة الشهر
+   SETTINGS — تشكيلة الشهر
 ========================================================= */
 
 function openSettingsMonth() {
@@ -347,13 +358,13 @@ function openSettingsMonth() {
     if (!body) return;
 
     const isOpen = !isLocked('month');
-    const statusIcon = isOpen ? '👁️' : '🔒';
+    const statusIcon = isOpen ? phIcon('eye', 'fill') : phIcon('lock', 'fill');
     const statusText = isOpen ? 'مفتوح للجميع' : 'مقفول';
     const statusClass = isOpen ? 'mwm-visible' : 'mwm-hidden';
 
     body.innerHTML =
         '<button class="settings-item settings-back" onclick="openSettingsMain()">' +
-            '<span class="si-icon">←</span>' +
+            '<span class="si-icon">' + phIcon('arrow-right', 'bold') + '</span>' +
             '<span class="si-label">رجوع</span>' +
         '</button>' +
 
@@ -363,7 +374,9 @@ function openSettingsMonth() {
 
         '<div class="mwm-round-row" style="padding:20px 16px;">' +
             '<div class="mwm-round-info">' +
-                '<div class="mwm-round-num" style="font-size:17px;">🏆 تشكيلة الشهر</div>' +
+                '<div class="mwm-round-num" style="font-size:17px;">' +
+                    phIcon('trophy', 'fill') + ' تشكيلة الشهر' +
+                '</div>' +
                 '<div class="mwm-round-meta" style="margin-top:6px;font-size:13px;">' +
                     'الحالة: <span class="' + statusClass + '">' + statusIcon + ' ' + statusText + '</span>' +
                 '</div>' +
@@ -397,7 +410,6 @@ async function toggleMonthLock() {
             showToast(newLocked ? 'تم قفل تشكيلة الشهر' : 'تم فتح تشكيلة الشهر', true, 2500);
         }
 
-        /* نحدّث القائمة */
         openSettingsMonth();
     } else {
         if (typeof showToast === 'function') {
@@ -421,12 +433,14 @@ function openSettingsLocks() {
     SECTIONS.forEach(function(s) {
         const locked = isLocked(s.key);
         const btnClass = locked ? 'locked' : 'unlocked';
-        const btnText = locked ? '🔒 مقفول' : '🔓 مفتوح';
+        const btnText = locked
+            ? phIcon('lock', 'fill') + ' مقفول'
+            : phIcon('lock-open', 'fill') + ' مفتوح';
 
         itemsHtml +=
             '<div class="lock-item">' +
                 '<div class="lock-item-label">' +
-                    '<span class="lock-item-icon">' + s.icon + '</span>' +
+                    '<span class="lock-item-icon">' + phIcon(s.icon, 'fill') + '</span>' +
                     '<span>' + s.label + '</span>' +
                 '</div>' +
                 '<button class="lock-item-btn ' + btnClass + '" onclick="toggleLockFromSettings(\'' + s.key + '\')">' +
@@ -439,7 +453,7 @@ function openSettingsLocks() {
 
     body.innerHTML =
         '<button class="settings-item settings-back" onclick="openSettingsMain()">' +
-            '<span class="si-icon">←</span>' +
+            '<span class="si-icon">' + phIcon('arrow-right', 'bold') + '</span>' +
             '<span class="si-label">رجوع</span>' +
         '</button>' +
         '<div class="settings-hint" style="padding:4px 0 12px 0;">' +
@@ -490,17 +504,17 @@ function openSettingsMaintenance() {
 
     body.innerHTML =
         '<button class="settings-item settings-back" onclick="openSettingsMain()">' +
-            '<span class="si-icon">←</span>' +
+            '<span class="si-icon">' + phIcon('arrow-right', 'bold') + '</span>' +
             '<span class="si-label">رجوع</span>' +
         '</button>' +
         '<div class="settings-hint" style="padding:4px 0 8px 0;">' +
             'عند تفعيل الصيانة، جميع الأقسام تُقفل للزوار' +
         '</div>' +
         '<button class="maint-all-btn" onclick="activateMaintenance()">' +
-            '🔧 ' + (allLocked ? 'إلغاء الصيانة' : 'تفعيل الصيانة') +
+            phIcon('wrench', 'bold') + ' ' + (allLocked ? 'إلغاء الصيانة' : 'تفعيل الصيانة') +
         '</button>' +
         '<button class="maint-open-btn" onclick="deactivateMaintenance()">' +
-            '🔓 فتح كل الأقسام' +
+            phIcon('lock-open', 'bold') + ' فتح كل الأقسام' +
         '</button>';
 }
 
@@ -579,3 +593,4 @@ window.isLocked = isLocked;
 window.isAdmin = isAdmin;
 window.showSectionMaintenance = showSectionMaintenance;
 window.hideSectionMaintenance = hideSectionMaintenance;
+window.phIcon = phIcon;
