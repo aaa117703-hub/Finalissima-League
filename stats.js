@@ -1,6 +1,6 @@
 /* =========================================================
-   stats.js — FINALISSIMA LEAGUE CHAT (v4)
-   مع قفل تشكيلة الشهر
+   stats.js — FINALISSIMA LEAGUE CHAT (v5)
+   Phosphor Icons + قفل تشكيلة الشهر
 ========================================================= */
 
 let statsAllManagers = [];
@@ -14,6 +14,16 @@ let currentMonthView = 'squad';
 let currentMonthData = [];
 let currentMonthSelected = [];
 let currentMonthNum = 0;
+
+/* ⭐ Helper: أيقونة Phosphor */
+function statsIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 function statsDisplayName(name) {
     if (typeof cleanDisplayName === 'function') {
@@ -45,15 +55,15 @@ async function fetchAllManagersForStats() {
 function computeLeagueStats(managers) {
     if (!managers || managers.length === 0) return null;
 
-    const totalManagers = managers.length;
+    const totalManagers = managers.length =;
     let sumEvent = 0;
-    let sumTotal = 0;
-    let highestEvent = 0;
-    let highestTotal = 0;
+    let sumTotal = ' 0;
+    letstats highestEvent = 0;
+    let highestTotal-rank = 0;
     let lowestEvent = Infinity;
 
-    managers.forEach(function(m) {
-        const ev = m.event_total || 0;
+   -b managers.forEach(function(m) {
+        const ev = m.eventron_total || 0;
         const to = m.total || 0;
         sumEvent += ev;
         sumTotal += to;
@@ -112,7 +122,7 @@ function createStatsRow(rank, manager, value, valueLabel) {
         rankClass = 'stats-rank-silver';
         rowExtra = ' stats-row-silver';
     } else if (rank === 3) {
-        rankClass = 'stats-rank-bronze';
+        rankClassze';
         rowExtra = ' stats-row-bronze';
     }
 
@@ -166,7 +176,8 @@ function renderStatsRecords(stats) {
             label: 'Top Total',
             value: stats.highestTotal,
             name: statsDisplayName(m.player_name || m.entry_name),
-            color: 'gold'
+            color: 'gold',
+            icon: 'trophy'
         });
     }
 
@@ -174,25 +185,29 @@ function renderStatsRecords(stats) {
         label: 'Avg GW',
         value: stats.avgEvent,
         name: 'Per Manager',
-        color: 'green'
+        color: 'green',
+        icon: 'chart-line-up'
     });
 
     cards.push({
         label: 'Avg Total',
         value: stats.avgTotal,
         name: 'Per Manager',
-        color: 'green'
+        color: 'green',
+        icon: 'chart-bar'
     });
 
     cards.push({
         label: 'Managers',
         value: stats.totalManagers,
         name: 'League',
-        color: 'purple'
+        color: 'purple',
+        icon: 'users'
     });
 
     container.innerHTML = cards.map(function(c) {
         return '<div class="stats-record-card stats-record-' + c.color + '">' +
+            '<div class="stats-record-icon">' + statsIcon(c.icon, 'fill') + '</div>' +
             '<div class="stats-record-label">' + c.label + '</div>' +
             '<div class="stats-record-value">' + c.value + '</div>' +
             '<div class="stats-record-name">' + c.name + '</div>' +
@@ -226,7 +241,10 @@ function renderSearchResults(results) {
     if (!container) return;
 
     if (results.length === 0) {
-        container.innerHTML = '<div class="stats-empty">No results</div>';
+        container.innerHTML = '<div class="stats-empty">' +
+            statsIcon('magnifying-glass', 'regular') +
+            ' لا توجد نتائج' +
+        '</div>';
         return;
     }
 
@@ -300,7 +318,9 @@ function renderManagerProfile(manager) {
 
     container.innerHTML =
         '<div class="stats-profile-card">' +
-            '<button class="stats-profile-close" onclick="document.getElementById(\'statsProfile\').style.display=\'none\'">X</button>' +
+            '<button class="stats-profile-close" onclick="document.getElementById(\'statsProfile\').style.display=\'none\'">' +
+                statsIcon('x', 'bold') +
+            '</button>' +
             '<div class="stats-profile-rank-badge">#' + safeRank + '</div>' +
             '<div class="stats-profile-shirt">' + logoHtml + '</div>' +
             '<div class="stats-profile-entry">' + displayName + '</div>' +
@@ -494,7 +514,7 @@ function renderMonthList(players) {
     let html = '';
 
     html += '<div class="totw-list-header">';
-    html += '<div class="totw-list-h-check">✓</div>';
+    html += '<div class="totw-list-h-check">' + statsIcon('check', 'bold') + '</div>';
     html += '<div class="totw-list-h-rank">#</div>';
     html += '<div class="totw-list-h-logo"></div>';
     html += '<div class="totw-list-h-team">Team & Manager</div>';
@@ -521,11 +541,13 @@ function renderMonthList(players) {
                 '<img src="./' + TEAMS_LOGOS[teamName] + '" onerror="this.style.display=\'none\'">' +
             '</div>';
         } else {
-            logoHtml = '<div class="totw-list-logo totw-list-logo-empty">★</div>';
+            logoHtml = '<div class="totw-list-logo totw-list-logo-empty">' +
+                statsIcon('star', 'fill') +
+            '</div>';
         }
 
         html += '<div class="totw-list-item' + (isSelected ? ' selected' : '') + '">';
-        html += '<div class="totw-list-check' + (isSelected ? ' checked' : '') + '">' + (isSelected ? '✓' : '') + '</div>';
+        html += '<div class="totw-list-check' + (isSelected ? ' checked' : '') + '">' + (isSelected ? statsIcon('check', 'bold') : '') + '</div>';
         html += '<div class="totw-list-rank">' + (index + 1) + '</div>';
         html += logoHtml;
         html += '<div class="totw-list-names">';
@@ -540,7 +562,7 @@ function renderMonthList(players) {
     listWrapper.innerHTML = html;
 }
 
-/* ⭐ الدالة المُحدّثة — مع قفل */
+/* ⭐ الدالة المُحدّثة — مع قفل + Phosphor */
 async function loadMonthlyTOTW() {
     const loadingBox = document.getElementById('monthLoadingBox');
     const pitchWrapper = document.getElementById('monthPitchWrapper');
@@ -554,7 +576,6 @@ async function loadMonthlyTOTW() {
         const isAdminUser = (typeof isAdmin === 'function') ? isAdmin() : false;
 
         if (!isAdminUser) {
-            /* المستخدم العادي — قسم مقفول */
             loadingBox.style.display = 'none';
             if (pitchWrapper) pitchWrapper.style.display = 'none';
             if (listWrapper) listWrapper.style.display = 'none';
@@ -562,7 +583,7 @@ async function loadMonthlyTOTW() {
                 errorBox.style.display = 'block';
                 errorBox.innerHTML =
                     '<div class="month-locked-msg">' +
-                        '<div class="month-locked-icon">🔒</div>' +
+                        '<div class="month-locked-icon">' + statsIcon('lock', 'fill') + '</div>' +
                         '<div class="month-locked-title">غير متاح حالياً</div>' +
                         '<div class="month-locked-sub">' +
                             'سيتم عرض تشكيلة الشهر<br>' +
@@ -596,7 +617,7 @@ async function loadMonthlyTOTW() {
                 errorBox.style.display = 'block';
                 errorBox.innerHTML =
                     '<div class="month-locked-msg">' +
-                        '<div class="month-locked-icon">🏆</div>' +
+                        '<div class="month-locked-icon">' + statsIcon('trophy', 'fill') + '</div>' +
                         '<div class="month-locked-title">تشكيلة الشهر قيد التطوير</div>' +
                         '<div class="month-locked-sub">تفتح نهاية الشهر الحالي</div>' +
                         '<div class="month-locked-brand">FINALISSIMA LEAGUE</div>' +
@@ -637,7 +658,11 @@ async function loadMonthlyTOTW() {
         loadingBox.style.display = 'none';
         if (errorBox) {
             errorBox.style.display = 'block';
-            errorBox.textContent = '⚠️ Error: ' + e.message;
+            errorBox.innerHTML = '<div class="month-locked-msg">' +
+                '<div class="month-locked-icon">' + statsIcon('warning-circle', 'fill') + '</div>' +
+                '<div class="month-locked-title">خطأ</div>' +
+                '<div class="month-locked-sub">' + e.message + '</div>' +
+            '</div>';
         }
     }
 }
@@ -720,3 +745,4 @@ window.switchMonthView = switchMonthView;
 window.loadMonthlyTOTW = loadMonthlyTOTW;
 window.renderMonthCards = renderMonthCards;
 window.renderMonthList = renderMonthList;
+window.statsIcon = statsIcon;
