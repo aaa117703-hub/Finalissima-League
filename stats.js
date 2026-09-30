@@ -9,13 +9,12 @@ let statsRankMap = {};
 let statsLoaded = false;
 let statsComputed = null;
 
-/* ⭐ Month state */
 let currentMonthView = 'squad';
 let currentMonthData = [];
 let currentMonthSelected = [];
 let currentMonthNum = 0;
 
-/* ⭐ Helper: أيقونة Phosphor */
+/* Helper: أيقونة Phosphor */
 function statsIcon(name, variant) {
     variant = variant || 'regular';
     const variantClass = variant === 'fill' ? 'ph-fill' :
@@ -35,10 +34,6 @@ function statsDisplayName(name) {
     return result.substring(0, 13);
 }
 
-/* =========================================================
-   Fetch Managers from history
-========================================================= */
-
 async function fetchAllManagersForStats() {
     if (typeof getManagersWithHistory !== 'function') {
         console.warn('[Stats] getManagersWithHistory not available');
@@ -48,22 +43,18 @@ async function fetchAllManagersForStats() {
     return await getManagersWithHistory();
 }
 
-/* =========================================================
-   Compute
-========================================================= */
-
 function computeLeagueStats(managers) {
     if (!managers || managers.length === 0) return null;
 
-    const totalManagers = managers.length =;
+    const totalManagers = managers.length;
     let sumEvent = 0;
-    let sumTotal = ' 0;
-    letstats highestEvent = 0;
-    let highestTotal-rank = 0;
+    let sumTotal = 0;
+    let highestEvent = 0;
+    let highestTotal = 0;
     let lowestEvent = Infinity;
 
-   -b managers.forEach(function(m) {
-        const ev = m.eventron_total || 0;
+    managers.forEach(function(m) {
+        const ev = m.event_total || 0;
         const to = m.total || 0;
         sumEvent += ev;
         sumTotal += to;
@@ -122,7 +113,7 @@ function createStatsRow(rank, manager, value, valueLabel) {
         rankClass = 'stats-rank-silver';
         rowExtra = ' stats-row-silver';
     } else if (rank === 3) {
-        rankClassze';
+        rankClass = 'stats-rank-bronze';
         rowExtra = ' stats-row-bronze';
     }
 
@@ -385,7 +376,7 @@ async function loadStats() {
 }
 
 /* =========================================================
-   ⭐ MONTH (تشكيلة الشهر) — مع قفل
+   MONTH
 ========================================================= */
 
 function switchMonthView(view) {
@@ -562,7 +553,6 @@ function renderMonthList(players) {
     listWrapper.innerHTML = html;
 }
 
-/* ⭐ الدالة المُحدّثة — مع قفل + Phosphor */
 async function loadMonthlyTOTW() {
     const loadingBox = document.getElementById('monthLoadingBox');
     const pitchWrapper = document.getElementById('monthPitchWrapper');
@@ -571,7 +561,6 @@ async function loadMonthlyTOTW() {
 
     if (!loadingBox) return;
 
-    /* ⭐ تحقق من القفل */
     if (typeof isLocked === 'function' && isLocked('month')) {
         const isAdminUser = (typeof isAdmin === 'function') ? isAdmin() : false;
 
@@ -596,7 +585,6 @@ async function loadMonthlyTOTW() {
         }
     }
 
-    /* ⭐ باقي الدالة */
     loadingBox.style.display = 'block';
     if (pitchWrapper) pitchWrapper.style.display = 'none';
     if (listWrapper) listWrapper.style.display = 'none';
@@ -667,10 +655,6 @@ async function loadMonthlyTOTW() {
     }
 }
 
-/* =========================================================
-   switchStatsTab
-========================================================= */
-
 function switchStatsTab(tabName) {
     document.querySelectorAll('.stats-tab-btn').forEach(function(btn) {
         btn.classList.toggle('active', btn.dataset.tab === tabName);
@@ -691,7 +675,6 @@ function switchStatsTab(tabName) {
         h2hInit();
     }
 
-    /* ⭐ Month */
     if (tabName === 'month') {
         loadMonthlyTOTW();
     }
@@ -740,7 +723,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-/* ===== Window ===== */
 window.switchMonthView = switchMonthView;
 window.loadMonthlyTOTW = loadMonthlyTOTW;
 window.renderMonthCards = renderMonthCards;
