@@ -1,6 +1,7 @@
 /* =========================================================
-   fixtures.js — FINALISSIMA LEAGUE CHAT (v9)
+   fixtures.js — FINALISSIMA LEAGUE CHAT (v10)
    قراءة من Supabase + GW 1-5 محفوظة + GW 6-38 default
+   + Countdown للجولات المخفية
 ========================================================= */
 
 /* ===== ذاكرة مؤقتة للجولات المخصصة ===== */
@@ -195,6 +196,11 @@ function updateScore(round, idx, type, val) {
 
 function renderFixtures() {
     try {
+        /* ⭐ نوقف أي عداد سابق */
+        if (typeof stopRoundCountdown === 'function') {
+            stopRoundCountdown();
+        }
+
         const list = document.getElementById('fixturesList');
         const title = document.getElementById('currentRoundTitle');
         const selectEl = document.getElementById('roundSelect');
@@ -215,7 +221,16 @@ function renderFixtures() {
                     '<div class="round-hidden-icon">🔒</div>' +
                     '<div class="round-hidden-title">المواجهات غير متاحة حالياً</div>' +
                     '<div class="round-hidden-sub">سيتم الإعلان عن مباريات هذه الجولة عند إغلاق الديدلاين</div>' +
+                    '<div id="roundCountdown" class="round-countdown"></div>' +
                 '</div>';
+
+            /* ⭐ نبدأ العداد */
+            if (typeof initRoundCountdown === 'function') {
+                setTimeout(function() {
+                    initRoundCountdown(currentRound);
+                }, 100);
+            }
+
             return;
         }
 
