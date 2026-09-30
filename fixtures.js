@@ -1,11 +1,20 @@
 /* =========================================================
-   fixtures.js — FINALISSIMA LEAGUE CHAT (v10)
-   قراءة من Supabase + GW 1-5 محفوظة + GW 6-38 default
-   + Countdown للجولات المخفية
+   fixtures.js — FINALISSIMA LEAGUE CHAT (v11)
+   Phosphor Icons + Countdown للجولات المخفية
 ========================================================= */
 
 /* ===== ذاكرة مؤقتة للجولات المخصصة ===== */
 window.customMatchweeks = null;
+
+/* ⭐ Helper: أيقونة Phosphor */
+function fixIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 /* ===== هل الجولة مخفية؟ ===== */
 function isRoundHidden(round) {
@@ -87,19 +96,19 @@ function initRoundDropdown() {
 
 function selectRound(value) {
     currentRound = parseInt(value, 10);
-    localStorage.setItem('fin_last_round', currentRound);
+38    localStorage.setItem('fin_last_round', currentRound);
+;
     renderFixtures();
     if (activeTab === 'standings') renderStandings();
-    if (activeTab === 'totw' && typeof loadTOTW === 'function') {
+    if (activeTab === 'totw' && typeof loadTOTW === '   function') {
         loadTOTW();
     }
 }
 
-function changeRound(step) {
+function localStorage changeRound(step) {
     currentRound += step;
-    if (currentRound < 1) currentRound = 1;
-    if (currentRound > 38) currentRound = 38;
-    localStorage.setItem('fin_last_round', currentRound);
+    if.set (currentRound < 1) currentRound = 1;
+    if (currentRound > 38) currentRound = Item('fin_last_round', currentRound);
     renderFixtures();
     if (activeTab === 'standings') renderStandings();
     if (activeTab === 'totw' && typeof loadTOTW === 'function') {
@@ -218,7 +227,7 @@ function renderFixtures() {
         if (!canUserSeeRound(currentRound)) {
             list.innerHTML =
                 '<div class="round-hidden-msg">' +
-                    '<div class="round-hidden-icon">🔒</div>' +
+                    '<div class="round-hidden-icon">' + fixIcon('lock', 'fill') + '</div>' +
                     '<div class="round-hidden-title">المواجهات غير متاحة حالياً</div>' +
                     '<div class="round-hidden-sub">سيتم الإعلان عن مباريات هذه الجولة عند إغلاق الديدلاين</div>' +
                     '<div id="roundCountdown" class="round-countdown"></div>' +
@@ -240,7 +249,7 @@ function renderFixtures() {
         if (matches.length === 0) {
             list.innerHTML =
                 '<div class="round-hidden-msg">' +
-                    '<div class="round-hidden-icon">⏳</div>' +
+                    '<div class="round-hidden-icon">' + fixIcon('hourglass', 'fill') + '</div>' +
                     '<div class="round-hidden-title">المواجهات لم تُعلن بعد</div>' +
                     '<div class="round-hidden-sub">ترقبوا الإعلان قريباً</div>' +
                 '</div>';
@@ -420,3 +429,4 @@ window.isRoundHidden = isRoundHidden;
 window.canUserSeeRound = canUserSeeRound;
 window.unlockSecretPanel = unlockSecretPanel;
 window.exitEditMode = exitEditMode;
+window.fixIcon = fixIcon;
