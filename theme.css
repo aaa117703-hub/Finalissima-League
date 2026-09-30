@@ -1560,3 +1560,74 @@ img,
     .cd-wrapper { padding: 16px 12px; }
     .cd-label { font-size: 12px; }
 }
+/* ═══════════════════════════════════════════════════════
+   PHOSPHOR ICONS — Settings + Maintenance
+   ═══════════════════════════════════════════════════════ */
+
+/* أيقونات Settings Items */
+.settings-item .si-icon i {
+    font-size: 22px;
+    color: #8B1A2F;
+    vertical-align: middle;
+}
+
+.settings-item.settings-back .si-icon i {
+    color: #8B1A2F;
+}
+
+/* أيقونات Lock Items */
+.lock-item-icon i {
+    font-size: 20px;
+    color: #8B1A2F;
+    vertical-align: middle;
+}
+
+.lock-item-btn i {
+    font-size: 14px;
+    vertical-align: -2px;
+    margin-left: 4px;
+}
+
+/* أيقونات Maintenance */
+.maint-icon i {
+    font-size: 48px;
+    color: #C8A95F;
+}
+
+.maint-all-btn i,
+.maint-open-btn i {
+    font-size: 16px;
+    vertical-align: -3px;
+    margin-left: 6px;
+}
+
+/* Round Icon في Month */
+.mwm-round-num i {
+    font-size: 18px;
+    color: #C8A95F;
+    vertical-align: -3px;
+    margin-left: 4px;
+}
+
+/* mwm-visible/hidden مع Phosphor */
+.mwm-visible i {
+    color: #27AE60;
+}
+
+.mwm-hidden i {
+    color: #C0392B;
+}
+
+/* ⭐ Month Status Icon */
+.mwm-round-meta .mwm-visible i,
+.mwm-round-meta .mwm-hidden i {
+    font-size: 14px;
+    vertical-align: -2px;
+    margin-left: 4px;
+}
+
+/* mwm-toggle button */
+.mwm-btn.mwm-toggle i {
+    font-size: 18px;
+    color: #8B1A2F;
+}
