@@ -1,6 +1,6 @@
 /* =========================================================
-   download.js — FINALISSIMA LEAGUE CHAT
-   Web Share API للـ iOS Photos
+   download.js — FINALISSIMA LEAGUE CHAT (v4)
+   نسخة محسّنة — حل مشكلة الصورة الفاضية
 ========================================================= */
 
 function waitForImagesToLoad(element) {
@@ -28,7 +28,7 @@ function waitForImagesToLoad(element) {
             img.addEventListener('load', finish, { once: true });
             img.addEventListener('error', finish, { once: true });
 
-            setTimeout(finish, 5000);
+            setTimeout(finish, 8000);
         });
     }));
 }
@@ -138,17 +138,15 @@ function blobToFile(blob, filename) {
             lastModified: Date.now()
         });
     } catch (e) {
-        console.warn('[DL] blobToFile failed, trying fallback:', e);
-        /* fallback للمتصفحات القديمة */
+        console.warn('[DL] blobToFile failed:', e);
         blob.name = filename;
         blob.lastModified = Date.now();
         return blob;
     }
 }
 
-/* ⭐ دالة جديدة: محاولة Web Share API أولاً */
+/* ⭐ محاولة Web Share API */
 async function shareOrDownload(blob, filename) {
-    /* 1) نحاول Web Share API */
     if (navigator.canShare && navigator.share) {
         try {
             const file = blobToFile(blob, filename);
@@ -158,7 +156,6 @@ async function shareOrDownload(blob, filename) {
                 text: 'Matchweek Image'
             };
 
-            /* نتحقق إذا المتصفح يقدر يشارك الملف */
             if (navigator.canShare(shareData)) {
                 dlDebug('Trying Web Share API...');
                 await navigator.share(shareData);
@@ -167,22 +164,17 @@ async function shareOrDownload(blob, filename) {
                     showToast('تم! اخترت حفظ في الصور', true, 2500);
                 }
                 return true;
-            } else {
-                dlDebug('canShare returned false', true);
             }
         } catch (err) {
-            /* إذا المستخدم ألغى → ما نعتبرها فشل */
             if (err.name === 'AbortError') {
                 dlDebug('User cancelled share');
                 return true;
             }
             dlDebug('Share failed: ' + err.message, true);
         }
-    } else {
-        dlDebug('Web Share API not supported', true);
     }
 
-    /* 2) Fallback: التنزيل المباشر */
+    /* Fallback: التنزيل المباشر */
     try {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
@@ -198,7 +190,7 @@ async function shareOrDownload(blob, filename) {
         }, 2000);
 
         if (typeof showToast === 'function') {
-            showToast('تم التحميل (Files)', true, 2500);
+            showToast('تم التحميل', true, 2500);
         }
         return true;
     } catch (e) {
@@ -235,10 +227,7 @@ function showImageModal(blob, filename) {
         'font-family:inherit'
     ].join(';');
 
-    /* زر الحفظ الرئيسي — حسب دعم المتصفح */
-    let primaryBtnText = canShare
-        ? '📥 حفظ في الصور'
-        : '📥 حفظ في Files';
+    let primaryBtnText = canShare ? '📥 حفظ في الصور' : '📥 حفظ في Files';
     let primaryHint = canShare
         ? 'يفتح قائمة iOS → اختر "حفظ في الصور"'
         : 'يحفظ في ملفات الجهاز';
@@ -258,7 +247,6 @@ function showImageModal(blob, filename) {
 
     document.body.appendChild(modal);
 
-    /* زر الحفظ الرئيسي */
     modal.querySelector('#dlDirectBtn').addEventListener('click', async function() {
         const btn = this;
         btn.disabled = true;
@@ -269,7 +257,6 @@ function showImageModal(blob, filename) {
             const success = await shareOrDownload(blob, filename);
 
             if (success) {
-                /* لا نغلق الـ modal — المستخدم قد يريد استخدامه مرة أخرى */
                 setTimeout(function() {
                     btn.disabled = false;
                     btn.innerHTML = originalText;
@@ -288,13 +275,11 @@ function showImageModal(blob, filename) {
         }
     });
 
-    /* زر الإغلاق */
     modal.querySelector('#dlCloseBtn').addEventListener('click', function() {
         URL.revokeObjectURL(url);
         modal.remove();
     });
 
-    /* إغلاق عند الضغط على الخلفية */
     modal.addEventListener('click', function(e) {
         if (e.target === modal) {
             URL.revokeObjectURL(url);
@@ -303,7 +288,8 @@ function showImageModal(blob, filename) {
     });
 }
 
-function downloadAsImage(scaleFactor) {
+/* ⭐ دالة رئيسية — محسّنة */
+async function downloadAsImage(scaleFactor) {
     if (typeof scaleFactor !== 'number') scaleFactor = 3;
 
     closeDownloadMenu();
@@ -362,122 +348,142 @@ function downloadAsImage(scaleFactor) {
         showToast('جاري تجهيز الصورة...', false, 2000);
     }
 
+    /* ⭐ ننتظر شوي عشان الصور والأنيميشن يخلصون */
+    await new Promise(function(resolve) { setTimeout(resolve, 500); });
+
+    /* ⭐ نوقف الأنيميشن قبل الالتقاط */
+    const animatedEls = element.querySelectorAll('.fixture-row, tr, .totw-card, .stats-kpi-card');
+    animatedEls.forEach(function(el) {
+        el.style.animation = 'none';
+        el.style.opacity = '1';
+    });
+
     const cornerRadius = 20 * scaleFactor;
 
-    waitForImagesToLoad(element)
-        .then(function() {
-            return html2canvas(element, {
-                backgroundColor: null,
-                scale: scaleFactor,
-                useCORS: true,
-                allowTaint: false,
-                logging: false,
-                width: element.offsetWidth,
-                height: element.offsetHeight,
-                windowWidth: element.scrollWidth,
-                windowHeight: element.scrollHeight,
-                imageTimeout: 0,
-                onclone: function(clonedDoc, clonedElement) {
-                    const wrappers = clonedElement.querySelectorAll('.logo-20, .logo-24');
+    try {
+        /* ⭐ ننتظر الصور */
+        await waitForImagesToLoad(element);
 
-                    wrappers.forEach(function(wrapper) {
-                        const isSmall = wrapper.classList.contains('logo-20');
-                        const size = isSmall ? '20px' : '22px';
+        /* ⭐ نستنى شوي إضافية */
+        await new Promise(function(resolve) { setTimeout(resolve, 200); });
 
-                        wrapper.style.width = size;
-                        wrapper.style.height = size;
-                        wrapper.style.minWidth = size;
-                        wrapper.style.minHeight = size;
-                        wrapper.style.maxWidth = size;
-                        wrapper.style.maxHeight = size;
-                        wrapper.style.overflow = 'hidden';
-                        wrapper.style.position = 'relative';
-                        wrapper.style.display = 'inline-block';
-                    });
+        /* ⭐ نلتقط */
+        const canvas = await html2canvas(element, {
+            backgroundColor: null,
+            scale: scaleFactor,
+            useCORS: true,
+            allowTaint: true,          /* ⭐ نخليها true عشان الصور الخارجية */
+            logging: false,
+            width: element.offsetWidth,
+            height: element.offsetHeight,
+            windowWidth: element.scrollWidth,
+            windowHeight: element.scrollHeight,
+            imageTimeout: 0,
+            removeContainer: true,
+            onclone: function(clonedDoc, clonedElement) {
+                /* ⭐ نطبق نفس إيقاف الأنيميشن على النسخة */
+                const animatedClone = clonedElement.querySelectorAll('.fixture-row, tr, .totw-card, .stats-kpi-card');
+                animatedClone.forEach(function(el) {
+                    el.style.animation = 'none';
+                    el.style.opacity = '1';
+                    el.style.transform = 'none';
+                });
 
-                    const logos = clonedElement.querySelectorAll('.logo-20 img, .logo-24 img');
+                const wrappers = clonedElement.querySelectorAll('.logo-20, .logo-24');
 
-                    logos.forEach(function(img) {
-                        img.style.position = 'absolute';
-                        img.style.top = '50%';
-                        img.style.left = '50%';
-                        img.style.transform = 'translate(-50%, -50%)';
-                        img.style.width = 'auto';
-                        img.style.height = 'auto';
-                        img.style.maxWidth = '100%';
-                        img.style.maxHeight = '100%';
-                        img.style.objectFit = 'contain';
-                        img.style.display = 'block';
-                    });
+                wrappers.forEach(function(wrapper) {
+                    const isSmall = wrapper.classList.contains('logo-20');
+                    const size = isSmall ? '20px' : '22px';
 
-                    const indicators = clonedElement.querySelectorAll('.pos-indicator-img');
+                    wrapper.style.width = size;
+                    wrapper.style.height = size;
+                    wrapper.style.minWidth = size;
+                    wrapper.style.minHeight = size;
+                    wrapper.style.maxWidth = size;
+                    wrapper.style.maxHeight = size;
+                    wrapper.style.overflow = 'hidden';
+                    wrapper.style.position = 'relative';
+                    wrapper.style.display = 'inline-block';
+                });
 
-                    indicators.forEach(function(img) {
-                        const size = '25px';
-                        img.style.width = size;
-                        img.style.height = size;
-                        img.style.minWidth = size;
-                        img.style.minHeight = size;
-                        img.style.maxWidth = size;
-                        img.style.maxHeight = size;
-                        img.style.objectFit = 'contain';
-                    });
+                const logos = clonedElement.querySelectorAll('.logo-20 img, .logo-24 img');
 
-                    const lockPanel = clonedElement.querySelector('#adminLockPanel');
-                    if (lockPanel) lockPanel.style.display = 'none';
+                logos.forEach(function(img) {
+                    img.style.position = 'absolute';
+                    img.style.top = '50%';
+                    img.style.left = '50%';
+                    img.style.transform = 'translate(-50%, -50%)';
+                    img.style.width = 'auto';
+                    img.style.height = 'auto';
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '100%';
+                    img.style.objectFit = 'contain';
+                    img.style.display = 'block';
+                });
 
-                    if (isTOTW) {
-                        const parent = clonedElement.parentElement;
-                        if (parent && parent.classList && parent.classList.contains('totw-pitch-wrapper')) {
-                            parent.style.padding = '0';
-                            parent.style.margin = '0';
-                            parent.style.background = 'transparent';
-                        }
+                const indicators = clonedElement.querySelectorAll('.pos-indicator-img');
+
+                indicators.forEach(function(img) {
+                    const size = '25px';
+                    img.style.width = size;
+                    img.style.height = size;
+                    img.style.minWidth = size;
+                    img.style.minHeight = size;
+                    img.style.maxWidth = size;
+                    img.style.maxHeight = size;
+                    img.style.objectFit = 'contain';
+                });
+
+                const lockPanel = clonedElement.querySelector('#adminLockPanel');
+                if (lockPanel) lockPanel.style.display = 'none';
+
+                if (isTOTW) {
+                    const parent = clonedElement.parentElement;
+                    if (parent && parent.classList && parent.classList.contains('totw-pitch-wrapper')) {
+                        parent.style.padding = '0';
+                        parent.style.margin = '0';
+                        parent.style.background = 'transparent';
                     }
                 }
-            });
-        })
-        .then(function(canvas) {
-            dlDebug('canvas=' + canvas.width + 'x' + canvas.height);
+            }
+        });
 
-            if (isCanvasTainted(canvas)) {
-                dlDebug('canvas tainted', true);
+        dlDebug('canvas=' + canvas.width + 'x' + canvas.height);
+
+        if (isCanvasTainted(canvas)) {
+            dlDebug('canvas tainted — trying anyway', true);
+        }
+
+        const finalCanvas = applyRoundedCorners(canvas, cornerRadius);
+
+        finalCanvas.toBlob(function(blob) {
+            if (!blob) {
+                dlDebug('blob null', true);
                 if (typeof showToast === 'function') {
-                    showToast('فشل: صور محمية', false, 5000);
+                    showToast('فشل إنشاء الصورة', false, 5000);
                 }
                 return;
             }
 
-            const finalCanvas = applyRoundedCorners(canvas, cornerRadius);
+            dlDebug('blob=' + Math.round(blob.size / 1024) + 'KB');
 
-            finalCanvas.toBlob(function(blob) {
-                if (!blob) {
-                    dlDebug('blob null', true);
-                    if (typeof showToast === 'function') {
-                        showToast('فشل إنشاء الصورة', false, 5000);
-                    }
-                    return;
-                }
+            const filename = filenamePrefix + '_' + scaleFactor + 'x.png';
 
-                dlDebug('blob=' + Math.round(blob.size / 1024) + 'KB');
+            showImageModal(blob, filename);
 
-                const filename = filenamePrefix + '_' + scaleFactor + 'x.png';
-
-                showImageModal(blob, filename);
-
-                if (typeof showToast === 'function') {
-                    showToast('اضغط على زر الحفظ', true, 2500);
-                }
-
-            }, 'image/png', 1.0);
-        })
-        .catch(function(err) {
-            console.error('[DL] error:', err);
-            dlDebug('error: ' + err.message, true);
             if (typeof showToast === 'function') {
-                showToast('فشل: ' + err.message, false, 5000);
+                showToast('اضغط على زر الحفظ', true, 2500);
             }
-        });
+
+        }, 'image/png', 1.0);
+
+    } catch (err) {
+        console.error('[DL] error:', err);
+        dlDebug('error: ' + err.message, true);
+        if (typeof showToast === 'function') {
+            showToast('فشل: ' + err.message, false, 5000);
+        }
+    }
 }
 
 function fallbackDownload(blob, filename) {
