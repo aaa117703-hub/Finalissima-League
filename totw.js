@@ -1,6 +1,6 @@
 /* =========================================================
-   totw.js — FINALISSIMA LEAGUE CHAT (v5 / v=123)
-   Phosphor Icons + تشكيلة الأسبوع فقط
+   totw.js — FINALISSIMA LEAGUE CHAT (v6 / v=124)
+   Phosphor Icons + Waiting State + تشكيلة الأسبوع
 ========================================================= */
 
 const TOTW_TOP_COUNT = 20;
@@ -334,8 +334,11 @@ async function loadTOTW() {
             if (errorBox) {
                 errorBox.style.display = 'block';
                 errorBox.innerHTML =
-                    xIcon('warning-circle', 'duotone') + ' <strong>بيانات الجولة ' + round + ' غير متوفرة</strong><br>' +
-                    '<span style="font-size:12px;color:#999;">لم يتم حفظ بيانات هذه الجولة</span>';
+                    '<div class="totw-waiting">' +
+                        '<i class="ph-bold ph-hourglass totw-waiting-icon"></i>' +
+                        '<div class="totw-waiting-text">التشكيلة تُعلن بعد نهاية الجولة، انتظرونا!</div>' +
+                        '<i class="ph-fill ph-sparkle totw-waiting-sparkle"></i>' +
+                    '</div>';
             }
             return;
         }
@@ -369,7 +372,12 @@ async function loadTOTW() {
         loadingBox.style.display = 'none';
         if (errorBox) {
             errorBox.style.display = 'block';
-            errorBox.innerHTML = xIcon('warning-circle', 'duotone') + ' Error: ' + e.message;
+            errorBox.innerHTML =
+                '<div class="totw-waiting">' +
+                    '<i class="ph-bold ph-hourglass totw-waiting-icon"></i>' +
+                    '<div class="totw-waiting-text">حدث خطأ — حاول تحديث الصفحة</div>' +
+                    '<i class="ph-fill ph-sparkle totw-waiting-sparkle"></i>' +
+                '</div>';
         }
     }
 }
