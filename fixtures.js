@@ -1,12 +1,10 @@
 /* =========================================================
    fixtures.js — FINALISSIMA LEAGUE CHAT (v11)
-   Phosphor Icons + Countdown للجولات المخفية
+   Phosphor Icons + Countdown
 ========================================================= */
 
-/* ===== ذاكرة مؤقتة للجولات المخصصة ===== */
 window.customMatchweeks = null;
 
-/* ⭐ Helper: أيقونة Phosphor */
 function fixIcon(name, variant) {
     variant = variant || 'regular';
     const variantClass = variant === 'fill' ? 'ph-fill' :
@@ -16,7 +14,6 @@ function fixIcon(name, variant) {
     return '<i class="' + variantClass + ' ph-' + name + '"></i>';
 }
 
-/* ===== هل الجولة مخفية؟ ===== */
 function isRoundHidden(round) {
     if (!window.customMatchweeks) return false;
     const custom = window.customMatchweeks[round];
@@ -24,14 +21,12 @@ function isRoundHidden(round) {
     return custom.is_hidden === true;
 }
 
-/* ===== هل نعرض الجولة للمستخدم؟ ===== */
 function canUserSeeRound(round) {
     if (editMode || (typeof isAdmin === 'function' && isAdmin())) return true;
     if (isRoundHidden(round)) return false;
     return true;
 }
 
-/* ===== تحميل الجولات المخصصة من Supabase ===== */
 async function loadCustomMatchweeksIntoMemory() {
     try {
         if (typeof loadCustomMatchweeks !== 'function') {
@@ -48,17 +43,14 @@ async function loadCustomMatchweeksIntoMemory() {
                 const r = parseInt(rStr, 10);
                 const custom = data[r];
 
-                /* ⭐ GW 1-5 → من Supabase (لا تلمسها) */
                 if (r >= 1 && r <= 5) {
                     if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
                         window.matchweeks[r] = custom.matches;
-                        console.log('[Custom MW] GW' + r + ': from Supabase ✅');
+                        console.log('[Custom MW] GW' + r + ': from Supabase');
                     } else {
                         console.warn('[Custom MW] GW' + r + ': EMPTY in Supabase');
                     }
-                }
-                /* ⭐ GW 6-38 → من matchweeks.js (default) إلا إذا Supabase عنده بيانات */
-                else {
+                } else {
                     if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
                         window.matchweeks[r] = custom.matches;
                         console.log('[Custom MW] GW' + r + ': from Supabase');
@@ -79,8 +71,6 @@ async function loadCustomMatchweeksIntoMemory() {
     }
 }
 
-/* ⭐ editMode موجود في config.js — ما نعرّفه هنا */
-
 function initRoundDropdown() {
     const select = document.getElementById('roundSelect');
     if (!select) return;
@@ -96,19 +86,19 @@ function initRoundDropdown() {
 
 function selectRound(value) {
     currentRound = parseInt(value, 10);
-38    localStorage.setItem('fin_last_round', currentRound);
-;
+    localStorage.setItem('fin_last_round', currentRound);
     renderFixtures();
     if (activeTab === 'standings') renderStandings();
-    if (activeTab === 'totw' && typeof loadTOTW === '   function') {
+    if (activeTab === 'totw' && typeof loadTOTW === 'function') {
         loadTOTW();
     }
 }
 
-function localStorage changeRound(step) {
+function changeRound(step) {
     currentRound += step;
-    if.set (currentRound < 1) currentRound = 1;
-    if (currentRound > 38) currentRound = Item('fin_last_round', currentRound);
+    if (currentRound < 1) currentRound = 1;
+    if (currentRound > 38) currentRound = 38;
+    localStorage.setItem('fin_last_round', currentRound);
     renderFixtures();
     if (activeTab === 'standings') renderStandings();
     if (activeTab === 'totw' && typeof loadTOTW === 'function') {
@@ -205,7 +195,6 @@ function updateScore(round, idx, type, val) {
 
 function renderFixtures() {
     try {
-        /* ⭐ نوقف أي عداد سابق */
         if (typeof stopRoundCountdown === 'function') {
             stopRoundCountdown();
         }
@@ -223,7 +212,6 @@ function renderFixtures() {
 
         list.innerHTML = '';
 
-        /* ⭐ هل الجولة مخفية للمستخدم؟ */
         if (!canUserSeeRound(currentRound)) {
             list.innerHTML =
                 '<div class="round-hidden-msg">' +
@@ -233,7 +221,6 @@ function renderFixtures() {
                     '<div id="roundCountdown" class="round-countdown"></div>' +
                 '</div>';
 
-            /* ⭐ نبدأ العداد */
             if (typeof initRoundCountdown === 'function') {
                 setTimeout(function() {
                     initRoundCountdown(currentRound);
@@ -245,7 +232,6 @@ function renderFixtures() {
 
         const matches = (window.matchweeks && window.matchweeks[currentRound]) || [];
 
-        /* ⭐ إذا الجولة فاضية (GW 1-5 وما فيها بيانات) */
         if (matches.length === 0) {
             list.innerHTML =
                 '<div class="round-hidden-msg">' +
@@ -423,7 +409,6 @@ function setupEruda() {
     });
 }
 
-/* ===== ربط الدوال بـ window ===== */
 window.loadCustomMatchweeksIntoMemory = loadCustomMatchweeksIntoMemory;
 window.isRoundHidden = isRoundHidden;
 window.canUserSeeRound = canUserSeeRound;
