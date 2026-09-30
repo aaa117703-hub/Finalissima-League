@@ -1,6 +1,6 @@
 /* =========================================================
-   stats.js — FINALISSIMA LEAGUE CHAT (v5)
-   Phosphor Icons + قفل تشكيلة الشهر
+   stats.js — FINALISSIMA LEAGUE CHAT (v6 / v=21)
+   Phosphor Icons + قفل تشكيلة الشهر + Champions Cup
 ========================================================= */
 
 let statsAllManagers = [];
@@ -677,6 +677,11 @@ function switchStatsTab(tabName) {
 
     if (tabName === 'month') {
         loadMonthlyTOTW();
+    }
+
+    /* ⭐ Champions Cup */
+    if (tabName === 'champions' && typeof loadChampions === 'function') {
+        loadChampions();
     }
 
     setTimeout(function() {
