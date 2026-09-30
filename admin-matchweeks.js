@@ -1,10 +1,21 @@
 /* =========================================================
-   admin-matchweeks.js — إدارة المواجهات (مع منع التكرار)
+   admin-matchweeks.js — إدارة المواجهات (v4)
+   Phosphor Icons + منع التكرار
 ========================================================= */
 
 window._editingRound = null;
 window._editingMatches = [];
 window._pickingSide = null;
+
+/* ⭐ Helper: أيقونة Phosphor */
+function mwmIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 /* ===== فتح صفحة الإدارة ===== */
 function openSettingsMatchweeks() {
@@ -20,7 +31,8 @@ function openSettingsMatchweeks() {
         const custom = window.customMatchweeks ? window.customMatchweeks[r] : null;
         const isHidden = custom ? custom.is_hidden : true;
         const matchCount = custom && custom.matches ? custom.matches.length : 0;
-        const statusIcon = isHidden ? '🔒' : '👁️';
+
+        const statusIcon = isHidden ? mwmIcon('lock', 'fill') : mwmIcon('eye', 'fill');
         const statusText = isHidden ? 'مخفي' : 'ظاهر';
         const statusClass = isHidden ? 'mwm-hidden' : 'mwm-visible';
 
@@ -32,7 +44,7 @@ function openSettingsMatchweeks() {
                 '</div>' +
                 '<div class="mwm-round-actions">' +
                     '<button class="mwm-btn mwm-toggle" onclick="toggleRoundVisibility(' + r + ')">' + statusIcon + '</button>' +
-                    '<button class="mwm-btn mwm-edit" onclick="openRoundEditor(' + r + ')">✏️</button>' +
+                    '<button class="mwm-btn mwm-edit" onclick="openRoundEditor(' + r + ')">' + mwmIcon('pencil-simple', 'bold') + '</button>' +
                 '</div>' +
             '</div>';
     }
@@ -40,7 +52,7 @@ function openSettingsMatchweeks() {
 
     body.innerHTML =
         '<button class="settings-item settings-back" onclick="openSettingsMain()">' +
-            '<span class="si-icon">←</span>' +
+            '<span class="si-icon">' + mwmIcon('arrow-right', 'bold') + '</span>' +
             '<span class="si-label">رجوع</span>' +
         '</button>' +
         '<div class="settings-hint" style="padding:8px 0;">' +
@@ -123,7 +135,7 @@ function renderRoundEditor() {
 
     body.innerHTML =
         '<button class="settings-item settings-back" onclick="openSettingsMatchweeks()">' +
-            '<span class="si-icon">←</span>' +
+            '<span class="si-icon">' + mwmIcon('arrow-right', 'bold') + '</span>' +
             '<span class="si-label">رجوع للقائمة</span>' +
         '</button>' +
 
@@ -134,8 +146,12 @@ function renderRoundEditor() {
 
         '<div class="mwm-edit-list" id="mwmEditList">' + cardsHtml + '</div>' +
 
-        '<button class="mwm-add-btn" onclick="addEditingMatch()">➕ إضافة مباراة</button>' +
-        '<button class="mwm-save-btn" onclick="saveRoundMatches()">💾 حفظ الجولة</button>';
+        '<button class="mwm-add-btn" onclick="addEditingMatch()">' +
+            mwmIcon('plus-circle', 'bold') + ' إضافة مباراة' +
+        '</button>' +
+        '<button class="mwm-save-btn" onclick="saveRoundMatches()">' +
+            mwmIcon('floppy-disk', 'bold') + ' حفظ الجولة' +
+        '</button>';
 }
 
 /* ===== رسم بطاقة مباراة ===== */
@@ -164,7 +180,9 @@ function renderMatchCard(match, idx) {
     const awayName = awayInfo ? awayInfo.name : 'اختر';
 
     return '<div class="mwm-match-card">' +
-        '<button class="mwm-del-btn" onclick="removeEditingMatch(' + idx + ')">✕</button>' +
+        '<button class="mwm-del-btn" onclick="removeEditingMatch(' + idx + ')">' +
+            mwmIcon('x', 'bold') +
+        '</button>' +
         '<button class="mwm-team-pick' + (home ? ' picked' : '') + '" onclick="openTeamPicker(' + idx + ', 0)">' +
             homeLogoHtml +
             '<div class="mwm-team-name">' + homeName + '</div>' +
@@ -177,7 +195,7 @@ function renderMatchCard(match, idx) {
     '</div>';
 }
 
-/* ===== فتح Modal اختيار المنتخب (مع استثناء المستخدمين) ===== */
+/* ===== فتح Modal اختيار المنتخب ===== */
 function openTeamPicker(matchIdx, side) {
     if (typeof teamsMap === 'undefined') {
         if (typeof showToast === 'function') showToast('teamsMap not loaded', false, 3000);
@@ -194,7 +212,6 @@ function openTeamPicker(matchIdx, side) {
         document.body.appendChild(modal);
     }
 
-    /* ⭐ تجميع المنتخبات المستخدمة في المباريات الأخرى */
     const usedTeams = getUsedTeamsExcept(matchIdx, side);
 
     let itemsHtml = '';
@@ -233,10 +250,15 @@ function openTeamPicker(matchIdx, side) {
         '<div class="mwm-picker-box">' +
             '<div class="mwm-picker-header">' +
                 '<div class="mwm-picker-title">اختر المنتخب</div>' +
-                '<button class="mwm-picker-close" onclick="closeTeamPicker()">✕</button>' +
+                '<button class="mwm-picker-close" onclick="closeTeamPicker()">' +
+                    mwmIcon('x', 'bold') +
+                '</button>' +
             '</div>' +
             '<div class="mwm-picker-search">' +
-                '<input type="text" id="mwmPickerSearch" placeholder="🔍 ابحث..." oninput="filterTeamPicker(this.value)" autocomplete="off">' +
+                '<div class="mwm-picker-search-wrap">' +
+                    mwmIcon('magnifying-glass', 'regular') +
+                    '<input type="text" id="mwmPickerSearch" placeholder="ابحث..." oninput="filterTeamPicker(this.value)" autocomplete="off">' +
+                '</div>' +
             '</div>' +
             '<div class="mwm-picker-info">' +
                 'متاح: ' + availableCount + ' / ' + teamsList.length +
@@ -249,7 +271,7 @@ function openTeamPicker(matchIdx, side) {
     modal.style.display = 'flex';
 }
 
-/* ===== حساب المنتخبات المستخدمة (باستثناء الجانب الحالي) ===== */
+/* ===== حساب المنتخبات المستخدمة ===== */
 function getUsedTeamsExcept(matchIdx, side) {
     const used = {};
     if (!window._editingMatches) return used;
@@ -257,7 +279,6 @@ function getUsedTeamsExcept(matchIdx, side) {
     window._editingMatches.forEach(function(m, idx) {
         if (!m) return;
 
-        /* تجاهل الجهة الحالية — نسمح بإعادة اختيار نفس المنتخب */
         const skipHome = (idx === matchIdx && side === 0);
         const skipAway = (idx === matchIdx && side === 1);
 
@@ -343,7 +364,7 @@ async function saveRoundMatches() {
         return;
     }
 
-    /* ⭐ فحص نهائي — ما فيه تكرار */
+    /* فحص نهائي — ما فيه تكرار */
     const used = {};
     let hasDupe = false;
     matches.forEach(function(m) {
@@ -355,7 +376,7 @@ async function saveRoundMatches() {
 
     if (hasDupe) {
         if (typeof showToast === 'function') {
-            showToast('⚠️ فيه منتخب مكرر! تأكد من المباريات', false, 4000);
+            showToast('فيه منتخب مكرر! تأكد من المباريات', false, 4000);
         }
         return;
     }
@@ -407,3 +428,4 @@ window.closeTeamPicker = closeTeamPicker;
 window.filterTeamPicker = filterTeamPicker;
 window.selectTeam = selectTeam;
 window.getUsedTeamsExcept = getUsedTeamsExcept;
+window.mwmIcon = mwmIcon;
