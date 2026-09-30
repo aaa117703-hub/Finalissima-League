@@ -1,7 +1,17 @@
 /* =========================================================
-   download.js — FINALISSIMA LEAGUE CHAT (v4)
-   نسخة محسّنة — حل مشكلة الصورة الفاضية
+   download.js — FINALISSIMA LEAGUE CHAT (v5 / v=5)
+   Phosphor Icons + نسخة محسّنة
 ========================================================= */
+
+/* ---------- Phosphor Icons Helper ---------- */
+function xIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 function waitForImagesToLoad(element) {
     const images = Array.from(element.querySelectorAll('img'));
@@ -227,7 +237,11 @@ function showImageModal(blob, filename) {
         'font-family:inherit'
     ].join(';');
 
-    let primaryBtnText = canShare ? '📥 حفظ في الصور' : '📥 حفظ في Files';
+    const downloadIcon = xIcon('download-simple', 'bold');
+    const closeIcon = xIcon('x', 'bold');
+    const hourglassIcon = xIcon('hourglass', 'bold');
+
+    let primaryBtnText = canShare ? (downloadIcon + ' حفظ في الصور') : (downloadIcon + ' حفظ في Files');
     let primaryHint = canShare
         ? 'يفتح قائمة iOS → اختر "حفظ في الصور"'
         : 'يحفظ في ملفات الجهاز';
@@ -239,7 +253,7 @@ function showImageModal(blob, filename) {
         '<img id="dlImagePreview" src="' + url + '" style="max-width:100%;max-height:60vh;border-radius:18px;box-shadow:0 10px 40px rgba(0,0,0,0.8);border:2px solid #C8A95F;margin:8px 0;background:transparent;" />' +
         '<div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-bottom:20px;">' +
             '<button id="dlDirectBtn" style="padding:14px 26px;background:linear-gradient(135deg,#C8A95F,#8B7340);color:#fff;border:none;border-radius:28px;font-weight:900;font-size:15px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(200,169,95,0.5);cursor:pointer;font-family:inherit;">' + primaryBtnText + '</button>' +
-            '<button id="dlCloseBtn" style="padding:14px 26px;background:linear-gradient(135deg,#8B1A2F,#6B0F1F);color:#fff;border:none;border-radius:28px;font-weight:900;font-size:15px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(139,26,47,0.5);cursor:pointer;font-family:inherit;">✕ إغلاق</button>' +
+            '<button id="dlCloseBtn" style="padding:14px 26px;background:linear-gradient(135deg,#8B1A2F,#6B0F1F);color:#fff;border:none;border-radius:28px;font-weight:900;font-size:15px;letter-spacing:0.5px;box-shadow:0 4px 14px rgba(139,26,47,0.5);cursor:pointer;font-family:inherit;">' + closeIcon + ' إغلاق</button>' +
         '</div>' +
         '<div style="color:#888;font-size:11px;margin-top:8px;text-align:center;padding-bottom:20px;max-width:400px;">' +
             'إذا ما اشتغل — اضغط مطولاً على الصورة ثم اختر "حفظ في الصور"' +
@@ -251,7 +265,7 @@ function showImageModal(blob, filename) {
         const btn = this;
         btn.disabled = true;
         const originalText = btn.innerHTML;
-        btn.innerHTML = '⏳ جاري...';
+        btn.innerHTML = hourglassIcon + ' جاري...';
 
         try {
             const success = await shareOrDownload(blob, filename);
