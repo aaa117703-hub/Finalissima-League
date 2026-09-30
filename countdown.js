@@ -1,6 +1,6 @@
 /* =========================================================
-   countdown.js — FINALISSIMA LEAGUE CHAT
-   عداد تنازلي للديدلاين + فتح تلقائي
+   countdown.js — FINALISSIMA LEAGUE CHAT (v2)
+   Phosphor Icons + عداد تنازلي + فتح تلقائي
 ========================================================= */
 
 (function(){
@@ -11,8 +11,8 @@
 ========================================================= */
 
 window.countdownState = {
-    deadlineTime: null,       // ISO string
-    deadlineMs: 0,            // milliseconds
+    deadlineTime: null,
+    deadlineMs: 0,
     roundNumber: 0,
     intervalId: null,
     autoOpenTriggered: false,
@@ -20,8 +20,18 @@ window.countdownState = {
     bootstrapFetchedAt: 0
 };
 
-const BOOTSTRAP_CACHE_TTL = 5 * 60 * 1000;  // 5 دقائق
+const BOOTSTRAP_CACHE_TTL = 5 * 60 * 1000;
 const WORKER_URL = 'https://finalissima-api.aaa117703.workers.dev';
+
+/* ⭐ Helper: أيقونة Phosphor */
+function cdIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 /* =========================================================
    جلب bootstrap
@@ -30,13 +40,11 @@ const WORKER_URL = 'https://finalissima-api.aaa117703.workers.dev';
 async function fetchBootstrapForCountdown() {
     const now = Date.now();
 
-    /* نستخدم cache لو حديث */
     if (window.countdownState.bootstrapData &&
         (now - window.countdownState.bootstrapFetchedAt) < BOOTSTRAP_CACHE_TTL) {
         return window.countdownState.bootstrapData;
     }
 
-    /* نحاول من fpl-database أولاً */
     if (typeof window.fplDbGetData === 'function') {
         try {
             const cached = window.fplDbGetData();
@@ -50,7 +58,6 @@ async function fetchBootstrapForCountdown() {
         }
     }
 
-    /* نجيب من Worker */
     try {
         const res = await fetch(WORKER_URL + '/?type=bootstrap');
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -122,13 +129,13 @@ function pad2(num) {
 }
 
 /* =========================================================
-   رسم العداد
+   رسم العداد — Phosphor
 ========================================================= */
 
 function renderCountdownHTML(deadlineInfo) {
     return '<div class="cd-wrapper">' +
         '<div class="cd-label">' +
-            '<span class="cd-label-icon">⏱️</span>' +
+            '<span class="cd-label-icon">' + cdIcon('timer', 'fill') + '</span>' +
             '<span>Deadline — ' + deadlineInfo.name + '</span>' +
         '</div>' +
         '<div class="cd-timer" id="cdTimer">' +
@@ -152,7 +159,10 @@ function renderCountdownHTML(deadlineInfo) {
                 '<div class="cd-text">ثانية</div>' +
             '</div>' +
         '</div>' +
-        '<div class="cd-hint" id="cdHint">الجولة تُفتح تلقائياً عند الديدلاين</div>' +
+        '<div class="cd-hint" id="cdHint">' +
+            cdIcon('clock', 'regular') +
+            ' الجولة تُفتح تلقائياً عند الديدلاين' +
+        '</div>' +
     '</div>';
 }
 
@@ -175,7 +185,7 @@ function updateCountdownDisplay(deadlineMs) {
     if (minutesEl) minutesEl.textContent = pad2(time.minutes);
     if (secondsEl) secondsEl.textContent = pad2(time.seconds);
 
-    /* تغيير الألوان حسب الوقت المتبقي */
+    /* تغيير الألوان */
     if (timerEl) {
         timerEl.classList.remove('cd-urgent', 'cd-warning');
 
@@ -184,26 +194,25 @@ function updateCountdownDisplay(deadlineMs) {
         if (totalHours < 2) {
             timerEl.classList.add('cd-urgent');
             if (hintEl) {
-                hintEl.textContent = '⚡ الوقت ضيق — قريباً تفتح الجولة';
+                hintEl.innerHTML = cdIcon('lightning', 'fill') + ' الوقت ضيق — قريباً تفتح الجولة';
                 hintEl.classList.add('cd-hint-urgent');
             }
         } else if (totalHours < 24) {
             timerEl.classList.add('cd-warning');
             if (hintEl) {
-                hintEl.textContent = '⏰ أقل من 24 ساعة — استعد!';
+                hintEl.innerHTML = cdIcon('alarm', 'fill') + ' أقل من 24 ساعة — استعد!';
                 hintEl.classList.remove('cd-hint-urgent');
             }
         } else {
             if (hintEl) {
-                hintEl.textContent = 'الجولة تُفتح تلقائياً عند الديدلاين';
+                hintEl.innerHTML = cdIcon('clock', 'regular') + ' الجولة تُفتح تلقائياً عند الديدلاين';
                 hintEl.classList.remove('cd-hint-urgent');
             }
         }
     }
 
-    /* انتهى الوقت */
     if (time.total <= 0) {
-        return true;  // منتهي
+        return true;
     }
 
     return false;
@@ -218,27 +227,23 @@ async function autoOpenRound(roundNum) {
 
     window.countdownState.autoOpenTriggered = true;
 
-    console.log('[Countdown] ⏰ Deadline reached for GW' + roundNum + ' — Opening...');
+    console.log('[Countdown] Deadline reached for GW' + roundNum + ' — Opening...');
 
-    /* نحدّث في Supabase */
     if (typeof setRoundHidden === 'function') {
         try {
             const result = await setRoundHidden(roundNum, false);
 
             if (result && result.ok) {
-                console.log('[Countdown] ✅ GW' + roundNum + ' opened successfully');
+                console.log('[Countdown] GW' + roundNum + ' opened successfully');
 
-                /* نحدّث الذاكرة */
                 if (window.customMatchweeks && window.customMatchweeks[roundNum]) {
                     window.customMatchweeks[roundNum].is_hidden = false;
                 }
 
-                /* toast */
                 if (typeof showToast === 'function') {
-                    showToast('🎉 الجولة ' + roundNum + ' مفتوحة الآن!', true, 4000);
+                    showToast('الجولة ' + roundNum + ' مفتوحة الآن!', true, 4000);
                 }
 
-                /* نحدّث المباريات */
                 setTimeout(function() {
                     if (typeof renderFixtures === 'function') {
                         renderFixtures();
@@ -264,46 +269,40 @@ async function autoOpenRound(roundNum) {
 async function initRoundCountdown(roundNum) {
     console.log('[Countdown] Starting for round ' + roundNum);
 
-    /* نوقف أي عداد سابق */
     stopRoundCountdown();
-
-    /* نreset flag الفتح التلقائي */
     window.countdownState.autoOpenTriggered = false;
 
-    /* نجيب deadline */
     const deadlineInfo = await getDeadlineForRound(roundNum);
 
     if (!deadlineInfo) {
         console.warn('[Countdown] No deadline for round ' + roundNum);
         const container = document.getElementById('roundCountdown');
         if (container) {
-            container.innerHTML = '<div class="cd-error">⚠️ لا يوجد deadline لهذه الجولة</div>';
+            container.innerHTML = '<div class="cd-error">' +
+                cdIcon('warning-circle', 'fill') +
+                ' لا يوجد deadline لهذه الجولة' +
+            '</div>';
         }
         return;
     }
 
-    /* إذا الجولة انتهت فعلاً → نفتح مباشرة */
     if (deadlineInfo.deadlineMs <= Date.now()) {
         console.log('[Countdown] Deadline already passed — Opening now');
         await autoOpenRound(roundNum);
         return;
     }
 
-    /* نخزن */
     window.countdownState.deadlineMs = deadlineInfo.deadlineMs;
     window.countdownState.deadlineTime = deadlineInfo.deadlineTime;
     window.countdownState.roundNumber = roundNum;
 
-    /* نعرض العداد */
     const container = document.getElementById('roundCountdown');
     if (container) {
         container.innerHTML = renderCountdownHTML(deadlineInfo);
     }
 
-    /* نحدّث فوراً */
     updateCountdownDisplay(deadlineInfo.deadlineMs);
 
-    /* نحدّث كل ثانية */
     window.countdownState.intervalId = setInterval(async function() {
         const ended = updateCountdownDisplay(deadlineInfo.deadlineMs);
 
@@ -328,6 +327,7 @@ function stopRoundCountdown() {
 window.initRoundCountdown = initRoundCountdown;
 window.stopRoundCountdown = stopRoundCountdown;
 window.getDeadlineForRound = getDeadlineForRound;
+window.cdIcon = cdIcon;
 
 console.log('[Countdown] loaded');
 
