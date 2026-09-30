@@ -1,6 +1,6 @@
 /* =========================================================
-   clubs.js — FINALISSIMA LEAGUE CHAT (v2)
-   مع وضع التعديل + حذف اللاعب
+   clubs.js — FINALISSIMA LEAGUE CHAT (v3 / v=12)
+   Phosphor Icons + وضع التعديل + حذف اللاعب
 ========================================================= */
 
 const CLUBS_PIN = '024680';
@@ -11,6 +11,16 @@ let clubsLoaded = false;
 let clubsEditMode = false;
 let currentOpenClub = null;
 let cpModalEl = null;
+
+/* ---------- Phosphor Icons Helper ---------- */
+function xIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 function clubsDisplayName(name) {
     if (typeof cleanDisplayName === 'function') {
@@ -180,7 +190,7 @@ function renderClubsList() {
                     '<div class="club-item-name">' + team + '</div>' +
                     '<div class="club-item-count">' + players.length + ' مدير</div>' +
                 '</div>' +
-                '<div class="club-item-arrow">›</div>' +
+                '<div class="club-item-arrow">' + xIcon('caret-right', 'bold') + '</div>' +
             '</div>';
     });
 
@@ -214,9 +224,9 @@ async function openClubPlayers(team) {
     }
 
     const editBtns = clubsEditMode
-        ? '<button class="cp-action-btn cp-add-btn" onclick="cpAddPlayer()">➕ إضافة</button>' +
-          '<button class="cp-action-btn cp-exit-edit" onclick="cpToggleEdit()">✓ إنهاء</button>'
-        : '<button class="cp-action-btn cp-edit-btn" onclick="cpToggleEdit()">✏️ تعديل</button>';
+        ? '<button class="cp-action-btn cp-add-btn" onclick="cpAddPlayer()">' + xIcon('plus', 'bold') + ' إضافة</button>' +
+          '<button class="cp-action-btn cp-exit-edit" onclick="cpToggleEdit()">' + xIcon('check', 'bold') + ' إنهاء</button>'
+        : '<button class="cp-action-btn cp-edit-btn" onclick="cpToggleEdit()">' + xIcon('pencil-simple', 'bold') + ' تعديل</button>';
 
     cpModalEl.innerHTML =
         '<div class="cp-modal-box">' +
@@ -227,7 +237,7 @@ async function openClubPlayers(team) {
                     '<div class="cp-header-sub">Loading...</div>' +
                 '</div>' +
                 '<div class="cp-header-actions">' + editBtns + '</div>' +
-                '<button class="cp-close" onclick="closeClubPlayers()">✕</button>' +
+                '<button class="cp-close" onclick="closeClubPlayers()">' + xIcon('x', 'bold') + '</button>' +
             '</div>' +
             '<div class="cp-loading">' +
                 '<div class="spinner"></div>' +
@@ -319,7 +329,7 @@ function renderClubPlayersModal(team, logoHtml, players) {
     if (players.length === 0) {
         playersHtml =
             '<div class="cp-empty">' +
-                '<span class="cp-empty-icon">👥</span>' +
+                '<span class="cp-empty-icon">' + xIcon('users', 'duotone') + '</span>' +
                 'لا يوجد مديرون في هذا المنتخب' +
             '</div>';
     } else {
@@ -338,7 +348,7 @@ function renderClubPlayersModal(team, logoHtml, players) {
 
             const delBtn = clubsEditMode
                 ? '<button class="cp-del-btn" onclick="event.stopPropagation(); cpDeletePlayer(\'' +
-                    escapeHtml(team).replace(/'/g, "\\'") + '\',' + idx + ')">🗑️</button>'
+                    escapeHtml(team).replace(/'/g, "\\'") + '\',' + idx + ')">' + xIcon('trash', 'bold') + '</button>'
                 : '';
 
             playersHtml +=
@@ -358,9 +368,9 @@ function renderClubPlayersModal(team, logoHtml, players) {
     }
 
     const editBtns = clubsEditMode
-        ? '<button class="cp-action-btn cp-add-btn" onclick="cpAddPlayer()">➕ إضافة</button>' +
-          '<button class="cp-action-btn cp-exit-edit" onclick="cpToggleEdit()">✓ إنهاء</button>'
-        : '<button class="cp-action-btn cp-edit-btn" onclick="cpToggleEdit()">✏️ تعديل</button>';
+        ? '<button class="cp-action-btn cp-add-btn" onclick="cpAddPlayer()">' + xIcon('plus', 'bold') + ' إضافة</button>' +
+          '<button class="cp-action-btn cp-exit-edit" onclick="cpToggleEdit()">' + xIcon('check', 'bold') + ' إنهاء</button>'
+        : '<button class="cp-action-btn cp-edit-btn" onclick="cpToggleEdit()">' + xIcon('pencil-simple', 'bold') + ' تعديل</button>';
 
     const listHeaderCols = clubsEditMode ? '34px 30px 1fr 60px 40px' : '34px 30px 1fr 60px';
 
@@ -375,7 +385,7 @@ function renderClubPlayersModal(team, logoHtml, players) {
                     '</div>' +
                 '</div>' +
                 '<div class="cp-header-actions">' + editBtns + '</div>' +
-                '<button class="cp-close" onclick="closeClubPlayers()">✕</button>' +
+                '<button class="cp-close" onclick="closeClubPlayers()">' + xIcon('x', 'bold') + '</button>' +
             '</div>' +
             (players.length > 0 ?
                 '<div class="cp-list-header" style="grid-template-columns:' + listHeaderCols + ';">' +
