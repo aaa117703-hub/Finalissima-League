@@ -1,6 +1,6 @@
 /* =========================================================
-   stats.js — FINALISSIMA LEAGUE CHAT (v2)
-   يقرأ من manager_history
+   stats.js — FINALISSIMA LEAGUE CHAT (v3)
+   مع تشكيلة الشهر
 ========================================================= */
 
 let statsAllManagers = [];
@@ -8,6 +8,12 @@ let statsSortedByTotal = [];
 let statsRankMap = {};
 let statsLoaded = false;
 let statsComputed = null;
+
+/* ⭐ Month state */
+let currentMonthView = 'squad';
+let currentMonthData = [];
+let currentMonthSelected = [];
+let currentMonthNum = 0;
 
 function statsDisplayName(name) {
     if (typeof cleanDisplayName === 'function') {
@@ -137,14 +143,6 @@ function renderStatsOverview(stats) {
     setVal('kpiHigh', stats.highestEvent);
     setVal('kpiHighestTotal', stats.highestTotal);
 
-    const topEventList = document.getElementById('statsTopEvent');
-    if (topEventList) {
-        topEventList.innerHTML = '';
-        stats.topEvent.forEach(function(m, i) {
-            topEventList.innerHTML += createStatsRow(i + 1, m, m.event_total || 0, 'GW');
-        });
-    }
-
     const topTotalList = document.getElementById('statsTopTotal');
     if (topTotalList) {
         topTotalList.innerHTML = '';
@@ -162,16 +160,6 @@ function renderStatsRecords(stats) {
 
     const cards = [];
 
-    if (stats.topEvent[0]) {
-        const m = stats.topEvent[0];
-        cards.push({
-            label: 'Highest GW',
-            value: stats.highestEvent,
-            name: statsDisplayName(m.player_name || m.entry_name),
-            color: 'gold'
-        });
-    }
-
     if (stats.topTotal[0]) {
         const m = stats.topTotal[0];
         cards.push({
@@ -179,15 +167,6 @@ function renderStatsRecords(stats) {
             value: stats.highestTotal,
             name: statsDisplayName(m.player_name || m.entry_name),
             color: 'gold'
-        });
-    }
-
-    if (stats.lowestEvent) {
-        cards.push({
-            label: 'Lowest GW',
-            value: stats.lowestEvent,
-            name: '—',
-            color: 'red'
         });
     }
 
@@ -319,11 +298,6 @@ function renderManagerProfile(manager) {
     const topManager = statsSortedByTotal[0];
     const diff = topManager ? (topManager.total || 0) - (manager.total || 0) : 0;
 
-    const nextManager = safeRank > 1 ? statsSortedByTotal[safeRank - 2] : null;
-    const prevManager = (safeRank > 0 && safeRank < totalManagers) ? statsSortedByTotal[safeRank] : null;
-    const toNext = nextManager ? (nextManager.total || 0) - (manager.total || 0) : 0;
-    const toPrev = prevManager ? (manager.total || 0) - (prevManager.total || 0) : 0;
-
     container.innerHTML =
         '<div class="stats-profile-card">' +
             '<button class="stats-profile-close" onclick="document.getElementById(\'statsProfile\').style.display=\'none\'">X</button>' +
@@ -340,8 +314,6 @@ function renderManagerProfile(manager) {
             '<div class="stats-profile-details">' +
                 '<div class="stats-detail-row"><span class="stats-detail-label">Percentile</span><span class="stats-detail-value">' + percentile + '%</span></div>' +
                 '<div class="stats-detail-row"><span class="stats-detail-label">To Leader</span><span class="stats-detail-value' + (diff === 0 ? ' stats-green' : '') + '">' + (diff === 0 ? 'Leader' : '-' + diff) + '</span></div>' +
-                (toNext > 0 ? '<div class="stats-detail-row"><span class="stats-detail-label">Behind Above</span><span class="stats-detail-value stats-yellow">-' + toNext + '</span></div>' : '') +
-                (toPrev > 0 ? '<div class="stats-detail-row"><span class="stats-detail-label">Ahead Below</span><span class="stats-detail-value stats-green">+' + toPrev + '</span></div>' : '') +
             '</div>' +
         '</div>';
 
@@ -393,7 +365,261 @@ async function loadStats() {
 }
 
 /* =========================================================
-   ⭐ switchStatsTab — محدّث (مع Compare)
+   ⭐ MONTH (تشكيلة الشهر)
+========================================================= */
+
+function switchMonthView(view) {
+    currentMonthView = view;
+
+    const squadBtn = document.getElementById('monthSquadBtn');
+    const listBtn = document.getElementById('monthListBtn');
+
+    if (squadBtn) squadBtn.classList.toggle('active', view === 'squad');
+    if (listBtn) listBtn.classList.toggle('active', view === 'list');
+
+    const pitchWrapper = document.getElementById('monthPitchWrapper');
+    const listWrapper = document.getElementById('monthListWrapper');
+
+    if (view === 'list') {
+        if (pitchWrapper) pitchWrapper.style.display = 'none';
+        if (listWrapper) listWrapper.style.display = 'block';
+    } else {
+        if (pitchWrapper) pitchWrapper.style.display = 'flex';
+        if (listWrapper) listWrapper.style.display = 'none';
+        renderMonthCards();
+    }
+}
+
+async function getMonthTop20(monthNum) {
+    if (typeof getManagersForMonth !== 'function') {
+        console.warn('[Month] getManagersForMonth not available');
+        return [];
+    }
+
+    const managers = await getManagersForMonth(monthNum);
+
+    if (!managers || managers.length === 0) return [];
+
+    const filtered = managers.filter(function(m) {
+        if (typeof findPlayerTeam !== 'function') return true;
+        const rawName = m.player_name || m.entry_name || '';
+        const teamName = findPlayerTeam(rawName) || '';
+        return teamName !== '';
+    });
+
+    const sorted = filtered.sort(function(a, b) {
+        return (b.event_total || 0) - (a.event_total || 0);
+    });
+
+    return sorted.slice(0, 20);
+}
+
+function renderMonthCards() {
+    const pitch = document.getElementById('monthPlayers');
+    if (!pitch) return;
+
+    const selected = currentMonthData.filter(function(p) {
+        return currentMonthSelected.indexOf(p.entry) !== -1;
+    });
+
+    const sorted = [...selected].sort(function(a, b) {
+        return (b.event_total || 0) - (a.event_total || 0);
+    });
+
+    const fwd = sorted.slice(0, 3);
+    const mid = sorted.slice(3, 6);
+    const def = sorted.slice(6, 10);
+    const gk  = sorted.slice(10, 11);
+
+    let html = '';
+
+    html += '<div class="totw-row totw-row-gk">';
+    html += gk.map(createMonthCard).join('');
+    html += '</div>';
+
+    html += '<div class="totw-row totw-row-def">';
+    html += def.map(createMonthCard).join('');
+    html += '</div>';
+
+    html += '<div class="totw-row totw-row-mid">';
+    html += mid.map(createMonthCard).join('');
+    html += '</div>';
+
+    html += '<div class="totw-row totw-row-fwd">';
+    html += fwd.map(createMonthCard).join('');
+    html += '</div>';
+
+    pitch.innerHTML = html;
+}
+
+function createMonthCard(player) {
+    if (!player) return '';
+
+    const rawName = player.player_name || player.entry_name || 'Unknown';
+    const name = shortenPlayerName(rawName);
+    const points = player.event_total || 0;
+
+    let teamName = '';
+    if (typeof findPlayerTeam === 'function') {
+        teamName = findPlayerTeam(rawName) || '';
+    }
+
+    let shirtHtml = '';
+
+    if (teamName && typeof TEAMS_SHIRTS !== 'undefined' && TEAMS_SHIRTS[teamName]) {
+        shirtHtml =
+            '<div class="tc-shirt">' +
+                '<img src="./' + TEAMS_SHIRTS[teamName].file + '" alt="" onerror="this.style.display=\'none\'">' +
+            '</div>';
+    } else if (teamName && typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[teamName]) {
+        shirtHtml =
+            '<div class="tc-shirt tc-shirt-fallback">' +
+                '<img src="./' + TEAMS_LOGOS[teamName] + '" alt="" onerror="this.style.display=\'none\'">' +
+            '</div>';
+    } else {
+        shirtHtml = '<div class="tc-shirt tc-shirt-empty"></div>';
+    }
+
+    return '<div class="totw-card">' +
+        shirtHtml +
+        '<div class="tc-name">' + name + '</div>' +
+        '<div class="tc-points">' + points + '</div>' +
+    '</div>';
+}
+
+function renderMonthList(players) {
+    const listWrapper = document.getElementById('monthListWrapper');
+    if (!listWrapper) return;
+
+    let html = '';
+
+    html += '<div class="totw-list-header">';
+    html += '<div class="totw-list-h-check">✓</div>';
+    html += '<div class="totw-list-h-rank">#</div>';
+    html += '<div class="totw-list-h-logo"></div>';
+    html += '<div class="totw-list-h-team">Team & Manager</div>';
+    html += '<div class="totw-list-h-gw">Month</div>';
+    html += '<div class="totw-list-h-total">Total</div>';
+    html += '</div>';
+
+    players.forEach(function(player, index) {
+        const entryId = player.entry;
+        const rawName = player.player_name || player.entry_name || 'Unknown';
+        const displayName = shortenPlayerName(rawName);
+        const points = player.event_total || 0;
+        const total = player.total || 0;
+        const isSelected = currentMonthSelected.indexOf(entryId) !== -1;
+
+        let teamName = '';
+        if (typeof findPlayerTeam === 'function') {
+            teamName = findPlayerTeam(rawName) || '';
+        }
+
+        let logoHtml = '';
+        if (teamName && typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[teamName]) {
+            logoHtml = '<div class="totw-list-logo">' +
+                '<img src="./' + TEAMS_LOGOS[teamName] + '" onerror="this.style.display=\'none\'">' +
+            '</div>';
+        } else {
+            logoHtml = '<div class="totw-list-logo totw-list-logo-empty">★</div>';
+        }
+
+        html += '<div class="totw-list-item' + (isSelected ? ' selected' : '') + '">';
+        html += '<div class="totw-list-check' + (isSelected ? ' checked' : '') + '">' + (isSelected ? '✓' : '') + '</div>';
+        html += '<div class="totw-list-rank">' + (index + 1) + '</div>';
+        html += logoHtml;
+        html += '<div class="totw-list-names">';
+        html += '<div class="totw-list-entry">' + displayName + '</div>';
+        html += '<div class="totw-list-player">' + rawName + '</div>';
+        html += '</div>';
+        html += '<div class="totw-list-gw">' + points + '</div>';
+        html += '<div class="totw-list-total">' + total + '</div>';
+        html += '</div>';
+    });
+
+    listWrapper.innerHTML = html;
+}
+
+async function loadMonthlyTOTW() {
+    const loadingBox = document.getElementById('monthLoadingBox');
+    const pitchWrapper = document.getElementById('monthPitchWrapper');
+    const listWrapper = document.getElementById('monthListWrapper');
+    const errorBox = document.getElementById('monthErrorBox');
+
+    if (!loadingBox) return;
+
+    loadingBox.style.display = 'block';
+    if (pitchWrapper) pitchWrapper.style.display = 'none';
+    if (listWrapper) listWrapper.style.display = 'none';
+    if (errorBox) errorBox.style.display = 'none';
+
+    try {
+        /* الشهر = من الجولة الحالية */
+        const monthNum = (typeof getMonthFromRound === 'function')
+            ? getMonthFromRound(currentRound || 1)
+            : 1;
+
+        currentMonthNum = monthNum;
+
+        const players = await getMonthTop20(monthNum);
+
+        if (!players || players.length === 0) {
+            loadingBox.style.display = 'none';
+            if (errorBox) {
+                errorBox.style.display = 'block';
+                errorBox.innerHTML =
+                    '<div style="text-align:center;padding:40px 20px;">' +
+                        '<div style="font-size:48px;margin-bottom:16px;">🏆</div>' +
+                        '<div style="font-size:18px;font-weight:900;color:#8B1A2F;margin-bottom:8px;">تشكيلة الشهر قيد التطوير</div>' +
+                        '<div style="font-size:13px;color:#999;font-weight:700;">تفتح نهاية الشهر الحالي</div>' +
+                    '</div>';
+            }
+            return;
+        }
+
+        const selected = players.slice(0, 11).map(function(p) {
+            return p.entry;
+        });
+
+        currentMonthData = players;
+        currentMonthSelected = selected;
+
+        const monthName = (typeof getMonthName === 'function')
+            ? getMonthName(monthNum)
+            : ('الشهر ' + monthNum);
+
+        const rounds = (typeof getRoundsForMonth === 'function')
+            ? getRoundsForMonth(monthNum)
+            : { start: 1, end: 5 };
+
+        const gwLabel = document.getElementById('monthLabel');
+        if (gwLabel) {
+            gwLabel.textContent = monthName;
+        }
+
+        renderMonthCards();
+        renderMonthList(players);
+
+        loadingBox.style.display = 'none';
+
+        if (currentMonthView === 'list') {
+            if (listWrapper) listWrapper.style.display = 'block';
+        } else {
+            if (pitchWrapper) pitchWrapper.style.display = 'flex';
+        }
+
+    } catch (e) {
+        console.error('Monthly TOTW Error:', e);
+        loadingBox.style.display = 'none';
+        if (errorBox) {
+            errorBox.style.display = 'block';
+            errorBox.textContent = '⚠️ Error: ' + e.message;
+        }
+    }
+}
+
+/* =========================================================
+   switchStatsTab — محدّث
 ========================================================= */
 
 function switchStatsTab(tabName) {
@@ -412,9 +638,13 @@ function switchStatsTab(tabName) {
         initCharts();
     }
 
-    /* ⭐ جديد: Compare (مقارنة المديرين) */
     if (tabName === 'compare' && typeof h2hInit === 'function') {
         h2hInit();
+    }
+
+    /* ⭐ Month */
+    if (tabName === 'month') {
+        loadMonthlyTOTW();
     }
 
     setTimeout(function() {
@@ -460,3 +690,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 150);
     });
 });
+
+/* ===== Window ===== */
+window.switchMonthView = switchMonthView;
+window.loadMonthlyTOTW = loadMonthlyTOTW;
