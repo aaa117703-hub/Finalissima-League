@@ -532,7 +532,7 @@ img,
 <link rel="stylesheet" href="fpl-database.css?v=2">
 <link rel="stylesheet" href="manager-squad.css?v=2">
 <link rel="stylesheet" href="manager-hub.css?v=2">
-<link rel="stylesheet" href="theme.css?v=11">
+<link rel="stylesheet" href="theme.css?v=12">
 
 </head>
 
@@ -673,15 +673,6 @@ img,
 
     <div id="totwTab" class="tab-content">
 
-        <div class="totw-mode-tabs">
-            <button id="totwWeekBtn" class="totw-mode-btn active" onclick="switchTOTWMode('week')">
-                تشكيلة الأسبوع
-            </button>
-            <button id="totwMonthBtn" class="totw-mode-btn" onclick="switchTOTWMode('month')">
-                تشكيلة الشهر
-            </button>
-        </div>
-
         <div class="totw-tabs">
             <button id="totwSquadBtn" class="totw-tab-btn active" onclick="switchTOTWView('squad')">Squad</button>
             <button id="totwListBtn" class="totw-tab-btn" onclick="switchTOTWView('list')">List</button>
@@ -712,6 +703,7 @@ img,
 
         <div class="stats-tabs">
             <button class="stats-tab-btn active" data-tab="overview" onclick="switchStatsTab('overview')">Overview</button>
+            <button class="stats-tab-btn" data-tab="month" onclick="switchStatsTab('month')">Month</button>
             <button class="stats-tab-btn" data-tab="charts" onclick="switchStatsTab('charts')">Charts</button>
             <button class="stats-tab-btn" data-tab="clubs" onclick="switchStatsTab('clubs')">Nations</button>
             <button class="stats-tab-btn" data-tab="compare" onclick="switchStatsTab('compare')">Compare</button>
@@ -747,15 +739,36 @@ img,
                     </div>
                 </div>
 
-                <div class="stats-section" style="display:none;">
-                    <div class="stats-section-title">Top 10 — This Gameweek</div>
-                    <div id="statsTopEvent"></div>
-                </div>
-
                 <div class="stats-section">
                     <div class="stats-section-title">Top 10 — Total Points</div>
                     <div id="statsTopTotal"></div>
                 </div>
+            </div>
+
+            <div id="statsView-month" class="stats-view">
+                <div class="month-tabs">
+                    <button id="monthSquadBtn" class="month-tab-btn active" onclick="switchMonthView('squad')">Squad</button>
+                    <button id="monthListBtn" class="month-tab-btn" onclick="switchMonthView('list')">List</button>
+                </div>
+
+                <div id="monthLoadingBox" class="totw-loading">
+                    <div class="spinner"></div>
+                    <div>Loading Team of the Month...</div>
+                </div>
+
+                <div id="monthPitchWrapper" class="totw-pitch-wrapper" style="display:none;">
+                    <div class="totw-pitch" id="monthPitchToSave">
+                        <div class="totw-pitch-title">
+                            <span>Team of the Month</span>
+                            <span class="gw-label" id="monthLabel">--</span>
+                        </div>
+                        <div class="totw-players" id="monthPlayers"></div>
+                    </div>
+                </div>
+
+                <div id="monthListWrapper" class="totw-list-view" style="display:none;"></div>
+
+                <div id="monthErrorBox" class="totw-error" style="display:none;"></div>
             </div>
 
             <div id="statsView-charts" class="stats-view">
@@ -953,12 +966,12 @@ img,
 <script src="standings.js?v=2"></script>
 <script src="download.js?v=3"></script>
 <script src="players-teams.js?v=3"></script>
-<script src="totw.js?v=121"></script>
+<script src="totw.js?v=122"></script>
 <script src="trends.js?v=3"></script>
 <script src="fpl-database.js?v=2"></script>
 <script src="manager-squad.js?v=5"></script>
 <script src="manager-hub.js?v=2"></script>
-<script src="stats.js?v=16"></script>
+<script src="stats.js?v=17"></script>
 <script src="charts.js?v=4"></script>
 <script src="clubs.js?v=11"></script>
 <script src="team-view.js?v=2"></script>
