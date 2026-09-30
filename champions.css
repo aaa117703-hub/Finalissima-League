@@ -1,0 +1,920 @@
+/* =========================================================
+   champions.css — FINALISSIMA LEAGUE CHAT (v=1)
+   🏆 Champions Cup — البطولة الأوروبية
+   الألوان: عنابي + ذهبي (Qatar 2022)
+========================================================= */
+
+/* =========================================================
+   الحاوية الرئيسية
+========================================================= */
+
+.champions-wrapper{
+    width:100%;
+    padding:0 4px 20px;
+    direction:rtl;
+    font-family:inherit;
+}
+
+/* =========================================================
+   البنر + الإطار الأنيميشن الذهبي
+========================================================= */
+
+.champions-banner{
+    position:relative;
+    width:100%;
+    max-width:720px;
+    margin:0 auto 18px;
+    border-radius:20px;
+    overflow:hidden;
+    isolation:isolate;
+    animation:champBannerIn .8s ease;
+}
+
+.champions-banner::before{
+    content:'';
+    position:absolute;
+    inset:-3px;
+    border-radius:22px;
+    padding:3px;
+    background:conic-gradient(
+        from 0deg,
+        #C8A95F 0%,
+        #8B7340 12%,
+        #4A0A15 25%,
+        #8B1A2F 38%,
+        #C8A95F 50%,
+        #E5D4A5 62%,
+        #8B1A2F 75%,
+        #4A0A15 88%,
+        #C8A95F 100%
+    );
+    z-index:-1;
+    animation:champBorderRotate 6s linear infinite;
+    filter:blur(0.5px);
+}
+
+.champions-banner::after{
+    content:'';
+    position:absolute;
+    inset:-3px;
+    border-radius:22px;
+    padding:3px;
+    background:conic-gradient(
+        from 0deg,
+        rgba(200,169,95,0) 0%,
+        rgba(200,169,95,0.8) 25%,
+        rgba(200,169,95,0) 50%,
+        rgba(200,169,95,0.8) 75%,
+        rgba(200,169,95,0) 100%
+    );
+    z-index:-1;
+    animation:champBorderRotate 3s linear infinite reverse;
+    filter:blur(2px);
+}
+
+.champions-banner-inner{
+    position:relative;
+    border-radius:18px;
+    overflow:hidden;
+    background:linear-gradient(135deg, #4A0A15 0%, #2D0A0F 100%);
+    box-shadow:
+        inset 0 0 30px rgba(0,0,0,.5),
+        0 10px 40px rgba(139,26,47,.4);
+}
+
+.champions-banner-img{
+    display:block;
+    width:100%;
+    height:auto;
+    aspect-ratio:1000/333;
+    object-fit:cover;
+    pointer-events:none;
+    user-select:none;
+}
+
+@keyframes champBorderRotate{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+
+@keyframes champBannerIn{
+    from{opacity:0;transform:scale(.94) translateY(12px);}
+    to{opacity:1;transform:scale(1) translateY(0);}
+}
+
+/* =========================================================
+   زر البدء + الحالة
+========================================================= */
+
+.champions-start-area{
+    text-align:center;
+    margin:18px 0 24px;
+    padding:0 12px;
+}
+
+.champions-start-btn{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:16px 42px;
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color:#fff;
+    border:2px solid #C8A95F;
+    border-radius:50px;
+    font-size:15px;
+    font-weight:900;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    cursor:pointer;
+    font-family:inherit;
+    box-shadow:
+        0 6px 24px rgba(139,26,47,.45),
+        inset 0 1px 0 rgba(255,255,255,.15);
+    transition:all .3s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+.champions-start-btn::before{
+    content:'';
+    position:absolute;
+    top:0;left:-100%;
+    width:100%;height:100%;
+    background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(200,169,95,.5) 50%,
+        transparent 100%);
+    animation:champBtnShine 3s ease-in-out infinite;
+}
+
+.champions-start-btn:hover{
+    transform:translateY(-2px);
+    box-shadow:
+        0 10px 30px rgba(139,26,47,.55),
+        inset 0 1px 0 rgba(255,255,255,.2);
+}
+
+.champions-start-btn:active{
+    transform:translateY(0) scale(.98);
+}
+
+.champions-start-btn i{
+    font-size:20px;
+    color:#C8A95F;
+}
+
+@keyframes champBtnShine{
+    0%{left:-100%;}
+    50%, 100%{left:100%;}
+}
+
+.champions-status-text{
+    margin-top:14px;
+    font-size:13px;
+    font-weight:800;
+    color:#8B1A2F;
+    letter-spacing:0.4px;
+}
+
+.champions-status-text strong{
+    color:#C8A95F;
+    font-weight:900;
+}
+
+/* =========================================================
+   القرعة (Draw)
+========================================================= */
+
+.champions-draw-screen{
+    position:fixed;
+    inset:0;
+    z-index:999999;
+    background:radial-gradient(ellipse at center, #2D0A0F 0%, #0a0000 100%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    overflow-y:auto;
+    animation:champDrawFadeIn .5s ease;
+}
+
+@keyframes champDrawFadeIn{
+    from{opacity:0;}
+    to{opacity:1;}
+}
+
+.champions-draw-title{
+    font-size:22px;
+    font-weight:900;
+    color:#C8A95F;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    text-shadow:
+        0 0 20px rgba(200,169,95,.6),
+        0 2px 8px rgba(0,0,0,.8);
+    margin-bottom:18px;
+    text-align:center;
+    animation:champTitleGlow 2.5s ease-in-out infinite;
+}
+
+@keyframes champTitleGlow{
+    0%, 100%{text-shadow:0 0 20px rgba(200,169,95,.6), 0 2px 8px rgba(0,0,0,.8);}
+    50%{text-shadow:0 0 35px rgba(200,169,95,1), 0 0 60px rgba(139,26,47,.6), 0 2px 8px rgba(0,0,0,.8);}
+}
+
+/* Pots */
+.champions-pots-row{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-bottom:24px;
+    width:100%;
+    max-width:900px;
+}
+
+.champions-pot{
+    flex:1 1 0;
+    min-width:110px;
+    max-width:160px;
+    padding:10px 8px;
+    background:linear-gradient(180deg, rgba(200,169,95,.12) 0%, rgba(139,26,47,.12) 100%);
+    border:2px solid rgba(200,169,95,.4);
+    border-radius:14px;
+    text-align:center;
+    transition:all .3s ease;
+}
+
+.champions-pot.active{
+    border-color:#C8A95F;
+    box-shadow:
+        0 0 20px rgba(200,169,95,.6),
+        inset 0 0 15px rgba(200,169,95,.15);
+    animation:champPotPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes champPotPulse{
+    0%, 100%{transform:scale(1);}
+    50%{transform:scale(1.03);}
+}
+
+.champions-pot-label{
+    font-size:11px;
+    font-weight:900;
+    color:#C8A95F;
+    letter-spacing:1.5px;
+    margin-bottom:6px;
+    text-transform:uppercase;
+}
+
+.champions-pot-teams{
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+}
+
+.champions-pot-team{
+    font-size:10px;
+    font-weight:800;
+    color:rgba(255,255,255,.85);
+    padding:3px 4px;
+    border-radius:6px;
+    transition:all .3s ease;
+}
+
+.champions-pot-team.drawn{
+    opacity:.3;
+    text-decoration:line-through;
+}
+
+/* كرة الذهبية */
+.champions-ball-area{
+    position:relative;
+    height:110px;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:14px 0;
+}
+
+.champions-ball{
+    width:90px;
+    height:90px;
+    border-radius:50%;
+    background:radial-gradient(circle at 35% 30%,
+        #E5D4A5 0%,
+        #C8A95F 30%,
+        #8B7340 70%,
+        #4A0A15 100%);
+    box-shadow:
+        0 0 40px rgba(200,169,95,.8),
+        0 0 80px rgba(200,169,95,.4),
+        inset -8px -8px 20px rgba(0,0,0,.4),
+        inset 8px 8px 20px rgba(255,255,255,.3);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    animation:champBallSpin 3s linear infinite;
+    transition:all .5s ease;
+}
+
+.champions-ball i{
+    font-size:36px;
+    color:#4A0A15;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+}
+
+.champions-ball.settled{
+    animation:champBallSettle .6s ease forwards;
+}
+
+@keyframes champBallSpin{
+    0%{transform:rotateY(0deg) rotateZ(0deg);}
+    100%{transform:rotateY(360deg) rotateZ(360deg);}
+}
+
+@keyframes champBallSettle{
+    0%{transform:scale(1.2);opacity:1;}
+    100%{transform:scale(0.6);opacity:0;}
+}
+
+.champions-ball-team{
+    position:absolute;
+    top:50%;left:50%;
+    transform:translate(-50%,-50%);
+    font-size:16px;
+    font-weight:900;
+    color:#fff;
+    text-shadow:0 0 20px rgba(200,169,95,1), 0 2px 8px rgba(0,0,0,.9);
+    white-space:nowrap;
+    letter-spacing:1px;
+    opacity:0;
+    animation:champTeamReveal .8s ease forwards;
+}
+
+@keyframes champTeamReveal{
+    0%{opacity:0;transform:translate(-50%,-50%) scale(.7);}
+    50%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
+    100%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+}
+
+/* المجموعات */
+.champions-groups-row{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    flex-wrap:wrap;
+    width:100%;
+    max-width:900px;
+    margin-top:14px;
+}
+
+.champions-group-box{
+    flex:1 1 0;
+    min-width:140px;
+    max-width:200px;
+    background:linear-gradient(180deg, rgba(139,26,47,.35) 0%, rgba(74,10,21,.55) 100%);
+    border:2px solid rgba(200,169,95,.5);
+    border-radius:16px;
+    padding:12px 10px;
+    text-align:center;
+    transition:all .4s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+.champions-group-box.flash{
+    animation:champGroupFlash .9s ease;
+}
+
+@keyframes champGroupFlash{
+    0%{box-shadow:0 0 0 rgba(200,169,95,0);border-color:rgba(200,169,95,.5);}
+    50%{box-shadow:0 0 40px rgba(200,169,95,1), inset 0 0 30px rgba(200,169,95,.4);border-color:#C8A95F;}
+    100%{box-shadow:0 0 0 rgba(200,169,95,0);border-color:rgba(200,169,95,.5);}
+}
+
+.champions-group-label{
+    font-size:18px;
+    font-weight:900;
+    color:#C8A95F;
+    letter-spacing:3px;
+    margin-bottom:8px;
+    text-shadow:0 0 12px rgba(200,169,95,.6);
+}
+
+.champions-group-teams{
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    min-height:130px;
+}
+
+.champions-group-team{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 8px;
+    background:rgba(0,0,0,.35);
+    border-radius:8px;
+    font-size:11px;
+    font-weight:800;
+    color:#fff;
+    letter-spacing:0.3px;
+    animation:champTeamSlideIn .5s ease;
+    border:1px solid rgba(200,169,95,.15);
+}
+
+.champions-group-team img{
+    width:22px;
+    height:22px;
+    object-fit:contain;
+    flex-shrink:0;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));
+}
+
+.champions-group-team span{
+    flex:1;
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+@keyframes champTeamSlideIn{
+    from{opacity:0;transform:translateX(20px);}
+    to{opacity:1;transform:translateX(0);}
+}
+
+/* زر إغلاق القرعة */
+.champions-draw-close{
+    margin-top:22px;
+    padding:12px 30px;
+    background:linear-gradient(135deg, #C8A95F 0%, #8B7340 100%);
+    color:#4A0A15;
+    border:none;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:1px;
+    cursor:pointer;
+    font-family:inherit;
+    box-shadow:0 6px 20px rgba(200,169,95,.5);
+    transition:all .3s ease;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.champions-draw-close:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(200,169,95,.7);
+}
+
+.champions-draw-close i{
+    font-size:16px;
+}
+
+/* =========================================================
+   جدول المجموعات
+========================================================= */
+
+.champions-groups-section{
+    margin-top:22px;
+}
+
+.champions-section-title{
+    font-size:16px;
+    font-weight:900;
+    color:#8B1A2F;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    margin-bottom:12px;
+    padding-bottom:8px;
+    border-bottom:2px solid #C8A95F;
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.champions-section-title i{
+    font-size:20px;
+    color:#C8A95F;
+}
+
+.champions-groups-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+    gap:14px;
+}
+
+.champions-group-card{
+    background:#fff;
+    border:2px solid #E5D4A5;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 4px 16px rgba(139,26,47,.08);
+}
+
+.champions-group-card-header{
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color:#fff;
+    font-size:14px;
+    font-weight:900;
+    letter-spacing:2px;
+    padding:10px 14px;
+    text-align:center;
+    text-transform:uppercase;
+    border-bottom:2px solid #C8A95F;
+}
+
+.champions-group-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+}
+
+.champions-group-table th{
+    background:#FAF6F0;
+    color:#6B0F1F;
+    font-weight:900;
+    padding:8px 6px;
+    border-bottom:1px solid #E5D4A5;
+    font-size:10px;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+}
+
+.champions-group-table td{
+    padding:7px 6px;
+    text-align:center;
+    font-weight:800;
+    color:#333;
+    border-bottom:1px solid #F3F4F6;
+    font-size:11px;
+}
+
+.champions-group-table tr:last-child td{
+    border-bottom:none;
+}
+
+.champions-group-table tr.qualified{
+    background:linear-gradient(90deg,
+        rgba(200,169,95,.25) 0%,
+        rgba(200,169,95,.08) 50%,
+        #fff 100%);
+}
+
+.champions-group-table tr.eliminated{
+    background:linear-gradient(90deg,
+        rgba(139,26,47,.15) 0%,
+        rgba(139,26,47,.04) 50%,
+        #fff 100%);
+}
+
+.champions-group-table .team-cell-mini{
+    display:flex;
+    align-items:center;
+    gap:5px;
+    text-align:right;
+    padding-right:6px;
+}
+
+.champions-group-table .team-cell-mini img{
+    width:18px;
+    height:18px;
+    object-fit:contain;
+    flex-shrink:0;
+}
+
+.champions-group-table .team-cell-mini span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+/* =========================================================
+   المباريات
+========================================================= */
+
+.champions-round-section{
+    margin-top:22px;
+}
+
+.champions-match-row{
+    display:grid;
+    grid-template-columns:1fr 60px 1fr;
+    gap:8px;
+    align-items:center;
+    padding:10px 12px;
+    background:#fff;
+    border:1.5px solid #E5D4A5;
+    border-radius:12px;
+    margin-bottom:8px;
+    transition:all .2s ease;
+}
+
+.champions-match-row:hover{
+    border-color:#C8A95F;
+    box-shadow:0 4px 14px rgba(200,169,95,.2);
+}
+
+.champions-match-team{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:12px;
+    font-weight:800;
+    color:#333;
+    overflow:hidden;
+}
+
+.champions-match-team.home{
+    justify-content:flex-end;
+    text-align:right;
+}
+
+.champions-match-team.away{
+    justify-content:flex-start;
+    text-align:left;
+}
+
+.champions-match-team img{
+    width:24px;
+    height:24px;
+    object-fit:contain;
+    flex-shrink:0;
+}
+
+.champions-match-team span{
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.champions-match-score{
+    text-align:center;
+    font-size:14px;
+    font-weight:900;
+    color:#8B1A2F;
+    padding:4px 6px;
+    background:#FAF6F0;
+    border-radius:8px;
+    border:1px solid #E5D4A5;
+}
+
+.champions-match-score.pending{
+    color:#9CA3AF;
+    font-size:11px;
+    letter-spacing:0.5px;
+}
+
+/* =========================================================
+   شجرة الإقصائيات
+========================================================= */
+
+.champions-bracket{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    align-items:center;
+    margin-top:22px;
+    overflow-x:auto;
+    padding:16px 8px 24px;
+}
+
+.champions-bracket-round{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    min-width:180px;
+}
+
+.champions-bracket-round-label{
+    font-size:11px;
+    font-weight:900;
+    color:#C8A95F;
+    letter-spacing:2px;
+    text-align:center;
+    text-transform:uppercase;
+    padding:6px;
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    border-radius:8px;
+    border:1px solid #C8A95F;
+    margin-bottom:6px;
+}
+
+.champions-bracket-match{
+    background:#fff;
+    border:1.5px solid #E5D4A5;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 3px 10px rgba(139,26,47,.08);
+}
+
+.champions-bracket-team{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:6px;
+    padding:6px 10px;
+    font-size:11px;
+    font-weight:800;
+    color:#333;
+    border-bottom:1px solid #F3F4F6;
+}
+
+.champions-bracket-team:last-child{
+    border-bottom:none;
+}
+
+.champions-bracket-team.winner{
+    background:linear-gradient(90deg,
+        rgba(200,169,95,.3) 0%,
+        rgba(200,169,95,.05) 100%);
+    color:#4A0A15;
+}
+
+.champions-bracket-team img{
+    width:18px;
+    height:18px;
+    object-fit:contain;
+    flex-shrink:0;
+}
+
+.champions-bracket-team-name{
+    flex:1;
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.champions-bracket-score{
+    font-weight:900;
+    color:#8B1A2F;
+    font-size:12px;
+    min-width:30px;
+    text-align:center;
+}
+
+/* =========================================================
+   Empty / Loading
+========================================================= */
+
+.champions-empty{
+    text-align:center;
+    padding:40px 20px;
+    background:linear-gradient(135deg, #FAF6F0 0%, #F5E6D3 100%);
+    border:2px dashed #C8A95F;
+    border-radius:16px;
+    color:#6B0F1F;
+    font-size:14px;
+    font-weight:800;
+    letter-spacing:0.5px;
+    margin-top:20px;
+    animation:champBannerIn .6s ease;
+}
+
+.champions-empty i{
+    display:block;
+    font-size:52px;
+    color:#C8A95F;
+    margin-bottom:12px;
+    animation:champPotPulse 2s ease-in-out infinite;
+}
+
+/* =========================================================
+   الموبايل
+========================================================= */
+
+@media(max-width:480px){
+
+    .champions-banner{
+        border-radius:16px;
+    }
+
+    .champions-banner::before,
+    .champions-banner::after{
+        border-radius:18px;
+    }
+
+    .champions-banner-inner{
+        border-radius:14px;
+    }
+
+    .champions-start-btn{
+        padding:14px 28px;
+        font-size:13px;
+    }
+
+    .champions-draw-title{
+        font-size:16px;
+        letter-spacing:2px;
+    }
+
+    .champions-pots-row{
+        gap:6px;
+    }
+
+    .champions-pot{
+        min-width:70px;
+        padding:8px 4px;
+    }
+
+    .champions-pot-label{
+        font-size:9px;
+        letter-spacing:1px;
+    }
+
+    .champions-pot-team{
+        font-size:8px;
+        padding:2px;
+    }
+
+    .champions-ball{
+        width:70px;
+        height:70px;
+    }
+
+    .champions-ball i{
+        font-size:28px;
+    }
+
+    .champions-ball-team{
+        font-size:13px;
+    }
+
+    .champions-groups-row{
+        gap:8px;
+    }
+
+    .champions-group-box{
+        min-width:140px;
+        flex:1 1 45%;
+        padding:10px 8px;
+    }
+
+    .champions-group-label{
+        font-size:15px;
+    }
+
+    .champions-group-team{
+        font-size:10px;
+        padding:4px 6px;
+    }
+
+    .champions-group-team img{
+        width:18px;
+        height:18px;
+    }
+
+    .champions-groups-grid{
+        grid-template-columns:1fr;
+    }
+
+    .champions-match-row{
+        grid-template-columns:1fr 50px 1fr;
+        padding:8px;
+    }
+
+    .champions-match-team{
+        font-size:11px;
+    }
+
+    .champions-match-team img{
+        width:20px;
+        height:20px;
+    }
+
+    .champions-bracket{
+        gap:12px;
+    }
+
+    .champions-bracket-round{
+        min-width:150px;
+    }
+
+    .champions-section-title{
+        font-size:14px;
+    }
+}
+
+/* =========================================================
+   منع حفظ الصور
+========================================================= */
+
+.champions-banner-img,
+.champions-group-team img,
+.champions-match-team img,
+.champions-bracket-team img,
+.champions-group-table .team-cell-mini img{
+    -webkit-user-select:none;
+    -webkit-user-drag:none;
+    -webkit-touch-callout:none;
+    user-select:none;
+    pointer-events:none;
+}
