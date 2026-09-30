@@ -1,10 +1,20 @@
 /* =========================================================
-   charts.js — FINALISSIMA LEAGUE CHAT (v3)
-   نسخة فخمة — 4 رسوم جديدة
+   charts.js — FINALISSIMA LEAGUE CHAT (v4 / v=5)
+   Phosphor Icons + 4 رسوم فخمة
 ========================================================= */
 
 (function(){
 'use strict';
+
+/* ---------- Phosphor Icons Helper ---------- */
+function xIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 let chartsLoaded = false;
 let chartsData = null;
@@ -338,7 +348,7 @@ function createRisersFallersChart(canvasId, data) {
                     callbacks: {
                         label: function(ctx) {
                             const v = ctx.parsed.x;
-                            return v > 0 ? ' ▲ ' + v + ' ranks' : ' ▼ ' + Math.abs(v) + ' ranks';
+                            return v > 0 ? ' ' + v + ' ranks' : ' ' + Math.abs(v) + ' ranks';
                         }
                     }
                 }
@@ -463,25 +473,25 @@ async function renderChartsPage() {
         }
 
         let html = '';
-        html += '<div class="charts-intro"><strong>📊 League Analytics</strong><br>نظرة شاملة على أداء المديرين — الرتب، النقاط، والتوزيع</div>';
+        html += '<div class="charts-intro">' + xIcon('chart-bar', 'duotone') + ' <strong>League Analytics</strong><br>نظرة شاملة على أداء المديرين — الرتب، النقاط، والتوزيع</div>';
 
         /* 1) Rank Progression */
         if (rankData) {
             html += '<div class="chart-card">' +
-                '<div class="chart-title"><span class="chart-icon">📈</span><span>Rank Progression</span><span class="chart-sub">TOP 10</span></div>' +
+                '<div class="chart-title"><span class="chart-icon">' + xIcon('chart-line-up', 'bold') + '</span><span>Rank Progression</span><span class="chart-sub">TOP 10</span></div>' +
                 '<div class="chart-wrap chart-tall"><canvas id="chartRankProg"></canvas></div>' +
             '</div>';
         } else {
             html += '<div class="chart-card">' +
-                '<div class="chart-title"><span class="chart-icon">📈</span><span>Rank Progression</span></div>' +
-                '<div class="chart-empty"><span class="chart-empty-icon">📊</span>Not enough rounds saved yet.</div>' +
+                '<div class="chart-title"><span class="chart-icon">' + xIcon('chart-line-up', 'bold') + '</span><span>Rank Progression</span></div>' +
+                '<div class="chart-empty"><span class="chart-empty-icon">' + xIcon('chart-bar', 'duotone') + '</span>Not enough rounds saved yet.</div>' +
             '</div>';
         }
 
         /* 2) Top 10 Average */
         if (top10Avg) {
             html += '<div class="chart-card">' +
-                '<div class="chart-title"><span class="chart-icon">🎯</span><span>Top 10 — Best Average</span><span class="chart-sub">PER GW</span></div>' +
+                '<div class="chart-title"><span class="chart-icon">' + xIcon('crosshair', 'bold') + '</span><span>Top 10 — Best Average</span><span class="chart-sub">PER GW</span></div>' +
                 '<div class="chart-wrap chart-tall"><canvas id="chartTop10Avg"></canvas></div>' +
             '</div>';
         }
@@ -489,7 +499,7 @@ async function renderChartsPage() {
         /* 3) Risers & Fallers */
         if (risersData && (risersData.risers.length > 0 || risersData.fallers.length > 0)) {
             html += '<div class="chart-card">' +
-                '<div class="chart-title"><span class="chart-icon">⚡</span><span>Risers & Fallers</span><span class="chart-sub">LAST GW</span></div>' +
+                '<div class="chart-title"><span class="chart-icon">' + xIcon('lightning', 'bold') + '</span><span>Risers & Fallers</span><span class="chart-sub">LAST GW</span></div>' +
                 '<div class="chart-wrap"><canvas id="chartRisers"></canvas></div>' +
             '</div>';
         }
@@ -498,7 +508,7 @@ async function renderChartsPage() {
         if (top5Data) {
             html += '<div class="chart-card">' +
                 '<div class="chart-title">' +
-                    '<span class="chart-icon">🏆</span>' +
+                    '<span class="chart-icon">' + xIcon('trophy', 'bold') + '</span>' +
                     '<span>Top 5 — By GW</span>' +
                     '<select class="chart-select" onchange="changeTop5GW(this.value)">' + gwOptions + '</select>' +
                 '</div>' +
