@@ -1,6 +1,6 @@
 /* =========================================================
-   totw.js — FINALISSIMA LEAGUE CHAT (v4)
-   تشكيلة الأسبوع فقط (Month انتقل لـ stats.js)
+   totw.js — FINALISSIMA LEAGUE CHAT (v5 / v=123)
+   Phosphor Icons + تشكيلة الأسبوع فقط
 ========================================================= */
 
 const TOTW_TOP_COUNT = 20;
@@ -11,6 +11,16 @@ let currentTOTWData = [];
 let currentTOTWSelected = [];
 let currentTOTWRound = 0;
 let currentTOTWSaved = false;
+
+/* ---------- Phosphor Icons Helper ---------- */
+function xIcon(name, variant) {
+    variant = variant || 'regular';
+    const variantClass = variant === 'fill' ? 'ph-fill' :
+                         variant === 'bold' ? 'ph-bold' :
+                         variant === 'duotone' ? 'ph-duotone' :
+                         'ph';
+    return '<i class="' + variantClass + ' ph-' + name + '"></i>';
+}
 
 /* =========================================================
    Helpers
@@ -186,7 +196,7 @@ function renderTOTWList(players) {
     html += '</div>';
 
     html += '<div class="totw-list-header">';
-    html += '<div class="totw-list-h-check">✓</div>';
+    html += '<div class="totw-list-h-check">' + xIcon('check', 'bold') + '</div>';
     html += '<div class="totw-list-h-rank">#</div>';
     html += '<div class="totw-list-h-logo"></div>';
     html += '<div class="totw-list-h-team">Team & Manager</div>';
@@ -213,11 +223,11 @@ function renderTOTWList(players) {
                 '<img src="./' + TEAMS_LOGOS[teamName] + '" onerror="this.style.display=\'none\'">' +
             '</div>';
         } else {
-            logoHtml = '<div class="totw-list-logo totw-list-logo-empty">★</div>';
+            logoHtml = '<div class="totw-list-logo totw-list-logo-empty">' + xIcon('star', 'fill') + '</div>';
         }
 
         html += '<div class="totw-list-item' + (isSelected ? ' selected' : '') + '" data-entry="' + entryId + '" onclick="toggleTOTWSelection(' + entryId + ')">';
-        html += '<div class="totw-list-check' + (isSelected ? ' checked' : '') + '">' + (isSelected ? '✓' : '') + '</div>';
+        html += '<div class="totw-list-check' + (isSelected ? ' checked' : '') + '">' + (isSelected ? xIcon('check', 'bold') : '') + '</div>';
         html += '<div class="totw-list-rank">' + (index + 1) + '</div>';
         html += logoHtml;
         html += '<div class="totw-list-names">';
@@ -324,7 +334,7 @@ async function loadTOTW() {
             if (errorBox) {
                 errorBox.style.display = 'block';
                 errorBox.innerHTML =
-                    '⚠️ <strong>بيانات الجولة ' + round + ' غير متوفرة</strong><br>' +
+                    xIcon('warning-circle', 'duotone') + ' <strong>بيانات الجولة ' + round + ' غير متوفرة</strong><br>' +
                     '<span style="font-size:12px;color:#999;">لم يتم حفظ بيانات هذه الجولة</span>';
             }
             return;
@@ -359,7 +369,7 @@ async function loadTOTW() {
         loadingBox.style.display = 'none';
         if (errorBox) {
             errorBox.style.display = 'block';
-            errorBox.textContent = '⚠️ Error: ' + e.message;
+            errorBox.innerHTML = xIcon('warning-circle', 'duotone') + ' Error: ' + e.message;
         }
     }
 }
