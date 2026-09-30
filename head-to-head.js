@@ -1,10 +1,11 @@
 /* =========================================================
-   head-to-head.js — مقارنة المديرين (v2)
-   مع شعارات المنتخبات
+   head-to-head.js — مقارنة المديرين (v4)
+   + Phosphor Icons
+   + تحميل محسّن
 ========================================================= */
 
 window.h2hState = {
-    slotA: null,   // { entry, player_name, ... }
+    slotA: null,
     slotB: null,
     allManagers: [],
     loaded: false
@@ -14,13 +15,11 @@ window.h2hState = {
    Helpers
 ========================================================= */
 
-/* ⭐ نجيب شعار المنتخب من اسم المدير */
 function h2hGetTeamLogo(manager) {
     if (!manager) return null;
 
     let teamName = manager._team || manager.nationName || '';
     
-    /* إذا ما عرفنا المنتخب — نستخدم findPlayerTeam */
     if (!teamName && typeof findPlayerTeam === 'function') {
         const rawName = manager.player_name || manager.entry_name || '';
         teamName = findPlayerTeam(rawName) || '';
@@ -38,17 +37,18 @@ function h2hGetTeamLogo(manager) {
     };
 }
 
-/* ⭐ HTML للشعار */
 function h2hLogoHtml(manager, sizeClass) {
     sizeClass = sizeClass || '';
     const logo = h2hGetTeamLogo(manager);
 
     if (!logo) {
-        return '<div class="h2h-logo ' + sizeClass + ' h2h-logo-empty">👤</div>';
+        return '<div class="h2h-logo ' + sizeClass + ' h2h-logo-empty">' +
+            '<i class="ph ph-user"></i>' +
+        '</div>';
     }
 
     return '<div class="h2h-logo ' + sizeClass + '">' +
-        '<img src="./' + logo.file + '" alt="" onerror="this.style.display=\'none\'">' +
+        '<img src="./' + logo.file + '" alt="" crossorigin="anonymous" onerror="this.style.display=\'none\'">' +
     '</div>';
 }
 
@@ -64,7 +64,6 @@ async function h2hLoadManagers() {
             ? await getManagersWithHistory()
             : [];
 
-        /* ترتيب حسب الاسم */
         managers.sort(function(a, b) {
             return (a.player_name || '').localeCompare(b.player_name || '');
         });
@@ -109,14 +108,16 @@ function h2hRender() {
 
     let html = '';
 
-    /* Intro */
+    /* ⭐ Intro */
     html += '<div class="h2h-intro">' +
-        '<div class="h2h-intro-icon">⚔️</div>' +
+        '<div class="h2h-intro-icon">' +
+            '<i class="ph-fill ph-trophy"></i>' +
+        '</div>' +
         '<div class="h2h-intro-title">مقارنة المديرين</div>' +
         '<div class="h2h-intro-sub">اختر مديرين لتقارن بينهما</div>' +
     '</div>';
 
-    /* Slots */
+    /* ⭐ Slots */
     html += '<div class="h2h-slots">';
 
     /* Slot A */
@@ -126,14 +127,18 @@ function h2hRender() {
         html += h2hLogoHtml(state.slotA, 'h2h-logo-slot');
         html += '<div class="h2h-slot-name">' + h2hShorten(state.slotA.player_name) + '</div>';
         html += '<div class="h2h-slot-nation">' + (state.slotA._team || state.slotA.nationName || state.slotA.nation || '') + '</div>';
-        html += '<div class="h2h-slot-clear" onclick="event.stopPropagation(); h2hClearSlot(\'A\')">✕</div>';
+        html += '<div class="h2h-slot-clear" onclick="event.stopPropagation(); h2hClearSlot(\'A\')">' +
+            '<i class="ph-bold ph-x"></i>' +
+        '</div>';
     } else {
-        html += '<div class="h2h-slot-plus">+</div>';
+        html += '<div class="h2h-slot-plus">' +
+            '<i class="ph-bold ph-plus"></i>' +
+        '</div>';
         html += '<div class="h2h-slot-empty">اختر المدير الأول</div>';
     }
     html += '</div>';
 
-    /* VS */
+    /* ⭐ VS */
     html += '<div class="h2h-vs">VS</div>';
 
     /* Slot B */
@@ -143,9 +148,13 @@ function h2hRender() {
         html += h2hLogoHtml(state.slotB, 'h2h-logo-slot');
         html += '<div class="h2h-slot-name">' + h2hShorten(state.slotB.player_name) + '</div>';
         html += '<div class="h2h-slot-nation">' + (state.slotB._team || state.slotB.nationName || state.slotB.nation || '') + '</div>';
-        html += '<div class="h2h-slot-clear" onclick="event.stopPropagation(); h2hClearSlot(\'B\')">✕</div>';
+        html += '<div class="h2h-slot-clear" onclick="event.stopPropagation(); h2hClearSlot(\'B\')">' +
+            '<i class="ph-bold ph-x"></i>' +
+        '</div>';
     } else {
-        html += '<div class="h2h-slot-plus">+</div>';
+        html += '<div class="h2h-slot-plus">' +
+            '<i class="ph-bold ph-plus"></i>' +
+        '</div>';
         html += '<div class="h2h-slot-empty">اختر المدير الثاني</div>';
     }
     html += '</div>';
@@ -159,7 +168,8 @@ function h2hRender() {
         '</div>';
     } else {
         html += '<div class="h2h-hint">' +
-            '👆 اختر مديرين لعرض المقارنة الكاملة' +
+            '<i class="ph ph-hand-pointing"></i> ' +
+            'اختر مديرين لعرض المقارنة الكاملة' +
         '</div>';
     }
 
@@ -180,7 +190,7 @@ function h2hShorten(name) {
 }
 
 /* =========================================================
-   اختيار المدير (Modal)
+   Picker
 ========================================================= */
 
 function h2hOpenPicker(slot) {
@@ -198,10 +208,15 @@ function h2hOpenPicker(slot) {
         '<div class="h2h-picker-box">' +
             '<div class="h2h-picker-header">' +
                 '<div class="h2h-picker-title">اختر المدير</div>' +
-                '<button class="h2h-picker-close" onclick="h2hClosePicker()">✕</button>' +
+                '<button class="h2h-picker-close" onclick="h2hClosePicker()">' +
+                    '<i class="ph-bold ph-x"></i>' +
+                '</button>' +
             '</div>' +
             '<div class="h2h-picker-search">' +
-                '<input type="text" id="h2hSearchInput" placeholder="🔍 ابحث..." oninput="h2hFilterPicker(this.value)" autocomplete="off">' +
+                '<div class="h2h-picker-search-wrap">' +
+                    '<i class="ph ph-magnifying-glass h2h-search-icon"></i>' +
+                    '<input type="text" id="h2hSearchInput" placeholder="ابحث..." oninput="h2hFilterPicker(this.value)" autocomplete="off">' +
+                '</div>' +
             '</div>' +
             '<div class="h2h-picker-list" id="h2hPickerList"></div>' +
         '</div>';
@@ -245,7 +260,9 @@ function h2hRenderPickerList(managers) {
         html += '<div class="h2h-picker-nation">' + nation + '</div>';
         html += '</div>';
         if (isUsed) {
-            html += '<div class="h2h-picker-used-badge">مختار</div>';
+            html += '<div class="h2h-picker-used-badge">' +
+                '<i class="ph-bold ph-check"></i> مختار' +
+            '</div>';
         }
         html += '</div>';
     });
@@ -313,14 +330,20 @@ async function h2hLoadResults() {
         const data = await getComparisonData(state.slotA.entry, state.slotB.entry);
 
         if (!data) {
-            container.innerHTML = '<div class="h2h-error">⚠️ تعذر تحميل البيانات</div>';
+            container.innerHTML = '<div class="h2h-error">' +
+                '<i class="ph-bold ph-warning-circle"></i> ' +
+                'تعذر تحميل البيانات' +
+            '</div>';
             return;
         }
 
         h2hRenderResults(data);
     } catch (e) {
         console.error('[H2H] load results error:', e);
-        container.innerHTML = '<div class="h2h-error">⚠️ خطأ: ' + e.message + '</div>';
+        container.innerHTML = '<div class="h2h-error">' +
+            '<i class="ph-bold ph-warning-circle"></i> ' +
+            'خطأ: ' + e.message +
+        '</div>';
     }
 }
 
@@ -331,29 +354,27 @@ function h2hRenderResults(data) {
     const a = data.a;
     const b = data.b;
 
-    /* ⭐ نجيب معلومات المديرين من state */
     const state = window.h2hState;
     const infoA = state.slotA || {};
     const infoB = state.slotB || {};
 
-    /* مصفوفة الصفوف */
+    /* ⭐ الصفوف مع أيقونات Phosphor */
     const rows = [
-        { icon: '📊', label: 'مجموع النقاط', valA: a.totalPoints, valB: b.totalPoints, format: 'number' },
-        { icon: '📈', label: 'متوسط الجولة', valA: a.avgPoints, valB: b.avgPoints, format: 'number' },
-        { icon: '🏆', label: 'مرات في تشكيلة الأسبوع', valA: a.totwWeekCount, valB: b.totwWeekCount, format: 'count' },
-        { icon: '🥇', label: 'مرات في تشكيلة الشهر', valA: a.totwMonthCount, valB: b.totwMonthCount, format: 'count' },
-        { icon: '🌍', label: 'المركز العالمي', valA: a.overallRank, valB: b.overallRank, format: 'rank', invert: true },
-        { icon: '🏅', label: 'المركز في الدوري', valA: a.leagueRank, valB: b.leagueRank, format: 'rank', invert: true },
-        { icon: '⭐', label: 'أفضل جولة', valA: a.bestGW.points + ' (GW' + a.bestGW.event + ')', valB: b.bestGW.points + ' (GW' + b.bestGW.event + ')', format: 'text' },
-        { icon: '📉', label: 'أسوأ جولة', valA: a.worstGW.points + ' (GW' + a.worstGW.event + ')', valB: b.worstGW.points + ' (GW' + b.worstGW.event + ')', format: 'text', invert: true }
+        { icon: 'chart-bar',       label: 'مجموع النقاط',              valA: a.totalPoints,    valB: b.totalPoints,    format: 'number' },
+        { icon: 'trend-up',        label: 'متوسط الجولة',              valA: a.avgPoints,      valB: b.avgPoints,      format: 'number' },
+        { icon: 'trophy',          label: 'مرات في تشكيلة الأسبوع',    valA: a.totwWeekCount,  valB: b.totwWeekCount,  format: 'count' },
+        { icon: 'medal',           label: 'مرات في تشكيلة الشهر',      valA: a.totwMonthCount, valB: b.totwMonthCount, format: 'count' },
+        { icon: 'globe-hemisphere-west', label: 'المركز العالمي',      valA: a.overallRank,    valB: b.overallRank,    format: 'rank', invert: true },
+        { icon: 'medal',           label: 'المركز في الدوري',          valA: a.leagueRank,     valB: b.leagueRank,     format: 'rank', invert: true },
+        { icon: 'star',            label: 'أفضل جولة',                 valA: a.bestGW.points + ' (GW' + a.bestGW.event + ')', valB: b.bestGW.points + ' (GW' + b.bestGW.event + ')', format: 'text' },
+        { icon: 'trend-down',      label: 'أسوأ جولة',                 valA: a.worstGW.points + ' (GW' + a.worstGW.event + ')', valB: b.worstGW.points + ' (GW' + b.worstGW.event + ')', format: 'text', invert: true }
     ];
 
     let html = '';
 
-    /* ⭐ Header — مع الشعارات */
+    /* ⭐ Header مع الشعارات */
     html += '<div class="h2h-results-header">';
     
-    /* Manager A */
     html += '<div class="h2h-results-side">';
     html += h2hLogoHtml(infoA, 'h2h-logo-result');
     html += '<div class="h2h-results-name">' + h2hShorten(a.player_name) + '</div>';
@@ -364,7 +385,6 @@ function h2hRenderResults(data) {
 
     html += '<div class="h2h-results-vs">VS</div>';
 
-    /* Manager B */
     html += '<div class="h2h-results-side">';
     html += h2hLogoHtml(infoB, 'h2h-logo-result');
     html += '<div class="h2h-results-name">' + h2hShorten(b.player_name) + '</div>';
@@ -375,24 +395,30 @@ function h2hRenderResults(data) {
 
     html += '</div>';
 
-    /* الفارق الإجمالي */
+    /* ⭐ الفارق الإجمالي */
     const diff = a.totalPoints - b.totalPoints;
     let diffText = '';
     let diffClass = 'h2h-diff-equal';
+    let diffIcon = 'scales';
 
     if (diff > 0) {
-        diffText = '🏆 ' + h2hShorten(a.player_name) + ' متقدم بـ ' + diff + ' نقطة';
+        diffText = h2hShorten(a.player_name) + ' متقدم بـ ' + diff + ' نقطة';
         diffClass = 'h2h-diff-a';
+        diffIcon = 'trophy';
     } else if (diff < 0) {
-        diffText = '🏆 ' + h2hShorten(b.player_name) + ' متقدم بـ ' + Math.abs(diff) + ' نقطة';
+        diffText = h2hShorten(b.player_name) + ' متقدم بـ ' + Math.abs(diff) + ' نقطة';
         diffClass = 'h2h-diff-b';
+        diffIcon = 'trophy';
     } else {
-        diffText = '🤝 تعادل في النقاط';
+        diffText = 'تعادل في النقاط';
     }
 
-    html += '<div class="h2h-overall-diff ' + diffClass + '">' + diffText + '</div>';
+    html += '<div class="h2h-overall-diff ' + diffClass + '">' +
+        '<i class="ph-fill ph-' + diffIcon + '"></i> ' +
+        diffText +
+    '</div>';
 
-    /* Rows */
+    /* ⭐ Rows */
     html += '<div class="h2h-rows">';
 
     rows.forEach(function(row) {
@@ -412,7 +438,7 @@ function h2hRenderResults(data) {
         html += '<div class="h2h-row">';
         html += '<div class="h2h-row-val ' + aClass + '">' + h2hFormatVal(row.valA, row.format) + '</div>';
         html += '<div class="h2h-row-label">';
-        html += '<span class="h2h-row-icon">' + row.icon + '</span>';
+        html += '<i class="ph ph-' + row.icon + ' h2h-row-icon"></i>';
         html += '<span class="h2h-row-text">' + row.label + '</span>';
         html += '</div>';
         html += '<div class="h2h-row-val ' + bClass + '">' + h2hFormatVal(row.valB, row.format) + '</div>';
@@ -421,17 +447,25 @@ function h2hRenderResults(data) {
 
     html += '</div>';
 
-    /* الرسم البياني */
+    /* ⭐ Chart */
     html += '<div class="h2h-chart-section">';
-    html += '<div class="h2h-chart-title">📊 تطور النقاط التراكمية</div>';
+    html += '<div class="h2h-chart-title">' +
+        '<i class="ph ph-chart-line-up"></i> ' +
+        'تطور النقاط التراكمية' +
+    '</div>';
     html += '<div class="h2h-chart-wrap"><canvas id="h2hChart"></canvas></div>';
     html += '</div>';
 
-    /* زر التحميل */
-    html += '<button class="h2h-download-btn" onclick="h2hDownload()">📥 تحميل المقارنة</button>';
+    /* ⭐ Buttons */
+    html += '<button class="h2h-download-btn" onclick="h2hDownload()">' +
+        '<i class="ph-bold ph-download-simple"></i> ' +
+        'تحميل المقارنة' +
+    '</button>';
 
-    /* زر تبديل */
-    html += '<button class="h2h-swap-btn" onclick="h2hSwap()">🔄 تبديل المديرين</button>';
+    html += '<button class="h2h-swap-btn" onclick="h2hSwap()">' +
+        '<i class="ph-bold ph-arrows-clockwise"></i> ' +
+        'تبديل المديرين' +
+    '</button>';
 
     container.innerHTML = html;
 
@@ -559,6 +593,10 @@ function h2hSwap() {
     h2hRender();
 }
 
+/* =========================================================
+   التحميل — محسّن
+========================================================= */
+
 async function h2hDownload() {
     const container = document.getElementById('h2hResults');
     if (!container) return;
@@ -570,17 +608,54 @@ async function h2hDownload() {
 
     if (typeof showToast === 'function') showToast('جاري التجهيز...', false, 2000);
 
+    const originalBg = container.style.background;
+    container.style.background = '#FAF6F0';
+
+    await new Promise(function(resolve) { setTimeout(resolve, 300); });
+
     try {
         const canvas = await html2canvas(container, {
             backgroundColor: '#FAF6F0',
             scale: 3,
             useCORS: true,
-            allowTaint: false,
-            logging: false
+            allowTaint: true,
+            logging: false,
+            removeContainer: true,
+            imageTimeout: 0,
+            onclone: function(clonedDoc, clonedElement) {
+                const allEls = clonedElement.querySelectorAll('*');
+                allEls.forEach(function(el) {
+                    const computed = window.getComputedStyle(el);
+
+                    if (computed.backgroundImage && computed.backgroundImage !== 'none') {
+                        if (computed.backgroundImage.indexOf('gradient') !== -1) {
+                            el.style.backgroundImage = 'none';
+                            el.style.backgroundColor =
+                                el.classList.contains('h2h-diff-b') ? '#C8A95F' :
+                                el.classList.contains('h2h-diff-a') ? '#8B1A2F' :
+                                el.classList.contains('h2h-row-val') && el.classList.contains('win') ? '#8B1A2F' :
+                                el.classList.contains('h2h-vs') ? '#8B1A2F' :
+                                el.classList.contains('h2h-results') ? '#FFFFFF' :
+                                '#FAF6F0';
+                        }
+                    }
+                });
+
+                const charts = clonedElement.querySelectorAll('canvas');
+                charts.forEach(function(c) {
+                    c.style.background = '#FFFFFF';
+                    c.style.borderRadius = '10px';
+                });
+            }
         });
 
+        container.style.background = originalBg;
+
         canvas.toBlob(function(blob) {
-            if (!blob) return;
+            if (!blob) {
+                if (typeof showToast === 'function') showToast('فشل إنشاء الصورة', false, 4000);
+                return;
+            }
 
             const state = window.h2hState;
             const nameA = (state.slotA.player_name || 'A').replace(/\s+/g, '_');
@@ -596,9 +671,11 @@ async function h2hDownload() {
                 link.href = url;
                 link.click();
             }
-        }, 'image/png');
+        }, 'image/png', 1.0);
+
     } catch (e) {
         console.error('[H2H] download error:', e);
+        container.style.background = originalBg;
         if (typeof showToast === 'function') showToast('فشل التحميل', false, 3000);
     }
 }
