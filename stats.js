@@ -1,6 +1,6 @@
 /* =========================================================
-   stats.js — FINALISSIMA LEAGUE CHAT (v3)
-   مع تشكيلة الشهر
+   stats.js — FINALISSIMA LEAGUE CHAT (v4)
+   مع قفل تشكيلة الشهر
 ========================================================= */
 
 let statsAllManagers = [];
@@ -365,7 +365,7 @@ async function loadStats() {
 }
 
 /* =========================================================
-   ⭐ MONTH (تشكيلة الشهر)
+   ⭐ MONTH (تشكيلة الشهر) — مع قفل
 ========================================================= */
 
 function switchMonthView(view) {
@@ -456,7 +456,7 @@ function createMonthCard(player) {
     if (!player) return '';
 
     const rawName = player.player_name || player.entry_name || 'Unknown';
-    const name = shortenPlayerName(rawName);
+    const name = statsDisplayName(rawName);
     const points = player.event_total || 0;
 
     let teamName = '';
@@ -505,7 +505,7 @@ function renderMonthList(players) {
     players.forEach(function(player, index) {
         const entryId = player.entry;
         const rawName = player.player_name || player.entry_name || 'Unknown';
-        const displayName = shortenPlayerName(rawName);
+        const displayName = statsDisplayName(rawName);
         const points = player.event_total || 0;
         const total = player.total || 0;
         const isSelected = currentMonthSelected.indexOf(entryId) !== -1;
@@ -540,6 +540,7 @@ function renderMonthList(players) {
     listWrapper.innerHTML = html;
 }
 
+/* ⭐ الدالة المُحدّثة — مع قفل */
 async function loadMonthlyTOTW() {
     const loadingBox = document.getElementById('monthLoadingBox');
     const pitchWrapper = document.getElementById('monthPitchWrapper');
@@ -548,13 +549,39 @@ async function loadMonthlyTOTW() {
 
     if (!loadingBox) return;
 
+    /* ⭐ تحقق من القفل */
+    if (typeof isLocked === 'function' && isLocked('month')) {
+        const isAdminUser = (typeof isAdmin === 'function') ? isAdmin() : false;
+
+        if (!isAdminUser) {
+            /* المستخدم العادي — قسم مقفول */
+            loadingBox.style.display = 'none';
+            if (pitchWrapper) pitchWrapper.style.display = 'none';
+            if (listWrapper) listWrapper.style.display = 'none';
+            if (errorBox) {
+                errorBox.style.display = 'block';
+                errorBox.innerHTML =
+                    '<div class="month-locked-msg">' +
+                        '<div class="month-locked-icon">🔒</div>' +
+                        '<div class="month-locked-title">غير متاح حالياً</div>' +
+                        '<div class="month-locked-sub">' +
+                            'سيتم عرض تشكيلة الشهر<br>' +
+                            'لحين اكتمال مباريات هذا الشهر' +
+                        '</div>' +
+                        '<div class="month-locked-brand">FINALISSIMA LEAGUE</div>' +
+                    '</div>';
+            }
+            return;
+        }
+    }
+
+    /* ⭐ باقي الدالة */
     loadingBox.style.display = 'block';
     if (pitchWrapper) pitchWrapper.style.display = 'none';
     if (listWrapper) listWrapper.style.display = 'none';
     if (errorBox) errorBox.style.display = 'none';
 
     try {
-        /* الشهر = من الجولة الحالية */
         const monthNum = (typeof getMonthFromRound === 'function')
             ? getMonthFromRound(currentRound || 1)
             : 1;
@@ -568,10 +595,11 @@ async function loadMonthlyTOTW() {
             if (errorBox) {
                 errorBox.style.display = 'block';
                 errorBox.innerHTML =
-                    '<div style="text-align:center;padding:40px 20px;">' +
-                        '<div style="font-size:48px;margin-bottom:16px;">🏆</div>' +
-                        '<div style="font-size:18px;font-weight:900;color:#8B1A2F;margin-bottom:8px;">تشكيلة الشهر قيد التطوير</div>' +
-                        '<div style="font-size:13px;color:#999;font-weight:700;">تفتح نهاية الشهر الحالي</div>' +
+                    '<div class="month-locked-msg">' +
+                        '<div class="month-locked-icon">🏆</div>' +
+                        '<div class="month-locked-title">تشكيلة الشهر قيد التطوير</div>' +
+                        '<div class="month-locked-sub">تفتح نهاية الشهر الحالي</div>' +
+                        '<div class="month-locked-brand">FINALISSIMA LEAGUE</div>' +
                     '</div>';
             }
             return;
@@ -587,10 +615,6 @@ async function loadMonthlyTOTW() {
         const monthName = (typeof getMonthName === 'function')
             ? getMonthName(monthNum)
             : ('الشهر ' + monthNum);
-
-        const rounds = (typeof getRoundsForMonth === 'function')
-            ? getRoundsForMonth(monthNum)
-            : { start: 1, end: 5 };
 
         const gwLabel = document.getElementById('monthLabel');
         if (gwLabel) {
@@ -619,7 +643,7 @@ async function loadMonthlyTOTW() {
 }
 
 /* =========================================================
-   switchStatsTab — محدّث
+   switchStatsTab
 ========================================================= */
 
 function switchStatsTab(tabName) {
@@ -694,3 +718,5 @@ document.addEventListener('DOMContentLoaded', function() {
 /* ===== Window ===== */
 window.switchMonthView = switchMonthView;
 window.loadMonthlyTOTW = loadMonthlyTOTW;
+window.renderMonthCards = renderMonthCards;
+window.renderMonthList = renderMonthList;
