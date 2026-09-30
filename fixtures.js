@@ -1,5 +1,6 @@
 /* =========================================================
-   fixtures.js — FINALISSIMA LEAGUE CHAT (v4)
+   fixtures.js — FINALISSIMA LEAGUE CHAT (v9)
+   قراءة من Supabase + GW 1-5 محفوظة + GW 6-38 default
 ========================================================= */
 
 /* ===== ذاكرة مؤقتة للجولات المخصصة ===== */
@@ -29,14 +30,31 @@ async function loadCustomMatchweeksIntoMemory() {
         }
 
         const data = await loadCustomMatchweeks();
+
         if (data) {
             window.customMatchweeks = data;
 
             Object.keys(data).forEach(function(rStr) {
                 const r = parseInt(rStr, 10);
                 const custom = data[r];
-                if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
-                    window.matchweeks[r] = custom.matches;
+
+                /* ⭐ GW 1-5 → من Supabase (لا تلمسها) */
+                if (r >= 1 && r <= 5) {
+                    if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
+                        window.matchweeks[r] = custom.matches;
+                        console.log('[Custom MW] GW' + r + ': from Supabase ✅');
+                    } else {
+                        console.warn('[Custom MW] GW' + r + ': EMPTY in Supabase');
+                    }
+                }
+                /* ⭐ GW 6-38 → من matchweeks.js (default) إلا إذا Supabase عنده بيانات */
+                else {
+                    if (custom && Array.isArray(custom.matches) && custom.matches.length > 0) {
+                        window.matchweeks[r] = custom.matches;
+                        console.log('[Custom MW] GW' + r + ': from Supabase');
+                    } else {
+                        console.log('[Custom MW] GW' + r + ': from matchweeks.js');
+                    }
                 }
             });
 
@@ -190,6 +208,7 @@ function renderFixtures() {
 
         list.innerHTML = '';
 
+        /* ⭐ هل الجولة مخفية للمستخدم؟ */
         if (!canUserSeeRound(currentRound)) {
             list.innerHTML =
                 '<div class="round-hidden-msg">' +
@@ -201,6 +220,17 @@ function renderFixtures() {
         }
 
         const matches = (window.matchweeks && window.matchweeks[currentRound]) || [];
+
+        /* ⭐ إذا الجولة فاضية (GW 1-5 وما فيها بيانات) */
+        if (matches.length === 0) {
+            list.innerHTML =
+                '<div class="round-hidden-msg">' +
+                    '<div class="round-hidden-icon">⏳</div>' +
+                    '<div class="round-hidden-title">المواجهات لم تُعلن بعد</div>' +
+                    '<div class="round-hidden-sub">ترقبوا الإعلان قريباً</div>' +
+                '</div>';
+            return;
+        }
 
         matches.forEach(function(match, idx) {
             const home = teamsMap[match[0]] || { name: match[0], logo: '' };
@@ -369,6 +399,7 @@ function setupEruda() {
     });
 }
 
+/* ===== ربط الدوال بـ window ===== */
 window.loadCustomMatchweeksIntoMemory = loadCustomMatchweeksIntoMemory;
 window.isRoundHidden = isRoundHidden;
 window.canUserSeeRound = canUserSeeRound;
