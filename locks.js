@@ -1,19 +1,22 @@
 /* =========================================================
-   locks.js — FINALISSIMA LEAGUE CHAT
+   locks.js — FINALISSIMA LEAGUE CHAT (v4)
+   مع إضافة قسم "month"
 ========================================================= */
 
 window.sectionLocks = {
     fixtures:  false,
     standings: false,
     totw:      false,
-    stats:     false
+    stats:     false,
+    month:     false   /* ⭐ جديد */
 };
 
 window.pendingLocks = {
     fixtures:  false,
     standings: false,
     totw:      false,
-    stats:     false
+    stats:     false,
+    month:     false
 };
 
 const LOCK_PIN = '024680';
@@ -21,10 +24,11 @@ const EDIT_PIN = '1999';
 const SETTINGS_PIN = '024680';
 
 const SECTIONS = [
-    { key: 'fixtures',  label: 'المواجهات',  icon: '⚽' },
-    { key: 'standings', label: 'الترتيب',    icon: '📊' },
-    { key: 'totw',      label: 'التشكيلة',   icon: '⭐' },
-    { key: 'stats',     label: 'الإحصائيات', icon: '📈' }
+    { key: 'fixtures',  label: 'المواجهات',        icon: '⚽' },
+    { key: 'standings', label: 'الترتيب',          icon: '📊' },
+    { key: 'totw',      label: 'التشكيلة',         icon: '⭐' },
+    { key: 'stats',     label: 'الإحصائيات',       icon: '📈' },
+    { key: 'month',     label: 'تشكيلة الشهر',     icon: '🏆' }  /* ⭐ جديد */
 ];
 
 /* =========================================================
@@ -225,6 +229,10 @@ function openSettingsMain() {
             '<span class="si-icon">📋</span>' +
             '<span class="si-label">إدارة المواجهات</span>' +
         '</button>' +
+        '<button class="settings-item" onclick="openSettingsMonth()">' +
+            '<span class="si-icon">🏆</span>' +
+            '<span class="si-label">تشكيلة الشهر</span>' +
+        '</button>' +
         '<button class="settings-item" onclick="openSettingsLocks()">' +
             '<span class="si-icon">🔐</span>' +
             '<span class="si-label">قفل الأقسام</span>' +
@@ -326,6 +334,76 @@ function openSettingsClubs() {
         if (attempts < 20) setTimeout(tryMove, 250);
     };
     tryMove();
+}
+
+/* =========================================================
+   ⭐ SETTINGS — تشكيلة الشهر
+========================================================= */
+
+function openSettingsMonth() {
+    restoreSettingsContent();
+
+    const body = document.getElementById('settingsBody');
+    if (!body) return;
+
+    const isOpen = !isLocked('month');
+    const statusIcon = isOpen ? '👁️' : '🔒';
+    const statusText = isOpen ? 'مفتوح للجميع' : 'مقفول';
+    const statusClass = isOpen ? 'mwm-visible' : 'mwm-hidden';
+
+    body.innerHTML =
+        '<button class="settings-item settings-back" onclick="openSettingsMain()">' +
+            '<span class="si-icon">←</span>' +
+            '<span class="si-label">رجوع</span>' +
+        '</button>' +
+
+        '<div class="settings-hint" style="padding:8px 0 12px 0;text-align:center;">' +
+            'تحكم بإتاحة تشكيلة الشهر للمستخدمين' +
+        '</div>' +
+
+        '<div class="mwm-round-row" style="padding:20px 16px;">' +
+            '<div class="mwm-round-info">' +
+                '<div class="mwm-round-num" style="font-size:17px;">🏆 تشكيلة الشهر</div>' +
+                '<div class="mwm-round-meta" style="margin-top:6px;font-size:13px;">' +
+                    'الحالة: <span class="' + statusClass + '">' + statusIcon + ' ' + statusText + '</span>' +
+                '</div>' +
+            '</div>' +
+            '<div class="mwm-round-actions">' +
+                '<button class="mwm-btn mwm-toggle" onclick="toggleMonthLock()">' + statusIcon + '</button>' +
+            '</div>' +
+        '</div>' +
+
+        '<div style="margin-top:20px;padding:14px;background:#FAF6F0;border-radius:14px;border:2px dashed #C8A95F;">' +
+            '<div style="font-size:12px;color:#8B1A2F;font-weight:800;line-height:1.8;text-align:right;">' +
+                '<strong>ملاحظة:</strong><br>' +
+                '• عندما يكون <strong>مقفولاً</strong> → المستخدم يرى "غير متاح حالياً"<br>' +
+                '• عندما يكون <strong>مفتوحاً</strong> → يظهر Top 11 للمستخدمين' +
+            '</div>' +
+        '</div>';
+}
+
+async function toggleMonthLock() {
+    const currentLocked = isLocked('month');
+    const newLocked = !currentLocked;
+
+    if (typeof showToast === 'function') {
+        showToast('جاري التحديث...', false, 10000);
+    }
+
+    const ok = await saveLock('month', newLocked);
+
+    if (ok) {
+        if (typeof showToast === 'function') {
+            showToast(newLocked ? 'تم قفل تشكيلة الشهر' : 'تم فتح تشكيلة الشهر', true, 2500);
+        }
+
+        /* نحدّث القائمة */
+        openSettingsMonth();
+    } else {
+        if (typeof showToast === 'function') {
+            showToast('فشل التحديث', false, 3000);
+        }
+    }
 }
 
 /* =========================================================
@@ -489,6 +567,8 @@ window.closeSettingsModal = closeSettingsModal;
 window.openSettingsMain = openSettingsMain;
 window.openSettingsManagers = openSettingsManagers;
 window.openSettingsClubs = openSettingsClubs;
+window.openSettingsMonth = openSettingsMonth;
+window.toggleMonthLock = toggleMonthLock;
 window.openSettingsLocks = openSettingsLocks;
 window.openSettingsMaintenance = openSettingsMaintenance;
 window.toggleLockFromSettings = toggleLockFromSettings;
