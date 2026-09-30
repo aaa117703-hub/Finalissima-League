@@ -1358,3 +1358,47 @@ img,
     .h2h-row-text { font-size: 9px; }
     .h2h-chart-wrap { height: 220px; }
 }
+/* ═══════════════════════════════════════════════════════
+   MONTH LOCKED MESSAGE
+   ═══════════════════════════════════════════════════════ */
+
+#monthErrorBox .month-locked-msg {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+#monthErrorBox .month-locked-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+    animation: monthLockPulse 2s ease-in-out infinite;
+}
+
+@keyframes monthLockPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50%      { transform: scale(1.05); opacity: 1; }
+}
+
+#monthErrorBox .month-locked-title {
+    font-size: 20px;
+    font-weight: 900;
+    color: #8B1A2F;
+    margin-bottom: 12px;
+    font-family: 'Cairo', sans-serif;
+    letter-spacing: 0.5px;
+}
+
+#monthErrorBox .month-locked-sub {
+    font-size: 14px;
+    color: #999;
+    font-weight: 700;
+    line-height: 1.8;
+    font-family: 'Cairo', sans-serif;
+}
+
+#monthErrorBox .month-locked-brand {
+    font-size: 11px;
+    color: #C8A95F;
+    font-weight: 900;
+    margin-top: 30px;
+    letter-spacing: 3px;
+}
