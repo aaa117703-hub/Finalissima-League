@@ -1,7 +1,8 @@
 /* =========================================================
-   totw.css — v4
-   - نفس التصميم v30
+   totw.css — v5
+   - نفس التصميم v4
    - الألوان: عنابي (Qatar 2022) + ذهبي
+   - ⭐ جديد: TOTW Waiting State (بدل رسالة الخطأ)
 ========================================================= */
 
 .totw-tabs{
@@ -517,6 +518,92 @@
 }
 
 /* =========================================================
+   ⭐ TOTW Waiting State (بدل رسالة الخطأ)
+========================================================= */
+
+.totw-waiting{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:14px;
+    padding:34px 22px;
+    background:linear-gradient(135deg, #FAF6F0 0%, #F5E6D3 100%);
+    border:2px solid #E5D4A5;
+    border-radius:18px;
+    box-shadow:0 6px 22px rgba(139,26,47,.12);
+    text-align:center;
+    animation:totwWaitingIn .6s ease;
+    position:relative;
+    overflow:hidden;
+}
+
+.totw-waiting::before{
+    content:'';
+    position:absolute;
+    top:-50%;
+    left:-50%;
+    width:200%;
+    height:200%;
+    background:radial-gradient(circle, rgba(200,169,95,.18) 0%, transparent 60%);
+    animation:totwWaitingGlow 4s ease-in-out infinite;
+    pointer-events:none;
+    z-index:0;
+}
+
+.totw-waiting > *{
+    position:relative;
+    z-index:1;
+}
+
+.totw-waiting-icon{
+    font-size:48px;
+    color:#8B1A2F;
+    display:inline-block;
+    animation:totwHourglassFlip 3s ease-in-out infinite;
+    filter:drop-shadow(0 3px 6px rgba(139,26,47,.25));
+}
+
+.totw-waiting-text{
+    font-size:15px;
+    font-weight:900;
+    color:#4A0A15;
+    letter-spacing:0.5px;
+    line-height:1.6;
+    font-family:inherit;
+    max-width:320px;
+}
+
+.totw-waiting-sparkle{
+    font-size:26px;
+    color:#C8A95F;
+    display:inline-block;
+    animation:totwSparklePulse 1.8s ease-in-out infinite;
+    filter:drop-shadow(0 2px 5px rgba(200,169,95,.5));
+}
+
+@keyframes totwWaitingIn{
+    from{opacity:0;transform:translateY(12px) scale(.96);}
+    to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+@keyframes totwHourglassFlip{
+    0%, 40%{transform:rotate(0deg);}
+    50%, 90%{transform:rotate(180deg);}
+    100%{transform:rotate(360deg);}
+}
+
+@keyframes totwSparklePulse{
+    0%, 100%{transform:scale(1);opacity:1;}
+    50%{transform:scale(1.3);opacity:.7;}
+}
+
+@keyframes totwWaitingGlow{
+    0%, 100%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+
+/* =========================================================
    الموبايل
 ========================================================= */
 
@@ -603,7 +690,27 @@
     .totw-list-player{font-size:9px;}
     .totw-list-gw,
     .totw-list-total{font-size:12px;}
+
+    /* ⭐ Waiting State موبايل */
+    .totw-waiting{
+        padding:26px 16px;
+        gap:10px;
+    }
+
+    .totw-waiting-icon{
+        font-size:38px;
+    }
+
+    .totw-waiting-text{
+        font-size:13px;
+        max-width:260px;
+    }
+
+    .totw-waiting-sparkle{
+        font-size:22px;
+    }
 }
+
 /* =========================================================
    TOTW Mode Tabs (Week / Month)
 ========================================================= */
@@ -648,6 +755,7 @@
 .totw-mode-btn:active {
     transform: translateY(0) scale(0.97);
 }
+
 /* ═══════════════════════════════════════
    منع حفظ الصور
    ═══════════════════════════════════════ */
@@ -664,5 +772,4 @@ img,
     -webkit-touch-callout: none;
     user-select: none;
     pointer-events: none;
-    /* ⚠️ مهم: pointer-events: none تعطل الضغط عليه */
 }
