@@ -1,6 +1,5 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=7)
-   🏆 Champions Cup — Banner Split Draw
+   champions.js — FINALISSIMA LEAGUE CHAT (v=8)
    ========================================================= */
 
 const CHAMP_PIN = '024680';
@@ -609,6 +608,9 @@ function renderChampionsMain() {
     container.innerHTML = html;
     attachChampHiddenBtns();
 }
+/* =========================================================
+   Render Groups Section
+========================================================= */
 
 function renderGroupsSection(draw, matches, meta) {
     let html = '<div class="champions-groups-section">';
@@ -656,6 +658,10 @@ function renderGroupsSection(draw, matches, meta) {
     return html;
 }
 
+/* =========================================================
+   Render Group Matches
+========================================================= */
+
 function renderGroupsMatches(matches, meta) {
     const groupMatches = matches.filter(function(m) { return m.stage === 'groups'; });
     if (groupMatches.length === 0) return '';
@@ -677,6 +683,10 @@ function renderGroupsMatches(matches, meta) {
     html += '</div>';
     return html;
 }
+
+/* =========================================================
+   Render Knockout Bracket
+========================================================= */
 
 function renderKnockoutBracket(matches, meta) {
     const qfMatches = matches.filter(function(m) { return m.stage === 'qf'; });
@@ -775,7 +785,7 @@ function renderMatchRow(m) {
 }
 
 /* =========================================================
-   🎬 CINEMATIC DRAW v=7 — Banner Split Draw
+   🎬 CINEMATIC DRAW v=8
 ========================================================= */
 
 async function champPerformDraw() {
@@ -835,7 +845,6 @@ function champBuildDrawScreen() {
     /* Cards (4 pieces from banner) */
     html += '<div class="champ-cards-stage" id="champCardsStage" style="display:none;">';
     for (let i = 0; i < 4; i++) {
-        /* 4 pieces: each shows 25% of banner */
         const bgPos = (i * 33.33) + '% 0%';
 
         html += '<div class="champ-card" id="champCard' + i + '" data-index="' + i + '">';
@@ -872,14 +881,14 @@ function champBuildDrawScreen() {
     screen.innerHTML = html;
     document.body.appendChild(screen);
 }
-
 /* =========================================================
-   Cinematic Draw Sequence
+   🎬 Cinematic Draw Sequence
 ========================================================= */
 
 async function champRunCinematicDraw(drawRows, pots) {
     const banner = document.getElementById('champBannerOriginal');
     const cardsStage = document.getElementById('champCardsStage');
+    const cardInners = document.querySelectorAll('.champ-card-inner');
     const cards = document.querySelectorAll('.champ-card');
     const header = document.getElementById('champDrawHeader');
 
@@ -895,9 +904,8 @@ async function champRunCinematicDraw(drawRows, pots) {
 
     await champWait(1200);
 
-    /* ⭐ المشهد 2: الانقسام — البنر يختفي والبطاقات تظهر بنفس الصورة */
+    /* ⭐ المشهد 2: الانقسام — البنر يختفي والبطاقات تظهر */
     await new Promise(function(resolve) {
-        /* إخفاء البنر */
         gsap.to(banner, {
             opacity: 0,
             duration: 0.4,
@@ -925,10 +933,10 @@ async function champRunCinematicDraw(drawRows, pots) {
 
     await champWait(800);
 
-    /* ⭐ المشهد 3: قلب البطاقات الأولى (لعرض المنتخبات) */
+    /* ⭐ المشهد 3: قلب البطاقات — على inner */
     await new Promise(function(resolve) {
-        gsap.to(cards, {
-            rotateY: 180,
+        gsap.to(cardInners, {
+            rotationY: 180,
             duration: 1.2,
             stagger: 0.15,
             ease: 'power2.inOut',
@@ -951,15 +959,12 @@ async function champRunCinematicDraw(drawRows, pots) {
 
         potRows.sort(function(a, b) { return a.slot_index - b.slot_index; });
 
-        /* إظهار منتخبات Pot — البطاقات ترجع للواجهة ثم تنقلب */
         await champShowPotTeams(potNum, potRows);
 
-        /* توزيع كل منتخب */
         for (let i = 0; i < potRows.length; i++) {
             await champDistributeTeam(potRows[i], i);
         }
 
-        /* إعادة البطاقات للواجهة */
         await champResetCardsForNextPot();
 
         await champWait(400);
@@ -970,7 +975,7 @@ async function champRunCinematicDraw(drawRows, pots) {
 }
 
 /* =========================================================
-   Show Pot Teams in Cards
+   Show Pot Teams
 ========================================================= */
 
 async function champShowPotTeams(potNum, potRows) {
@@ -985,7 +990,6 @@ async function champShowPotTeams(potNum, potRows) {
 
     const cards = document.querySelectorAll('.champ-card');
 
-    /* إعداد محتوى المنتخبات */
     for (let i = 0; i < 4; i++) {
         const card = cards[i];
         const teamSlot = document.getElementById('champCardTeam' + i);
@@ -1019,9 +1023,9 @@ async function champDistributeTeam(row, slotIndex) {
 
     if (!card || !groupTarget || !groupTeamsEl) return;
 
-    /* ⭐ Spotlight */
     const allCards = document.querySelectorAll('.champ-card');
 
+    /* ⭐ Spotlight */
     for (let cycle = 0; cycle < 2; cycle++) {
         for (let c = 0; c < 4; c++) {
             gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.1 });
@@ -1034,7 +1038,7 @@ async function champDistributeTeam(row, slotIndex) {
         }
     }
 
-    /* ⭐ توقف على البطاقة المختارة */
+    /* ⭐ توقف على البطاقة */
     gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.2 });
     gsap.to(card, {
         boxShadow: '0 0 60px rgba(212,183,122,1)',
@@ -1045,7 +1049,7 @@ async function champDistributeTeam(row, slotIndex) {
 
     await champWait(500);
 
-    /* ⭐ Clone للمنتخب */
+    /* ⭐ Clone */
     const cardRect = card.getBoundingClientRect();
     const groupRect = groupTarget.getBoundingClientRect();
 
@@ -1160,9 +1164,21 @@ async function champDistributeTeam(row, slotIndex) {
 ========================================================= */
 
 async function champResetCardsForNextPot() {
+    const cardInners = document.querySelectorAll('.champ-card-inner');
     const teamSlots = document.querySelectorAll('.champ-card-back-team');
-    teamSlots.forEach(function(el) { el.innerHTML = ''; });
-    await champWait(200);
+
+    gsap.to(cardInners, {
+        rotationY: 0,
+        duration: 0.8,
+        stagger: 0.1,
+        ease: 'power2.inOut'
+    });
+
+    setTimeout(function() {
+        teamSlots.forEach(function(el) { el.innerHTML = ''; });
+    }, 800);
+
+    await champWait(900);
 }
 
 /* =========================================================
@@ -1263,9 +1279,10 @@ function champSpawnConfetti(count) {
 
 async function champSaveDraw(drawRows) {
     await saveChampionsDraw(drawRows);
-    champData.draw = drawRows;
+    champData.draw = draw.Rows;
 
-    const groups = { A: [], B: [], C: [], D: [] };
+    const groups =4 { A: [], B:,
+ [], C: [], D           : [] };
     drawRows.forEach(function(r) { groups[r.group_name].push(r); });
 
     const matches = buildRoundRobin(groups);
@@ -1278,8 +1295,7 @@ async function champCloseDraw() {
     if (screen) {
         gsap.to(screen, {
             opacity: 0,
-            duration: 0.4,
-            onComplete: async function() {
+            duration: 0 onComplete: async function() {
                 screen.remove();
 
                 const drawRows = champData.pendingDraw || [];
