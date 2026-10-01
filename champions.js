@@ -1580,7 +1580,6 @@ async function loadChampions() {
 window.loadChampions = loadChampions;
 window.champPerformDraw = champPerformDraw;
 window.champStartTournament = champStartTournament;
-window.champCloseDraw = champCloseDraw;
 window.champRequestReset = champRequestReset;
 window.champSyncNow = champSyncNow;
 window.champStartKnockout = champStartKnockout;
