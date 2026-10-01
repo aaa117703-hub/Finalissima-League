@@ -1,6 +1,6 @@
 /* =========================================================
-   fixtures.js — FINALISSIMA LEAGUE CHAT (v11)
-   Phosphor Icons + Countdown
+   fixtures.js — FINALISSIMA LEAGUE CHAT (v13)
+   Phosphor Icons + Countdown + Champions Cup
 ========================================================= */
 
 window.customMatchweeks = null;
@@ -124,6 +124,11 @@ function switchTab(tabName) {
             showSectionMaintenance('تشكيلة الأسبوع');
             return;
         }
+        /* ⭐ Champions Cup lock */
+        if (tabName === 'champions' && isLocked('champions')) {
+            showSectionMaintenance('كأس الأبطال');
+            return;
+        }
     }
 
     if (typeof hideSectionMaintenance === 'function') {
@@ -147,6 +152,11 @@ function switchTab(tabName) {
         const el = document.getElementById('statsTab');
         if (el) el.classList.add('active');
         if (typeof loadStats === 'function') loadStats();
+    } else if (tabName === 'champions') {
+        /* ⭐ Champions Cup tab */
+        const el = document.getElementById('championsTab');
+        if (el) el.classList.add('active');
+        if (typeof loadChampions === 'function') loadChampions();
     } else {
         const el = document.getElementById('fixturesTab');
         if (el) el.classList.add('active');
@@ -415,3 +425,4 @@ window.canUserSeeRound = canUserSeeRound;
 window.unlockSecretPanel = unlockSecretPanel;
 window.exitEditMode = exitEditMode;
 window.fixIcon = fixIcon;
+window.switchTab = switchTab;
