@@ -1,5 +1,5 @@
 /* =========================================================
-   champions.js - FINALISSIMA LEAGUE CHAT (v=2)
+   champions.js - FINALISSIMA LEAGUE CHAT (v=3)
    Champions Cup
 ========================================================= */
 
@@ -9,16 +9,10 @@ const CHAMP_POT_SIZE = 4;
 const CHAMP_GROUP_SIZE = 5;
 const CHAMP_GS_GWS = [6, 7, 8, 9];
 
-let champData = {
-    meta: null,
-    draw: [],
-    matches: []
-};
-
+let champData = { meta: null, draw: [], matches: [] };
 let champLoaded = false;
 let champDrawAnimating = false;
 
-/* ---------- Phosphor Icons Helper ---------- */
 function xIcon(name, variant) {
     variant = variant || 'regular';
     const variantClass = variant === 'fill' ? 'ph-fill' :
@@ -27,10 +21,6 @@ function xIcon(name, variant) {
                          'ph';
     return '<i class="' + variantClass + ' ph-' + name + '"></i>';
 }
-
-/* =========================================================
-   Navigation - فتح تاب Champions
-========================================================= */
 
 function champGoToTab() {
     if (typeof switchTab === 'function') switchTab('stats');
@@ -50,10 +40,7 @@ async function loadChampionsMeta() {
     if (!window.sbClient) return null;
     try {
         const { data, error } = await window.sbClient
-            .from('champions_meta')
-            .select('*')
-            .eq('id', 1)
-            .single();
+            .from('champions_meta').select('*').eq('id', 1).single();
         if (error) throw error;
         return data;
     } catch (e) {
@@ -66,8 +53,7 @@ async function loadChampionsDraw() {
     if (!window.sbClient) return [];
     try {
         const { data, error } = await window.sbClient
-            .from('champions_draw')
-            .select('*')
+            .from('champions_draw').select('*')
             .order('pot_number', { ascending: true })
             .order('group_name', { ascending: true });
         if (error) throw error;
@@ -82,8 +68,7 @@ async function loadChampionsMatches() {
     if (!window.sbClient) return [];
     try {
         const { data, error } = await window.sbClient
-            .from('champions_matches')
-            .select('*')
+            .from('champions_matches').select('*')
             .order('stage', { ascending: true })
             .order('round_num', { ascending: true })
             .order('id', { ascending: true });
@@ -100,8 +85,7 @@ async function saveChampionsMeta(updates) {
     try {
         const payload = Object.assign({ id: 1, updated_at: new Date().toISOString() }, updates);
         const { error } = await window.sbClient
-            .from('champions_meta')
-            .upsert(payload, { onConflict: 'id' });
+            .from('champions_meta').upsert(payload, { onConflict: 'id' });
         if (error) throw error;
         return true;
     } catch (e) {
@@ -141,9 +125,7 @@ async function updateChampionsMatch(id, updates) {
     try {
         const payload = Object.assign({ updated_at: new Date().toISOString() }, updates);
         const { error } = await window.sbClient
-            .from('champions_matches')
-            .update(payload)
-            .eq('id', id);
+            .from('champions_matches').update(payload).eq('id', id);
         if (error) throw error;
         return true;
     } catch (e) {
@@ -158,13 +140,9 @@ async function resetChampions() {
         await window.sbClient.from('champions_draw').delete().neq('id', 0);
         await window.sbClient.from('champions_matches').delete().neq('id', 0);
         await window.sbClient.from('champions_meta').upsert({
-            id: 1,
-            started: false,
-            start_gw: null,
-            current_stage: 'groups',
-            current_round: 0,
-            champion: null,
-            updated_at: new Date().toISOString()
+            id: 1, started: false, start_gw: null,
+            current_stage: 'groups', current_round: 0,
+            champion: null, updated_at: new Date().toISOString()
         }, { onConflict: 'id' });
         return true;
     } catch (e) {
@@ -174,20 +152,17 @@ async function resetChampions() {
 }
 
 /* =========================================================
-   Match results
+   Fetch team scores from match_results
 ========================================================= */
 
 async function fetchTeamScoresForRound(gw) {
     if (!window.sbClient) return {};
-
     try {
         const { data, error } = await window.sbClient
             .from('match_results')
             .select('home_team, away_team, home_score, away_score')
             .eq('round', gw);
-
         if (error) throw error;
-
         const map = {};
         (data || []).forEach(function(row) {
             const hs = parseInt(row.home_score, 10);
@@ -195,7 +170,6 @@ async function fetchTeamScoresForRound(gw) {
             if (!isNaN(hs)) map[row.home_team] = hs;
             if (!isNaN(as)) map[row.away_team] = as;
         });
-
         return map;
     } catch (e) {
         console.warn('[Champions] fetchTeamScores GW' + gw + ':', e.message);
@@ -213,16 +187,16 @@ async function buildPots() {
     let standings = [];
     try {
         standings = await calculateStandingsUpToRound(38);
-0    } catch (e) {
-        };
- console.warn('[Ch           ampions] buildPots standings:', e.message);
+    } catch (e) {
+        console.warn('[Champions] buildPots standings:', e.message);
     }
 
     if (!standings || standings.length === 0) {
         if (typeof TEAMS_LOGOS !== 'undefined') {
+            standings = Object.keys(TEAMS_LOGOS).map(function(t) {
+                return { team: t, points: 0 };
             });
- standings = Object.keys(TEAMS       _LOGOS).map(function(t) {
-                return { team: t, points:  }
+        }
     }
 
     const sorted = standings.slice().sort(function(a, b) {
@@ -253,10 +227,8 @@ function shuffleArray(arr) {
 
 function performDraw(pots) {
     const groups = { A: [], B: [], C: [], D: [] };
-
     pots.forEach(function(potTeams, potIdx) {
         const shuffled = shuffleArray(potTeams);
-
         shuffled.forEach(function(team, idx) {
             const groupLetter = CHAMP_GROUPS[idx % CHAMP_GROUPS.length];
             groups[groupLetter].push({
@@ -267,12 +239,10 @@ function performDraw(pots) {
             });
         });
     });
-
     const allRows = [];
     CHAMP_GROUPS.forEach(function(g) {
         groups[g].forEach(function(row) { allRows.push(row); });
     });
-
     return allRows;
 }
 
@@ -282,15 +252,14 @@ function performDraw(pots) {
 
 function buildRoundRobin(groups) {
     const matches = [];
-
     CHAMP_GROUPS.forEach(function(gName) {
         const teams = (groups[gName] || []).map(function(r) { return r.team; });
         if (teams.length < 5) return;
 
         const n = teams.length;
         const ids = teams.map(function(_, i) { return i; });
-
         const rounds = [];
+
         for (let r = 0; r < n - 1; r++) {
             const round = [];
             for (let i = 0; i < n / 2; i++) {
@@ -322,32 +291,26 @@ function buildRoundRobin(groups) {
                     gw: null,
                     home_team: m.home,
                     away_team: m.away,
-                    home_score: null,
-                    away_score: null,
-                    home_real: null,
-                    away_real: null,
-                    home_gf: null,
-                    away_gf: null,
-                    winner: null,
-                    is_played: false
+                    home_score: null, away_score: null,
+                    home_real: null, away_real: null,
+                    home_gf: null, away_gf: null,
+                    winner: null, is_played: false
                 });
             });
             roundNum++;
         });
     });
-
     return matches;
 }
 
 /* =========================================================
-   Sync - Group results
+   Sync group results
 ========================================================= */
 
 async function syncGroupResults() {
     const matches = champData.matches.filter(function(m) {
         return m.stage === 'groups' && !m.is_played;
     });
-
     if (matches.length === 0) return 0;
 
     const meta = champData.meta || {};
@@ -355,8 +318,7 @@ async function syncGroupResults() {
 
     const gwsNeeded = {};
     matches.forEach(function(m) {
-        const gw = startGw + (m.round_num - 1);
-        gwsNeeded[gw] = true;
+        gwsNeeded[startGw + (m.round_num - 1)] = true;
     });
 
     const scoresByGw = {};
@@ -365,28 +327,21 @@ async function syncGroupResults() {
     }
 
     let updated = 0;
-
     for (const m of matches) {
         const gw = startGw + (m.round_num - 1);
         const scores = scoresByGw[gw] || {};
         const hs = scores[m.home_team];
         const as = scores[m.away_team];
-
         if (hs === undefined || as === undefined) continue;
 
-        let winner = null;
+        let winner = 'draw';
         if (hs > as) winner = m.home_team;
         else if (as > hs) winner = m.away_team;
-        else winner = 'draw';
 
         const ok = await updateChampionsMatch(m.id, {
-            gw: gw,
-            home_score: hs,
-            away_score: as,
-            winner: winner,
-            is_played: true
+            gw: gw, home_score: hs, away_score: as,
+            winner: winner, is_played: true
         });
-
         if (ok) {
             m.gw = gw;
             m.home_score = hs;
@@ -396,7 +351,6 @@ async function syncGroupResults() {
             updated++;
         }
     }
-
     return updated;
 }
 
@@ -406,12 +360,10 @@ async function syncGroupResults() {
 
 function computeGroupStandings(draw, matches, groupName) {
     const teams = draw.filter(function(r) { return r.group_name === groupName; });
-
     const table = {};
     teams.forEach(function(t) {
         table[t.team] = {
-            team: t.team,
-            played: 0, won: 0, drawn: 0, lost: 0,
+            team: t.team, played: 0, won: 0, drawn: 0, lost: 0,
             gf: 0, ga: 0, gd: 0, points: 0
         };
     });
@@ -430,20 +382,16 @@ function computeGroupStandings(draw, matches, groupName) {
         a.gf += m.away_score; a.ga += m.home_score;
 
         if (m.home_score > m.away_score) {
-            h.won++; a.lost++;
-            h.points += 3;
+            h.won++; a.lost++; h.points += 3;
         } else if (m.away_score > m.home_score) {
-            a.won++; h.lost++;
-            a.points += 3;
+            a.won++; h.lost++; a.points += 3;
         } else {
             h.drawn++; a.drawn++;
             h.points += 1; a.points += 1;
         }
     });
 
-    Object.values(table).forEach(function(t) {
-        t.gd = t.gf - t.ga;
-    });
+    Object.values(table).forEach(function(t) { t.gd = t.gf - t.ga; });
 
     return Object.values(table).sort(function(x, y) {
         if (y.points !== x.points) return y.points - x.points;
@@ -459,7 +407,6 @@ function computeGroupStandings(draw, matches, groupName) {
 
 async function buildKnockoutStage(startGw) {
     const qualified = [];
-
     CHAMP_GROUPS.forEach(function(g) {
         const standings = computeGroupStandings(champData.draw, champData.matches, g);
         if (standings.length >= 2) {
@@ -482,27 +429,17 @@ async function buildKnockoutStage(startGw) {
 
     const qfMatches = qfPairs.map(function(p, idx) {
         return {
-            stage: 'qf',
-            group_name: null,
-            round_num: idx + 1,
-            gw: startGw,
-            home_team: p.home,
-            away_team: p.away,
+            stage: 'qf', group_name: null, round_num: idx + 1, gw: startGw,
+            home_team: p.home, away_team: p.away,
             home_score: null, away_score: null,
             home_real: null, away_real: null,
             home_gf: null, away_gf: null,
-            winner: null,
-            is_played: false
+            winner: null, is_played: false
         };
     });
 
     await window.sbClient.from('champions_matches').insert(qfMatches);
-
-    await saveChampionsMeta({
-        current_stage: 'qf',
-        current_round: 1
-    });
-
+    await saveChampionsMeta({ current_stage: 'qf', current_round: 1 });
     return true;
 }
 
@@ -514,7 +451,6 @@ async function syncKnockoutResults() {
     const knockoutMatches = champData.matches.filter(function(m) {
         return m.stage !== 'groups' && !m.is_played;
     });
-
     if (knockoutMatches.length === 0) return 0;
 
     const gwsNeeded = {};
@@ -528,26 +464,20 @@ async function syncKnockoutResults() {
     }
 
     let updated = 0;
-
     for (const m of knockoutMatches) {
         const scores = scoresByGw[m.gw] || {};
         const hs = scores[m.home_team];
         const as = scores[m.away_team];
-
         if (hs === undefined || as === undefined) continue;
 
-        let winner = null;
+        let winner = m.home_team;
         if (hs > as) winner = m.home_team;
         else if (as > hs) winner = m.away_team;
-        else winner = m.home_team;
 
         const ok = await updateChampionsMatch(m.id, {
-            home_score: hs,
-            away_score: as,
-            winner: winner,
-            is_played: true
+            home_score: hs, away_score: as,
+            winner: winner, is_played: true
         });
-
         if (ok) {
             m.home_score = hs;
             m.away_score = as;
@@ -558,7 +488,6 @@ async function syncKnockoutResults() {
     }
 
     await checkAndBuildNextRound();
-
     return updated;
 }
 
@@ -591,32 +520,28 @@ async function checkAndBuildNextRound() {
 
         const winners = stageMatches.map(function(m) { return m.winner; });
         const gw = (stageMatches[0].gw || 0) + 1;
-
         const newMatches = [];
-        if (nextStage === 'sf') {
-            if (winners.length >= 4) {
-                newMatches.push({
-                    stage: 'sf', group_name: null, round_num: 1, gw: gw,
-                    home_team: winners[0], away_team: winners[1],
-                    home_score: null, away_score: null, home_real: null, away_real: null,
-                    home_gf: null, away_gf: null, winner: null, is_played: false
-                });
-                newMatches.push({
-                    stage: 'sf', group_name: null, round_num: 2, gw: gw,
-                    home_team: winners[2], away_team: winners[3],
-                    home_score: null, away_score: null, home_real: null, away_real: null,
-                    home_gf: null, away_gf: null, winner: null, is_played: false
-                });
-            }
-        } else if (nextStage === 'final') {
-            if (winners.length >= 2) {
-                newMatches.push({
-                    stage: 'final', group_name: null, round_num: 1, gw: gw,
-                    home_team: winners[0], away_team: winners[1],
-                    home_score: null, away_score: null, home_real: null, away_real: null,
-                    home_gf: null, away_gf: null, winner: null, is_played: false
-                });
-            }
+
+        if (nextStage === 'sf' && winners.length >= 4) {
+            newMatches.push({
+                stage: 'sf', group_name: null, round_num: 1, gw: gw,
+                home_team: winners[0], away_team: winners[1],
+                home_score: null, away_score: null, home_real: null, away_real: null,
+                home_gf: null, away_gf: null, winner: null, is_played: false
+            });
+            newMatches.push({
+                stage: 'sf', group_name: null, round_num: 2, gw: gw,
+                home_team: winners[2], away_team: winners[3],
+                home_score: null, away_score: null, home_real: null, away_real: null,
+                home_gf: null, away_gf: null, winner: null, is_played: false
+            });
+        } else if (nextStage === 'final' && winners.length >= 2) {
+            newMatches.push({
+                stage: 'final', group_name: null, round_num: 1, gw: gw,
+                home_team: winners[0], away_team: winners[1],
+                home_score: null, away_score: null, home_real: null, away_real: null,
+                home_gf: null, away_gf: null, winner: null, is_played: false
+            });
         }
 
         if (newMatches.length > 0) {
@@ -628,9 +553,9 @@ async function checkAndBuildNextRound() {
         }
     }
 }
-       
+
 /* =========================================================
-   Render - Main
+   Render Main
 ========================================================= */
 
 function renderChampionsMain() {
@@ -647,25 +572,25 @@ function renderChampionsMain() {
         if (draw.length === 0) {
             html += '<div class="champions-start-area">';
             html += '<button class="champions-start-btn" onclick="champPerformDraw()">';
-            html += xIcon('shuffle', 'bold') + ' ' + '\u0628\u062f\u0621 \u0627\u0644\u0642\u0631\u0639\u0629';
+            html += xIcon('shuffle', 'bold') + ' Start Draw';
             html += '</button>';
-            html += '<div class="champions-status-text">' + '\u0627\u0636\u063a\u0637 \u0644\u0628\u062f\u0621 \u0642\u0631\u0639\u0629 \u0627\u0644\u0628\u0637\u0648\u0644\u0629' + '</div>';
+            html += '<div class="champions-status-text">Press to start the draw</div>';
             html += '</div>';
         } else {
             html += '<div class="champions-start-area">';
             html += '<button class="champions-start-btn" onclick="champStartTournament()">';
-            html += xIcon('play-circle', 'fill') + ' ' + '\u0627\u0628\u062f\u0623 \u0627\u0644\u0628\u0637\u0648\u0644\u0629';
+            html += xIcon('play-circle', 'fill') + ' Start Tournament';
             html += '</button>';
-            html += '<div class="champions-status-text">' + '\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0631\u0627\u062d \u062a\u0628\u062f\u0623 \u0645\u0646 \u0627\u0644\u062c\u0648\u0644\u0629 \u0627\u0644\u0642\u0627\u062f\u0645\u0629' + '</div>';
+            html += '<div class="champions-status-text">Starts from the <strong>next round</strong></div>';
             html += '</div>';
         }
     } else {
         let stageText = '';
-        if (meta.current_stage === 'groups') stageText = '\u062f\u0648\u0631 \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0627\u062a';
-        else if (meta.current_stage === 'qf') stageText = '\u0631\u0628\u0639 \u0627\u0644\u0646\u0647\u0627\u0626\u064a';
-        else if (meta.current_stage === 'sf') stageText = '\u0646\u0635\u0641 \u0627\u0644\u0646\u0647\u0627\u0626\u064a';
-        else if (meta.current_stage === 'final') stageText = '\u0627\u0644\u0646\u0647\u0627\u0626\u064a';
-        else if (meta.current_stage === 'done') stageText = '\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0627\u0646\u062a\u0647\u062a';
+        if (meta.current_stage === 'groups') stageText = 'Group Stage';
+        else if (meta.current_stage === 'qf') stageText = 'Quarter Finals';
+        else if (meta.current_stage === 'sf') stageText = 'Semi Finals';
+        else if (meta.current_stage === 'final') stageText = 'Final';
+        else if (meta.current_stage === 'done') stageText = 'Finished';
 
         html += '<div class="champions-start-area">';
         html += '<div class="champions-status-text">';
@@ -676,7 +601,6 @@ function renderChampionsMain() {
 
     if (draw.length > 0) {
         html += renderGroupsSection(draw, matches, meta);
-
         if (meta.started) {
             if (meta.current_stage === 'groups') {
                 html += renderGroupsMatches(matches, meta);
@@ -687,22 +611,21 @@ function renderChampionsMain() {
     } else {
         html += '<div class="champions-empty">';
         html += xIcon('trophy', 'duotone');
-        html += '<div>' + '\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u062c\u0627\u0647\u0632\u0629 \u0644\u0644\u0627\u0646\u0637\u0644\u0627\u0642' + '</div>';
+        html += '<div>Ready to Start</div>';
         html += '</div>';
     }
 
     container.innerHTML = html;
-
     attachChampHiddenBtns();
 }
 
 /* =========================================================
-   Render - Groups section
+   Render Groups
 ========================================================= */
 
 function renderGroupsSection(draw, matches, meta) {
     let html = '<div class="champions-groups-section">';
-    html += '<div class="champions-section-title">' + xIcon('squares-four', 'bold') + ' ' + '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0627\u062a' + '</div>';
+    html += '<div class="champions-section-title">' + xIcon('squares-four', 'bold') + ' Groups</div>';
     html += '<div class="champions-groups-grid">';
 
     CHAMP_GROUPS.forEach(function(gName) {
@@ -748,7 +671,7 @@ function renderGroupsSection(draw, matches, meta) {
 }
 
 /* =========================================================
-   Render - Group matches
+   Render Group Matches
 ========================================================= */
 
 function renderGroupsMatches(matches, meta) {
@@ -758,7 +681,7 @@ function renderGroupsMatches(matches, meta) {
     const startGw = meta.start_gw || 6;
 
     let html = '<div class="champions-round-section">';
-    html += '<div class="champions-section-title">' + xIcon('soccer-ball', 'bold') + ' ' + '\u0645\u0628\u0627\u0631\u064a\u0627\u062a \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0627\u062a' + '</div>';
+    html += '<div class="champions-section-title">' + xIcon('soccer-ball', 'bold') + ' Group Matches</div>';
 
     for (let r = 1; r <= 4; r++) {
         const roundMatches = groupMatches.filter(function(m) { return m.round_num === r; });
@@ -777,7 +700,7 @@ function renderGroupsMatches(matches, meta) {
 }
 
 /* =========================================================
-   Render - Knockout bracket
+   Render Knockout
 ========================================================= */
 
 function renderKnockoutBracket(matches, meta) {
@@ -786,8 +709,7 @@ function renderKnockoutBracket(matches, meta) {
     const finalMatches = matches.filter(function(m) { return m.stage === 'final'; });
 
     let html = '<div class="champions-round-section">';
-    html += '<div class="champions-section-title">' + xIcon('trophy', 'fill') + ' ' + '\u0627\u0644\u0623\u062f\u0648\u0627\u0631 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0629' + '</div>';
-
+    html += '<div class="champions-section-title">' + xIcon('trophy', 'fill') + ' Knockout Stage</div>';
     html += '<div class="champions-bracket">';
 
     if (qfMatches.length > 0) {
@@ -831,7 +753,6 @@ function renderKnockoutBracket(matches, meta) {
 function renderBracketMatch(m) {
     const homeLogo = (typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[m.home_team]) || '';
     const awayLogo = (typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[m.away_team]) || '';
-
     const homeWin = m.winner === m.home_team;
     const awayWin = m.winner === m.away_team;
 
@@ -874,7 +795,7 @@ function renderMatchRow(m) {
 }
 
 /* =========================================================
-   Draw animation
+   Draw Animation
 ========================================================= */
 
 async function champPerformDraw() {
@@ -884,7 +805,7 @@ async function champPerformDraw() {
     const pots = await buildPots();
     if (!pots) {
         champDrawAnimating = false;
-        if (typeof showToast === 'function') showToast('\u0641\u0634\u0644 \u0628\u0646\u0627\u0621 \u0627\u0644\u062a\u0635\u0646\u064a\u0641', false);
+        if (typeof showToast === 'function') showToast('Failed to build pots', false);
         return;
     }
 
@@ -923,7 +844,7 @@ async function champPerformDraw() {
         '</div>' +
         '<div class="champions-groups-row">' + groupsHtml + '</div>' +
         '<button class="champions-draw-close" style="display:none;" id="champDrawClose" onclick="champCloseDraw()">' +
-            xIcon('check-circle', 'bold') + ' ' + '\u062a\u0645' +
+            xIcon('check-circle', 'bold') + ' Done' +
         '</button>';
 
     document.body.appendChild(screen);
@@ -1006,7 +927,7 @@ async function champAnimateSequence(drawRows) {
     champData.matches = matches;
 
     if (typeof showToast === 'function') {
-        showToast('\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0642\u0631\u0639\u0629', true, 2000);
+        showToast('Draw saved!', true, 2000);
     }
 }
 
@@ -1022,12 +943,12 @@ function champCloseDraw() {
 }
 
 /* =========================================================
-   Start tournament
+   Start Tournament
 ========================================================= */
 
 async function champStartTournament() {
     if (typeof currentRound === 'undefined') {
-        if (typeof showToast === 'function') showToast('currentRound', false);
+        if (typeof showToast === 'function') showToast('currentRound not available', false);
         return;
     }
 
@@ -1042,17 +963,17 @@ async function champStartTournament() {
 
     if (ok) {
         if (typeof showToast === 'function') {
-            showToast('\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0628\u062f\u0623\u062a \u0645\u0646 GW' + startGw, true, 3000);
+            showToast('Tournament started from GW' + startGw, true, 3000);
         }
         champLoaded = false;
         loadChampions();
     } else {
-        if (typeof showToast === 'function') showToast('\u0641\u0634\u0644 \u0628\u062f\u0621 \u0627\u0644\u0628\u0637\u0648\u0644\u0629', false);
+        if (typeof showToast === 'function') showToast('Failed to start', false);
     }
 }
 
 /* =========================================================
-   Hidden admin menu
+   Admin Menu
 ========================================================= */
 
 function attachChampHiddenBtns() {
@@ -1087,21 +1008,19 @@ function attachChampHiddenBtns() {
 }
 
 function champShowAdminMenu() {
-    const pin = prompt('\u0623\u062f\u062e\u0644 \u0631\u0645\u0632 \u0627\u0644\u062a\u062d\u0643\u0645:');
+    const pin = prompt('Enter PIN:');
     if (pin === null) return;
     if (pin !== CHAMP_PIN) {
-        alert('\u0627\u0644\u0631\u0645\u0632 \u063a\u0644\u0637');
+        alert('Wrong PIN');
         return;
     }
 
-    const meta = champData.meta || {};
-
     const choice = prompt(
-        '\u0627\u062e\u062a\u0631 \u0627\u0644\u0625\u062c\u0631\u0627\u0621:\n' +
-        '1 - \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0646\u062a\u0627\u0626\u062c\n' +
-        '2 - \u0627\u0628\u062f\u0623 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a\n' +
-        '3 - \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0642\u0631\u0639\u0629\n' +
-        '0 - \u0625\u0644\u063a\u0627\u0621'
+        'Choose action:\n' +
+        '1 - Sync Results\n' +
+        '2 - Start Knockout\n' +
+        '3 - Reset Draw\n' +
+        '0 - Cancel'
     );
 
     if (choice === '1') champSyncNow();
@@ -1110,7 +1029,7 @@ function champShowAdminMenu() {
 }
 
 async function champSyncNow() {
-    if (typeof showToast === 'function') showToast('\u062c\u0627\u0631\u064a \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0646\u062a\u0627\u0626\u062c...', false);
+    if (typeof showToast === 'function') showToast('Syncing...', false);
 
     const meta = champData.meta || {};
     let updated = 0;
@@ -1122,9 +1041,9 @@ async function champSyncNow() {
     }
 
     if (updated > 0) {
-        if (typeof showToast === 'function') showToast('\u062a\u0645 \u062a\u062d\u062f\u064a\u062b ' + updated + ' \u0645\u0628\u0627\u0631\u0627\u0629', true, 2500);
+        if (typeof showToast === 'function') showToast('Updated ' + updated + ' matches', true, 2500);
     } else {
-        if (typeof showToast === 'function') showToast('\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c \u062c\u062f\u064a\u062f\u0629', false, 2500);
+        if (typeof showToast === 'function') showToast('No new results', false, 2500);
     }
 
     champLoaded = false;
@@ -1134,11 +1053,11 @@ async function champSyncNow() {
 async function champStartKnockout() {
     const meta = champData.meta || {};
     if (!meta.started) {
-        alert('\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0645\u0627 \u0628\u062f\u0623\u062a \u0628\u0639\u062f');
+        alert('Tournament not started');
         return;
     }
     if (meta.current_stage !== 'groups') {
-        alert('\u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a \u0628\u062f\u0623\u062a \u0628\u0627\u0644\u0641\u0639\u0644');
+        alert('Knockout already started');
         return;
     }
 
@@ -1146,36 +1065,35 @@ async function champStartKnockout() {
     const allPlayed = groupMatches.every(function(m) { return m.is_played; });
 
     if (!allPlayed) {
-        alert('\u0645\u0627 \u0632\u0627\u0644\u062a \u0647\u0646\u0627\u0643 \u0645\u0628\u0627\u0631\u064a\u0627\u062a \u0645\u062c\u0645\u0648\u0639\u0627\u062a \u0644\u0645 \u062a\u0646\u062a\u0647');
+        alert('Group matches still pending');
         return;
     }
 
-    if (!confirm('\u0627\u0628\u062f\u0623 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a \u0645\u0646 \u0627\u0644\u062c\u0648\u0644\u0629 \u0627\u0644\u0642\u0627\u062f\u0645\u0629\u061f')) return;
+    if (!confirm('Start Knockout from next round?')) return;
 
     const startGw = (currentRound || 1) + 1;
-
     const ok = await buildKnockoutStage(startGw);
 
     if (ok) {
-        if (typeof showToast === 'function') showToast('\u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a \u0628\u062f\u0623\u062a \u0645\u0646 GW' + startGw, true, 3000);
+        if (typeof showToast === 'function') showToast('Knockout started from GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
     } else {
-        alert('\u0641\u0634\u0644 \u0628\u0646\u0627\u0621 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a');
+        alert('Failed to build knockout');
     }
 }
 
 function champRequestReset() {
-    if (!confirm('\u0631\u0627\u062d \u062a\u0645\u0633\u062d \u0627\u0644\u0642\u0631\u0639\u0629 \u0648\u0643\u0644 \u0627\u0644\u0645\u0628\u0627\u0631\u064a\u0627\u062a. \u0645\u062a\u0623\u0643\u062f\u061f')) return;
+    if (!confirm('Reset draw and all matches?')) return;
 
     resetChampions().then(function(ok) {
         if (ok) {
-            if (typeof showToast === 'function') showToast('\u062a\u0645\u062a \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0642\u0631\u0639\u0629', true, 2500);
+            if (typeof showToast === 'function') showToast('Draw reset', true, 2500);
             champData = { meta: null, draw: [], matches: [] };
             champLoaded = false;
             loadChampions();
         } else {
-            if (typeof showToast === 'function') showToast('\u0641\u0634\u0644', false);
+            if (typeof showToast === 'function') showToast('Failed', false);
         }
     });
 }
@@ -1189,7 +1107,7 @@ async function loadChampions() {
     if (!container) return;
 
     if (!window.sbClient) {
-        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase</div></div>';
+        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase not available</div></div>';
         return;
     }
 
@@ -1213,10 +1131,9 @@ async function loadChampions() {
         champLoaded = true;
 
         renderChampionsMain();
-
     } catch (e) {
         console.error('[Champions] load error:', e);
-        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>' + '\u0641\u0634\u0644 \u0627\u0644\u062a\u062d\u0645\u064a\u0644' + '</div></div>';
+        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Load failed</div></div>';
     }
 }
 
@@ -1228,6 +1145,7 @@ window.champRequestReset = champRequestReset;
 window.champSyncNow = champSyncNow;
 window.champStartKnockout = champStartKnockout;
 window.champShowAdminMenu = champShowAdminMenu;
+window.champGoToTab = champGoToTab;
 window.championsReload = function() {
     champLoaded = false;
     loadChampions();
