@@ -1294,7 +1294,8 @@ async function champCloseDraw() {
     if (screen) {
         gsap.to(screen, {
             opacity: 0,
-            duration: 0 onComplete: async function() {
+            duration: 0.4,
+            onComplete: async function() {
                 screen.remove();
 
                 const drawRows = champData.pendingDraw || [];
