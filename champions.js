@@ -10,7 +10,7 @@ const CHAMP_PIN = '024680';
 const CHAMP_GROUPS = ['A', 'B', 'C', 'D'];
 const CHAMP_POT_SIZE = 4;
 const CHAMP_GROUP_SIZE = 5;
-const CHAMP_GS_GWS = [6, 7, 8, 9]; /* GW لمراحل دور المجموعات */
+const CHAMP_GS_GWS = [6, 7, 8, 9];
 
 let champData = {
     meta: null,
@@ -342,7 +342,6 @@ async function syncGroupResults() {
     const meta = champData.meta || {};
     const startGw = meta.start_gw || 6;
 
-    /* اجمع النقاط لكل GW يحتاج */
     const gwsNeeded = {};
     matches.forEach(function(m) {
         const gw = startGw + (m.round_num - 1);
@@ -463,7 +462,6 @@ async function buildKnockoutStage(startGw) {
 
     if (qualified.length < 4) return false;
 
-    /* QF: A1 vs B2, B1 vs A2, C1 vs D2, D1 vs C2 */
     const qfPairs = [
         { home: qualified[0].first, away: qualified[1].second },
         { home: qualified[1].first, away: qualified[0].second },
@@ -530,7 +528,7 @@ async function syncKnockoutResults() {
         let winner = null;
         if (hs > as) winner = m.home_team;
         else if (as > hs) winner = m.away_team;
-        else winner = m.home_team; /* تعادل → الفريق المضيف يتأهل (يمكن تعديله) */
+        else winner = m.home_team;
 
         const ok = await updateChampionsMatch(m.id, {
             home_score: hs,
@@ -548,7 +546,6 @@ async function syncKnockoutResults() {
         }
     }
 
-    /* بناء الدور التالي إذا انتهى الحالي */
     await checkAndBuildNextRound();
 
     return updated;
@@ -568,7 +565,6 @@ async function checkAndBuildNextRound() {
 
         const nextStage = stages[i + 1];
         if (!nextStage) {
-            /* نهائي — إعلان البطل */
             const finalMatch = stageMatches[0];
             if (finalMatch && finalMatch.winner) {
                 await saveChampionsMeta({
@@ -579,11 +575,9 @@ async function checkAndBuildNextRound() {
             continue;
         }
 
-        /* تحقق إذا الدور التالي موجود */
         const nextMatches = matches.filter(function(m) { return m.stage === nextStage; });
         if (nextMatches.length > 0) continue;
 
-        /* ابنِ الدور التالي */
         const winners = stageMatches.map(function(m) { return m.winner; });
         const gw = (stageMatches[0].gw || 0) + 1;
 
@@ -638,14 +632,12 @@ function renderChampionsMain() {
 
     let html = '';
 
-    /* البنر */
     html += '<div class="champions-banner" id="champBanner">';
     html += '<div class="champions-banner-inner">';
     html += '<img class="champions-banner-img" src="./banner-fina.png" alt="Champions Cup">';
     html += '</div>';
     html += '</div>';
 
-    /* الحالة */
     if (!meta.started) {
         if (draw.length === 0) {
             html += '<div class="champions-start-area">';
@@ -663,7 +655,6 @@ function renderChampionsMain() {
             html += '</div>';
         }
     } else {
-        /* شريط الحالة */
         let stageText = '';
         if (meta.current_stage === 'groups') stageText = 'دور المجموعات';
         else if (meta.current_stage === 'qf') stageText = 'ربع النهائي';
@@ -678,7 +669,6 @@ function renderChampionsMain() {
         html += '</div>';
     }
 
-    /* المحتوى */
     if (draw.length > 0) {
         html += renderGroupsSection(draw, matches, meta);
 
@@ -818,7 +808,6 @@ function renderKnockoutBracket(matches, meta) {
 
     html += '</div>';
 
-    /* البطل */
     if (meta.champion) {
         const logoFile = (typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[meta.champion]) || '';
         html += '<div class="champ-champion-card">';
@@ -1148,7 +1137,6 @@ async function champStartKnockout() {
         return;
     }
 
-    /* تحقق من انتهاء كل مباريات المجموعات */
     const groupMatches = champData.matches.filter(function(m) { return m.stage === 'groups'; });
     const allPlayed = groupMatches.every(function(m) { return m.is_played; });
 
@@ -1195,8 +1183,8 @@ async function loadChampions() {
     const container = document.getElementById('championsContent');
     if (!container) return;
 
-    if.m (!window.sbClientatches) {
-        container.innerHTML = '<div class =="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase غير متوفر</div></div>';
+    if (!window.sbClient) {
+        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase غير متوفر</div></div>';
         return;
     }
 
@@ -1216,7 +1204,7 @@ async function loadChampions() {
 
         champData.meta = meta || { started: false };
         champData.draw = draw;
-        champData matches;
+        champData.matches = matches;
         champLoaded = true;
 
         renderChampionsMain();
