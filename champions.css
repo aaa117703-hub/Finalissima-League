@@ -1,5 +1,5 @@
 /* =========================================================
-   champions.css — FINALISSIMA LEAGUE CHAT (v=7)
+   champions.css — FINALISSIMA LEAGUE CHAT (v=8)
    ========================================================= */
 
 /* =========================================================
@@ -370,6 +370,11 @@
     margin:30px auto 0;
     flex-wrap:wrap;
     flex-shrink:0;
+    direction:rtl;
+    position:relative;
+    z-index:100;
+    padding:0 16px;
+    box-sizing:border-box;
 }
 
 .champ-btn-save,
@@ -471,6 +476,7 @@
     text-shadow:0 2px 6px rgba(0,0,0,.8);
     white-space:nowrap;
 }
+
 /* =========================================================
    5) GROUPS SECTION (في القسم العادي)
 ========================================================= */
