@@ -1,16 +1,16 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=1)
-   🏆 Champions Cup — البطولة الأوروبية
-   - 20 منتخب → 4 مجموعات × 5
-   - قرعة انصافية (5 Pots)
-   - أنيميشن UEFA Style
-   - ذهاب فقط
+   champions.js — FINALISSIMA LEAGUE CHAT (v=2)
+   🏆 Champions Cup — البطولة الكاملة
+   - القرعة UEFA Style
+   - مجموعات + إقصائيات + بطل
+   - يحسب النتائج تلقائياً من match_results
 ========================================================= */
 
 const CHAMP_PIN = '024680';
 const CHAMP_GROUPS = ['A', 'B', 'C', 'D'];
 const CHAMP_POT_SIZE = 4;
 const CHAMP_GROUP_SIZE = 5;
+const CHAMP_GS_GWS = [6, 7, 8, 9]; /* GW لمراحل دور المجموعات */
 
 let champData = {
     meta: null,
@@ -125,6 +125,22 @@ async function saveChampionsMatches(rows) {
     }
 }
 
+async function updateChampionsMatch(id, updates) {
+    if (!window.sbClient) return false;
+    try {
+        const payload = Object.assign({ updated_at: new Date().toISOString() }, updates);
+        const { error } = await window.sbClient
+            .from('champions_matches')
+            .update(payload)
+            .eq('id', id);
+        if (error) throw error;
+        return true;
+    } catch (e) {
+        console.error('[Champions] updateMatch:', e.message);
+        return false;
+    }
+}
+
 async function resetChampions() {
     if (!window.sbClient) return false;
     try {
@@ -143,6 +159,36 @@ async function resetChampions() {
     } catch (e) {
         console.error('[Champions] reset:', e.message);
         return false;
+    }
+}
+
+/* =========================================================
+   جلب نقاط المنتخبات من match_results
+========================================================= */
+
+async function fetchTeamScoresForRound(gw) {
+    if (!window.sbClient) return {};
+
+    try {
+        const { data, error } = await window.sbClient
+            .from('match_results')
+            .select('home_team, away_team, home_score, away_score')
+            .eq('round', gw);
+
+        if (error) throw error;
+
+        const map = {};
+        (data || []).forEach(function(row) {
+            const hs = parseInt(row.home_score, 10);
+            const as = parseInt(row.away_score, 10);
+            if (!isNaN(hs)) map[row.home_team] = hs;
+            if (!isNaN(as)) map[row.away_team] = as;
+        });
+
+        return map;
+    } catch (e) {
+        console.warn('[Champions] fetchTeamScores GW' + gw + ':', e.message);
+        return {};
     }
 }
 
@@ -182,7 +228,7 @@ async function buildPots() {
 }
 
 /* =========================================================
-   القرعة — انصافية
+   القرعة
 ========================================================= */
 
 function shuffleArray(arr) {
@@ -220,7 +266,7 @@ function performDraw(pots) {
 }
 
 /* =========================================================
-   Round Robin — جدول المباريات
+   Round Robin
 ========================================================= */
 
 function buildRoundRobin(groups) {
@@ -283,6 +329,302 @@ function buildRoundRobin(groups) {
 }
 
 /* =========================================================
+   الحساب — نتائج المجموعات
+========================================================= */
+
+async function syncGroupResults() {
+    const matches = champData.matches.filter(function(m) {
+        return m.stage === 'groups' && !m.is_played;
+    });
+
+    if (matches.length === 0) return 0;
+
+    const meta = champData.meta || {};
+    const startGw = meta.start_gw || 6;
+
+    /* اجمع النقاط لكل GW يحتاج */
+    const gwsNeeded = {};
+    matches.forEach(function(m) {
+        const gw = startGw + (m.round_num - 1);
+        gwsNeeded[gw] = true;
+    });
+
+    const scoresByGw = {};
+    for (const gw of Object.keys(gwsNeeded)) {
+        scoresByGw[gw] = await fetchTeamScoresForRound(parseInt(gw, 10));
+    }
+
+    let updated = 0;
+
+    for (const m of matches) {
+        const gw = startGw + (m.round_num - 1);
+        const scores = scoresByGw[gw] || {};
+        const hs = scores[m.home_team];
+        const as = scores[m.away_team];
+
+        if (hs === undefined || as === undefined) continue;
+
+        let winner = null;
+        if (hs > as) winner = m.home_team;
+        else if (as > hs) winner = m.away_team;
+        else winner = 'draw';
+
+        const ok = await updateChampionsMatch(m.id, {
+            gw: gw,
+            home_score: hs,
+            away_score: as,
+            winner: winner,
+            is_played: true
+        });
+
+        if (ok) {
+            m.gw = gw;
+            m.home_score = hs;
+            m.away_score = as;
+            m.winner = winner;
+            m.is_played = true;
+            updated++;
+        }
+    }
+
+    return updated;
+}
+
+/* =========================================================
+   ترتيب المجموعة
+========================================================= */
+
+function computeGroupStandings(draw, matches, groupName) {
+    const teams = draw.filter(function(r) { return r.group_name === groupName; });
+
+    const table = {};
+    teams.forEach(function(t) {
+        table[t.team] = {
+            team: t.team,
+            played: 0, won: 0, drawn: 0, lost: 0,
+            gf: 0, ga: 0, gd: 0, points: 0
+        };
+    });
+
+    const gMatches = matches.filter(function(m) {
+        return m.stage === 'groups' && m.group_name === groupName && m.is_played;
+    });
+
+    gMatches.forEach(function(m) {
+        const h = table[m.home_team];
+        const a = table[m.away_team];
+        if (!h || !a) return;
+
+        h.played++; a.played++;
+        h.gf += m.home_score; h.ga += m.away_score;
+        a.gf += m.away_score; a.ga += m.home_score;
+
+        if (m.home_score > m.away_score) {
+            h.won++; a.lost++;
+            h.points += 3;
+        } else if (m.away_score > m.home_score) {
+            a.won++; h.lost++;
+            a.points += 3;
+        } else {
+            h.drawn++; a.drawn++;
+            h.points += 1; a.points += 1;
+        }
+    });
+
+    Object.values(table).forEach(function(t) {
+        t.gd = t.gf - t.ga;
+    });
+
+    return Object.values(table).sort(function(x, y) {
+        if (y.points !== x.points) return y.points - x.points;
+        if (y.gd !== x.gd) return y.gd - x.gd;
+        if (y.gf !== x.gf) return y.gf - x.gf;
+        return x.team.localeCompare(y.team);
+    });
+}
+
+/* =========================================================
+   بناء الإقصائيات
+========================================================= */
+
+async function buildKnockoutStage(startGw) {
+    const qualified = [];
+
+    CHAMP_GROUPS.forEach(function(g) {
+        const standings = computeGroupStandings(champData.draw, champData.matches, g);
+        if (standings.length >= 2) {
+            qualified.push({
+                group: g,
+                first: standings[0].team,
+                second: standings[1].team
+            });
+        }
+    });
+
+    if (qualified.length < 4) return false;
+
+    /* QF: A1 vs B2, B1 vs A2, C1 vs D2, D1 vs C2 */
+    const qfPairs = [
+        { home: qualified[0].first, away: qualified[1].second },
+        { home: qualified[1].first, away: qualified[0].second },
+        { home: qualified[2].first, away: qualified[3].second },
+        { home: qualified[3].first, away: qualified[2].second }
+    ];
+
+    const qfMatches = qfPairs.map(function(p, idx) {
+        return {
+            stage: 'qf',
+            group_name: null,
+            round_num: idx + 1,
+            gw: startGw,
+            home_team: p.home,
+            away_team: p.away,
+            home_score: null, away_score: null,
+            home_real: null, away_real: null,
+            home_gf: null, away_gf: null,
+            winner: null,
+            is_played: false
+        };
+    });
+
+    await window.sbClient.from('champions_matches').insert(qfMatches);
+
+    await saveChampionsMeta({
+        current_stage: 'qf',
+        current_round: 1
+    });
+
+    return true;
+}
+
+/* =========================================================
+   حساب الإقصائيات
+========================================================= */
+
+async function syncKnockoutResults() {
+    const knockoutMatches = champData.matches.filter(function(m) {
+        return m.stage !== 'groups' && !m.is_played;
+    });
+
+    if (knockoutMatches.length === 0) return 0;
+
+    const gwsNeeded = {};
+    knockoutMatches.forEach(function(m) {
+        if (m.gw) gwsNeeded[m.gw] = true;
+    });
+
+    const scoresByGw = {};
+    for (const gw of Object.keys(gwsNeeded)) {
+        scoresByGw[gw] = await fetchTeamScoresForRound(parseInt(gw, 10));
+    }
+
+    let updated = 0;
+
+    for (const m of knockoutMatches) {
+        const scores = scoresByGw[m.gw] || {};
+        const hs = scores[m.home_team];
+        const as = scores[m.away_team];
+
+        if (hs === undefined || as === undefined) continue;
+
+        let winner = null;
+        if (hs > as) winner = m.home_team;
+        else if (as > hs) winner = m.away_team;
+        else winner = m.home_team; /* تعادل → الفريق المضيف يتأهل (يمكن تعديله) */
+
+        const ok = await updateChampionsMatch(m.id, {
+            home_score: hs,
+            away_score: as,
+            winner: winner,
+            is_played: true
+        });
+
+        if (ok) {
+            m.home_score = hs;
+            m.away_score = as;
+            m.winner = winner;
+            m.is_played = true;
+            updated++;
+        }
+    }
+
+    /* بناء الدور التالي إذا انتهى الحالي */
+    await checkAndBuildNextRound();
+
+    return updated;
+}
+
+async function checkAndBuildNextRound() {
+    const matches = champData.matches;
+    const stages = ['qf', 'sf', 'final'];
+
+    for (let i = 0; i < stages.length; i++) {
+        const stage = stages[i];
+        const stageMatches = matches.filter(function(m) { return m.stage === stage; });
+        if (stageMatches.length === 0) continue;
+
+        const allPlayed = stageMatches.every(function(m) { return m.is_played; });
+        if (!allPlayed) continue;
+
+        const nextStage = stages[i + 1];
+        if (!nextStage) {
+            /* نهائي — إعلان البطل */
+            const finalMatch = stageMatches[0];
+            if (finalMatch && finalMatch.winner) {
+                await saveChampionsMeta({
+                    current_stage: 'done',
+                    champion: finalMatch.winner
+                });
+            }
+            continue;
+        }
+
+        /* تحقق إذا الدور التالي موجود */
+        const nextMatches = matches.filter(function(m) { return m.stage === nextStage; });
+        if (nextMatches.length > 0) continue;
+
+        /* ابنِ الدور التالي */
+        const winners = stageMatches.map(function(m) { return m.winner; });
+        const gw = (stageMatches[0].gw || 0) + 1;
+
+        const newMatches = [];
+        if (nextStage === 'sf') {
+            if (winners.length >= 4) {
+                newMatches.push({
+                    stage: 'sf', group_name: null, round_num: 1, gw: gw,
+                    home_team: winners[0], away_team: winners[1],
+                    home_score: null, away_score: null, home_real: null, away_real: null,
+                    home_gf: null, away_gf: null, winner: null, is_played: false
+                });
+                newMatches.push({
+                    stage: 'sf', group_name: null, round_num: 2, gw: gw,
+                    home_team: winners[2], away_team: winners[3],
+                    home_score: null, away_score: null, home_real: null, away_real: null,
+                    home_gf: null, away_gf: null, winner: null, is_played: false
+                });
+            }
+        } else if (nextStage === 'final') {
+            if (winners.length >= 2) {
+                newMatches.push({
+                    stage: 'final', group_name: null, round_num: 1, gw: gw,
+                    home_team: winners[0], away_team: winners[1],
+                    home_score: null, away_score: null, home_real: null, away_real: null,
+                    home_gf: null, away_gf: null, winner: null, is_played: false
+                });
+            }
+        }
+
+        if (newMatches.length > 0) {
+            await window.sbClient.from('champions_matches').insert(newMatches);
+            await saveChampionsMeta({
+                current_stage: nextStage,
+                current_round: 1
+            });
+        }
+    }
+}
+
+/* =========================================================
    Render — الشاشة الرئيسية
 ========================================================= */
 
@@ -297,13 +639,13 @@ function renderChampionsMain() {
     let html = '';
 
     /* البنر */
-    html += '<div class="champions-banner">';
+    html += '<div class="champions-banner" id="champBanner">';
     html += '<div class="champions-banner-inner">';
     html += '<img class="champions-banner-img" src="./banner-fina.png" alt="Champions Cup">';
     html += '</div>';
     html += '</div>';
 
-    /* زر البدء */
+    /* الحالة */
     if (!meta.started) {
         if (draw.length === 0) {
             html += '<div class="champions-start-area">';
@@ -321,17 +663,32 @@ function renderChampionsMain() {
             html += '</div>';
         }
     } else {
+        /* شريط الحالة */
+        let stageText = '';
+        if (meta.current_stage === 'groups') stageText = 'دور المجموعات';
+        else if (meta.current_stage === 'qf') stageText = 'ربع النهائي';
+        else if (meta.current_stage === 'sf') stageText = 'نصف النهائي';
+        else if (meta.current_stage === 'final') stageText = 'النهائي';
+        else if (meta.current_stage === 'done') stageText = 'البطولة انتهت';
+
         html += '<div class="champions-start-area">';
         html += '<div class="champions-status-text">';
-        html += xIcon('trophy', 'fill') + ' البطولة انطلقت — من GW<strong>' + meta.start_gw + '</strong>';
+        html += xIcon('trophy', 'fill') + ' ' + stageText + ' — من GW<strong>' + meta.start_gw + '</strong>';
         html += '</div>';
         html += '</div>';
     }
 
     /* المحتوى */
     if (draw.length > 0) {
-        html += renderGroupsSection(draw);
-        html += renderMatchesSection(matches);
+        html += renderGroupsSection(draw, matches, meta);
+
+        if (meta.started) {
+            if (meta.current_stage === 'groups') {
+                html += renderGroupsMatches(matches, meta);
+            } else {
+                html += renderKnockoutBracket(matches, meta);
+            }
+        }
     } else {
         html += '<div class="champions-empty">';
         html += xIcon('trophy', 'duotone');
@@ -341,30 +698,36 @@ function renderChampionsMain() {
 
     container.innerHTML = html;
 
-    attachChampHiddenBtn();
+    attachChampHiddenBtns();
 }
 
 /* =========================================================
    Render — المجموعات
 ========================================================= */
 
-function renderGroupsSection(draw) {
+function renderGroupsSection(draw, matches, meta) {
     let html = '<div class="champions-groups-section">';
     html += '<div class="champions-section-title">' + xIcon('squares-four', 'bold') + ' المجموعات</div>';
     html += '<div class="champions-groups-grid">';
 
     CHAMP_GROUPS.forEach(function(gName) {
-        const teams = draw.filter(function(r) { return r.group_name === gName; })
-            .sort(function(a, b) { return a.position - b.position; });
+        const standings = computeGroupStandings(draw, matches, gName);
 
         html += '<div class="champions-group-card">';
-        html += '<div class="champions-group-card-header">' + xIcon('shield-star', 'fill') + ' Group ' + gName + '</div>';
+        html += '<div class="champions-group-card-header">' + xIcon('shield-star', 'fill') + ' GROUP ' + gName + '</div>';
         html += '<table class="champions-group-table">';
-        html += '<thead><tr><th>#</th><th style="text-align:right;">الفريق</th></tr></thead><tbody>';
+        html += '<thead><tr>';
+        html += '<th>#</th><th style="text-align:right;">Team</th>';
+        html += '<th>P</th><th>W</th><th>D</th><th>L</th>';
+        html += '<th>GD</th><th>Pts</th>';
+        html += '</tr></thead><tbody>';
 
-        teams.forEach(function(t, idx) {
+        standings.forEach(function(t, idx) {
             const logoFile = (typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[t.team]) || '';
-            html += '<tr>';
+            const isQualified = idx < 2 && meta.current_stage !== 'groups';
+            const rowClass = isQualified ? 'qualified' : '';
+
+            html += '<tr class="' + rowClass + '">';
             html += '<td>' + (idx + 1) + '</td>';
             html += '<td><div class="team-cell-mini">';
             if (logoFile) {
@@ -372,6 +735,12 @@ function renderGroupsSection(draw) {
             }
             html += '<span>' + t.team + '</span>';
             html += '</div></td>';
+            html += '<td>' + t.played + '</td>';
+            html += '<td>' + t.won + '</td>';
+            html += '<td>' + t.drawn + '</td>';
+            html += '<td>' + t.lost + '</td>';
+            html += '<td>' + (t.gd > 0 ? '+' + t.gd : t.gd) + '</td>';
+            html += '<td><strong>' + t.points + '</strong></td>';
             html += '</tr>';
         });
 
@@ -384,35 +753,106 @@ function renderGroupsSection(draw) {
 }
 
 /* =========================================================
-   Render — المباريات
+   Render — مباريات المجموعات
 ========================================================= */
 
-function renderMatchesSection(matches) {
-    if (!matches || matches.length === 0) return '';
+function renderGroupsMatches(matches, meta) {
+    const groupMatches = matches.filter(function(m) { return m.stage === 'groups'; });
+    if (groupMatches.length === 0) return '';
+
+    const startGw = meta.start_gw || 6;
 
     let html = '<div class="champions-round-section">';
-    html += '<div class="champions-section-title">' + xIcon('soccer-ball', 'bold') + ' المباريات</div>';
+    html += '<div class="champions-section-title">' + xIcon('soccer-ball', 'bold') + ' مباريات المجموعات</div>';
 
-    const groupMatches = matches.filter(function(m) { return m.stage === 'groups'; });
+    for (let r = 1; r <= 4; r++) {
+        const roundMatches = groupMatches.filter(function(m) { return m.round_num === r; });
+        if (roundMatches.length === 0) continue;
 
-    CHAMP_GROUPS.forEach(function(gName) {
-        const gMatches = groupMatches.filter(function(m) { return m.group_name === gName; });
-        if (gMatches.length === 0) return;
+        const gw = startGw + (r - 1);
+        html += '<div class="champ-round-label">Round ' + r + ' <span class="champ-gw">GW' + gw + '</span></div>';
 
-        html += '<div style="margin-bottom:14px;">';
-        html += '<div style="font-size:12px;font-weight:900;color:#8B1A2F;margin-bottom:6px;letter-spacing:1px;">';
-        html += 'GROUP ' + gName;
-        html += '</div>';
-
-        gMatches.forEach(function(m) {
+        roundMatches.forEach(function(m) {
             html += renderMatchRow(m);
         });
-
-        html += '</div>';
-    });
+    }
 
     html += '</div>';
     return html;
+}
+
+/* =========================================================
+   Render — شجرة الإقصائيات
+========================================================= */
+
+function renderKnockoutBracket(matches, meta) {
+    const qfMatches = matches.filter(function(m) { return m.stage === 'qf'; });
+    const sfMatches = matches.filter(function(m) { return m.stage === 'sf'; });
+    const finalMatches = matches.filter(function(m) { return m.stage === 'final'; });
+
+    let html = '<div class="champions-round-section">';
+    html += '<div class="champions-section-title">' + xIcon('trophy', 'fill') + ' الأدوار الإقصائية</div>';
+
+    html += '<div class="champions-bracket">';
+
+    if (qfMatches.length > 0) {
+        html += '<div class="champions-bracket-round">';
+        html += '<div class="champions-bracket-round-label">Quarter Finals</div>';
+        qfMatches.forEach(function(m) { html += renderBracketMatch(m); });
+        html += '</div>';
+    }
+
+    if (sfMatches.length > 0) {
+        html += '<div class="champions-bracket-round">';
+        html += '<div class="champions-bracket-round-label">Semi Finals</div>';
+        sfMatches.forEach(function(m) { html += renderBracketMatch(m); });
+        html += '</div>';
+    }
+
+    if (finalMatches.length > 0) {
+        html += '<div class="champions-bracket-round">';
+        html += '<div class="champions-bracket-round-label">Final</div>';
+        finalMatches.forEach(function(m) { html += renderBracketMatch(m); });
+        html += '</div>';
+    }
+
+    html += '</div>';
+
+    /* البطل */
+    if (meta.champion) {
+        const logoFile = (typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[meta.champion]) || '';
+        html += '<div class="champ-champion-card">';
+        html += '<div class="champ-champion-label">' + xIcon('crown', 'fill') + ' CHAMPION</div>';
+        if (logoFile) {
+            html += '<img src="./' + logoFile + '" class="champ-champion-logo" onerror="this.style.display=\'none\'">';
+        }
+        html += '<div class="champ-champion-name">' + meta.champion + '</div>';
+        html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function renderBracketMatch(m) {
+    const homeLogo = (typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[m.home_team]) || '';
+    const awayLogo = (typeof TEAMS_LOGOS !== 'undefined' && TEAMS_LOGOS[m.away_team]) || '';
+
+    const homeWin = m.winner === m.home_team;
+    const awayWin = m.winner === m.away_team;
+
+    return '<div class="champions-bracket-match">' +
+        '<div class="champions-bracket-team' + (homeWin ? ' winner' : '') + '">' +
+            (homeLogo ? '<img src="./' + homeLogo + '" onerror="this.style.display=\'none\'">' : '') +
+            '<span class="champions-bracket-team-name">' + m.home_team + '</span>' +
+            '<span class="champions-bracket-score">' + (m.is_played ? m.home_score : '-') + '</span>' +
+        '</div>' +
+        '<div class="champions-bracket-team' + (awayWin ? ' winner' : '') + '">' +
+            (awayLogo ? '<img src="./' + awayLogo + '" onerror="this.style.display=\'none\'">' : '') +
+            '<span class="champions-bracket-team-name">' + m.away_team + '</span>' +
+            '<span class="champions-bracket-score">' + (m.is_played ? m.away_score : '-') + '</span>' +
+        '</div>' +
+    '</div>';
 }
 
 function renderMatchRow(m) {
@@ -440,7 +880,7 @@ function renderMatchRow(m) {
 }
 
 /* =========================================================
-   الأنيميشن — القرعة UEFA Style
+   الأنيميشن — القرعة
 ========================================================= */
 
 async function champPerformDraw() {
@@ -562,7 +1002,6 @@ async function champAnimateSequence(drawRows) {
     const closeBtn = document.getElementById('champDrawClose');
     if (closeBtn) closeBtn.style.display = 'inline-flex';
 
-    /* حفظ القرعة */
     await saveChampionsDraw(drawRows);
     champData.draw = drawRows;
 
@@ -619,11 +1058,11 @@ async function champStartTournament() {
 }
 
 /* =========================================================
-   زر مخفي — إعادة القرعة
+   الأزرار المخفية — على البنر
 ========================================================= */
 
-function attachChampHiddenBtn() {
-    const banner = document.querySelector('.champions-banner');
+function attachChampHiddenBtns() {
+    const banner = document.getElementById('champBanner');
     if (!banner) return;
 
     banner.style.cursor = 'pointer';
@@ -635,7 +1074,7 @@ function attachChampHiddenBtn() {
 
     const startPress = function() {
         pressTimer = setTimeout(function() {
-            champRequestReset();
+            champShowAdminMenu();
         }, 1500);
     };
 
@@ -653,14 +1092,87 @@ function attachChampHiddenBtn() {
     banner.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 }
 
-function champRequestReset() {
-    const pin = prompt('أدخل رمز إعادة القرعة:');
+function champShowAdminMenu() {
+    const pin = prompt('أدخل رمز التحكم:');
     if (pin === null) return;
     if (pin !== CHAMP_PIN) {
         alert('الرمز غلط');
         return;
     }
 
+    const meta = champData.meta || {};
+
+    const choice = prompt(
+        'اختر الإجراء:\n' +
+        '1 — تحديث النتائج\n' +
+        '2 — ابدأ الإقصائيات\n' +
+        '3 — إعادة القرعة\n' +
+        '0 — إلغاء'
+    );
+
+    if (choice === '1') champSyncNow();
+    else if (choice === '2') champStartKnockout();
+    else if (choice === '3') champRequestReset();
+}
+
+async function champSyncNow() {
+    if (typeof showToast === 'function') showToast('جاري تحديث النتائج...', false);
+
+    const meta = champData.meta || {};
+    let updated = 0;
+
+    if (meta.current_stage === 'groups') {
+        updated = await syncGroupResults();
+    } else {
+        updated = await syncKnockoutResults();
+    }
+
+    if (updated > 0) {
+        if (typeof showToast === 'function') showToast('تم تحديث ' + updated + ' مباراة', true, 2500);
+    } else {
+        if (typeof showToast === 'function') showToast('لا توجد نتائج جديدة', false, 2500);
+    }
+
+    champLoaded = false;
+    loadChampions();
+}
+
+async function champStartKnockout() {
+    const meta = champData.meta || {};
+    if (!meta.started) {
+        alert('البطولة ما بدأت بعد');
+        return;
+    }
+    if (meta.current_stage !== 'groups') {
+        alert('الإقصائيات بدأت بالفعل');
+        return;
+    }
+
+    /* تحقق من انتهاء كل مباريات المجموعات */
+    const groupMatches = champData.matches.filter(function(m) { return m.stage === 'groups'; });
+    const allPlayed = groupMatches.every(function(m) { return m.is_played; });
+
+    if (!allPlayed) {
+        alert('ما زالت هناك مباريات مجموعات لم تنته');
+        return;
+    }
+
+    if (!confirm('⚠️ ابدأ الإقصائيات من الجولة القادمة؟')) return;
+
+    const startGw = (currentRound || 1) + 1;
+
+    const ok = await buildKnockoutStage(startGw);
+
+    if (ok) {
+        if (typeof showToast === 'function') showToast('الإقصائيات بدأت من GW' + startGw, true, 3000);
+        champLoaded = false;
+        loadChampions();
+    } else {
+        alert('فشل بناء الإقصائيات');
+    }
+}
+
+function champRequestReset() {
     if (!confirm('⚠️ راح تمسح القرعة وكل المباريات. متأكد؟')) return;
 
     resetChampions().then(function(ok) {
@@ -676,15 +1188,15 @@ function champRequestReset() {
 }
 
 /* =========================================================
-   التحميل الرئيسي
+   التحميل
 ========================================================= */
 
 async function loadChampions() {
     const container = document.getElementById('championsContent');
     if (!container) return;
 
-    if (!window.sbClient) {
-        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase غير متوفر</div></div>';
+    if.m (!window.sbClientatches) {
+        container.innerHTML = '<div class =="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase غير متوفر</div></div>';
         return;
     }
 
@@ -704,7 +1216,7 @@ async function loadChampions() {
 
         champData.meta = meta || { started: false };
         champData.draw = draw;
-        champData.matches = matches;
+        champData matches;
         champLoaded = true;
 
         renderChampionsMain();
@@ -720,16 +1232,10 @@ window.champPerformDraw = champPerformDraw;
 window.champStartTournament = champStartTournament;
 window.champCloseDraw = champCloseDraw;
 window.champRequestReset = champRequestReset;
+window.champSyncNow = champSyncNow;
+window.champStartKnockout = champStartKnockout;
+window.champShowAdminMenu = champShowAdminMenu;
 window.championsReload = function() {
     champLoaded = false;
     loadChampions();
 };
-
-/* Auto-load عند فتح التاب */
-document.addEventListener('DOMContentLoaded', function() {
-    setTimeout(function() {
-        if (document.getElementById('championsContent')) {
-            loadChampions();
-        }
-    }, 3000);
-});
