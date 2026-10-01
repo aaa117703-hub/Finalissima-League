@@ -1,5 +1,5 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=8)
+   champions.js — FINALISSIMA LEAGUE CHAT (v=9)
    ========================================================= */
 
 const CHAMP_PIN = '024680';
@@ -544,7 +544,6 @@ async function buildKnockoutStage(startGw) {
     await saveChampionsMeta({ current_stage: 'qf', current_round: 1 });
     return true;
 }
-
 /* =========================================================
    Render Main
 ========================================================= */
@@ -608,9 +607,6 @@ function renderChampionsMain() {
     container.innerHTML = html;
     attachChampHiddenBtns();
 }
-/* =========================================================
-   Render Groups Section
-========================================================= */
 
 function renderGroupsSection(draw, matches, meta) {
     let html = '<div class="champions-groups-section">';
@@ -658,10 +654,6 @@ function renderGroupsSection(draw, matches, meta) {
     return html;
 }
 
-/* =========================================================
-   Render Group Matches
-========================================================= */
-
 function renderGroupsMatches(matches, meta) {
     const groupMatches = matches.filter(function(m) { return m.stage === 'groups'; });
     if (groupMatches.length === 0) return '';
@@ -683,10 +675,6 @@ function renderGroupsMatches(matches, meta) {
     html += '</div>';
     return html;
 }
-
-/* =========================================================
-   Render Knockout Bracket
-========================================================= */
 
 function renderKnockoutBracket(matches, meta) {
     const qfMatches = matches.filter(function(m) { return m.stage === 'qf'; });
@@ -785,7 +773,7 @@ function renderMatchRow(m) {
 }
 
 /* =========================================================
-   🎬 CINEMATIC DRAW v=8
+   🎬 CINEMATIC DRAW
 ========================================================= */
 
 async function champPerformDraw() {
@@ -814,10 +802,6 @@ async function champPerformDraw() {
 
     champDrawAnimating = false;
 }
-
-/* =========================================================
-   Build Draw Screen
-========================================================= */
 
 function champBuildDrawScreen() {
     const old = document.getElementById('champDrawScreen');
@@ -904,7 +888,7 @@ async function champRunCinematicDraw(drawRows, pots) {
 
     await champWait(1200);
 
-    /* ⭐ المشهد 2: الانقسام — البنر يختفي والبطاقات تظهر */
+    /* ⭐ المشهد 2: الانقسام */
     await new Promise(function(resolve) {
         gsap.to(banner, {
             opacity: 0,
@@ -917,7 +901,6 @@ async function champRunCinematicDraw(drawRows, pots) {
         });
     });
 
-    /* ظهور البطاقات */
     gsap.set(cards, { opacity: 0, scale: 0.9 });
 
     await new Promise(function(resolve) {
@@ -933,7 +916,7 @@ async function champRunCinematicDraw(drawRows, pots) {
 
     await champWait(800);
 
-    /* ⭐ المشهد 3: قلب البطاقات — على inner */
+    /* ⭐ المشهد 3: قلب البطاقات */
     await new Promise(function(resolve) {
         gsap.to(cardInners, {
             rotationY: 180,
@@ -965,7 +948,10 @@ async function champRunCinematicDraw(drawRows, pots) {
             await champDistributeTeam(potRows[i], i);
         }
 
-        await champResetCardsForNextPot();
+        /* استنى قبل Pot الجديد */
+        if (potNum < 5) {
+            await champResetCardsForNextPot();
+        }
 
         await champWait(400);
     }
@@ -988,7 +974,11 @@ async function champShowPotTeams(potNum, potRows) {
         );
     }
 
+    const cardInners = document.querySelectorAll('.champ-card-inner');
     const cards = document.querySelectorAll('.champ-card');
+
+    /* تأكد البطاقات مقلوبة للظهر */
+    gsap.set(cardInners, { rotationY: 180 });
 
     for (let i = 0; i < 4; i++) {
         const card = cards[i];
@@ -1009,11 +999,11 @@ async function champShowPotTeams(potNum, potRows) {
         card.dataset.group = row.group_name;
     }
 
-    await champWait(1000);
+    await champWait(900);
 }
 
 /* =========================================================
-   Distribute One Team
+   Distribute One Team — UEFA Trail Animation
 ========================================================= */
 
 async function champDistributeTeam(row, slotIndex) {
@@ -1025,81 +1015,110 @@ async function champDistributeTeam(row, slotIndex) {
 
     const allCards = document.querySelectorAll('.champ-card');
 
-    /* ⭐ Spotlight */
-    for (let cycle = 0; cycle < 2; cycle++) {
+    /* ⭐ Spotlight — 3 دورات */
+    for (let cycle = 0; cycle < 3; cycle++) {
         for (let c = 0; c < 4; c++) {
             gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.1 });
             gsap.to(allCards[c], {
-                boxShadow: '0 0 40px rgba(212,183,122,0.9)',
-                scale: 1.08,
-                duration: 0.15
+                boxShadow: '0 0 45px rgba(212,183,122,0.9)',
+                scale: 1.06,
+                duration: 0.13
             });
-            await champWait(120);
+            await champWait(110);
         }
     }
 
     /* ⭐ توقف على البطاقة */
     gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.2 });
     gsap.to(card, {
-        boxShadow: '0 0 60px rgba(212,183,122,1)',
-        scale: 1.15,
-        duration: 0.3,
+        boxShadow: '0 0 70px rgba(212,183,122,1)',
+        scale: 1.18,
+        duration: 0.35,
         ease: 'power2.out'
     });
 
-    await champWait(500);
+    await champWait(550);
 
-    /* ⭐ Clone */
-    const cardRect = card.getBoundingClientRect();
-    const groupRect = groupTarget.getBoundingClientRect();
-
+    /* ⭐ بيانات */
     const teamName = champGetTeamName(row.team);
     const teamLogo = champGetTeamLogo(row.team);
 
-    const flyingTeam = document.createElement('div');
-    flyingTeam.className = 'champ-flying-team';
-    flyingTeam.innerHTML =
-        (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
-        '<span>' + teamName + '</span>';
-
-    flyingTeam.style.position = 'fixed';
-    flyingTeam.style.left = cardRect.left + 'px';
-    flyingTeam.style.top = cardRect.top + 'px';
-    flyingTeam.style.width = cardRect.width + 'px';
-    flyingTeam.style.height = cardRect.height + 'px';
-    flyingTeam.style.zIndex = '9999999';
-    flyingTeam.style.pointerEvents = 'none';
-    document.body.appendChild(flyingTeam);
+    const cardRect = card.getBoundingClientRect();
+    const groupRect = groupTarget.getBoundingClientRect();
 
     const startX = cardRect.left + cardRect.width / 2;
     const startY = cardRect.top + cardRect.height / 2;
     const endX = groupRect.left + groupRect.width / 2;
     const endY = groupRect.top + groupRect.height / 2;
 
-    /* ⭐ Flight */
+    /* ⭐ LED */
+    const led = document.createElement('div');
+    led.className = 'champ-led';
+    led.innerHTML =
+        (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
+        '<span>' + teamName + '</span>';
+    led.style.position = 'fixed';
+    led.style.left = '0';
+    led.style.top = '0';
+    led.style.zIndex = '9999999';
+    led.style.pointerEvents = 'none';
+    led.style.transform = 'translate(' + (startX - 60) + 'px, ' + (startY - 30) + 'px) scale(0.3)';
+    led.style.opacity = '0';
+    document.body.appendChild(led);
+
+    /* fade البطاقة */
+    const cardTeam = card.querySelector('.champ-card-back-team');
+    if (cardTeam) {
+        gsap.to(cardTeam, {
+            opacity: 0,
+            scale: 0.5,
+            duration: 0.4
+        });
+    }
+
+    /* ظهور LED */
     await new Promise(function(resolve) {
-        const duration = 1.3;
+        gsap.to(led, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            ease: 'back.out(1.5)',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(300);
+
+    /* ⭐ الطيران UEFA Trail */
+    await new Promise(function(resolve) {
+        const duration = 1.6;
         const startTime = performance.now();
         const midX = (startX + endX) / 2;
-        const midY = Math.min(startY, endY) - 150;
+        const midY = Math.min(startY, endY) - 180;
+
+        let lastTrailTime = 0;
 
         function animate(now) {
             const elapsed = now - startTime;
             const t = Math.min(elapsed / duration, 1);
-            const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+            const eased = t < 0.5
+                ? 4 * t * t * t
+                : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
             const mt = 1 - eased;
             const x = mt*mt*mt*startX + 3*mt*mt*eased*midX + 3*mt*eased*eased*midX + eased*eased*eased*endX;
             const y = mt*mt*mt*startY + 3*mt*mt*eased*midY + 3*mt*eased*eased*midY + eased*eased*eased*endY;
 
-            const sc = 1 + Math.sin(eased * Math.PI) * 0.3;
-            const rot = eased * 360;
+            const sc = 1 + Math.sin(eased * Math.PI) * 0.4;
+            const rot = eased * 720;
 
-            flyingTeam.style.transform =
-                'translate(' + (x - cardRect.left - cardRect.width/2) + 'px, ' +
-                (y - cardRect.top - cardRect.height/2) + 'px) scale(' + sc + ') rotate(' + rot + 'deg)';
+            led.style.transform =
+                'translate(' + (x - 60) + 'px, ' + (y - 30) + 'px) ' +
+                'rotate(' + rot + 'deg) scale(' + sc + ')';
 
-            if (elapsed % 40 < 20) {
+            if (now - lastTrailTime > 25) {
+                lastTrailTime = now;
                 champSpawnTrail(x, y);
             }
 
@@ -1112,30 +1131,30 @@ async function champDistributeTeam(row, slotIndex) {
         requestAnimationFrame(animate);
     });
 
-    flyingTeam.remove();
+    /* ⭐ الوصول */
+    led.remove();
     champSpawnShockwave(endX, endY);
 
-    /* ⭐ Group pulse */
     gsap.timeline()
         .to(groupTarget, {
-            scale: 1.15,
-            boxShadow: '0 0 60px rgba(212,183,122,1)',
+            scale: 1.18,
+            boxShadow: '0 0 70px rgba(212,183,122,1), inset 0 0 40px rgba(212,183,122,0.4)',
             borderColor: '#D4B77A',
             duration: 0.3,
             ease: 'power2.out'
         })
         .to(groupTarget, {
             scale: 1,
-            duration: 0.5,
+            duration: 0.6,
             ease: 'elastic.out(1, 0.5)'
         })
         .to(groupTarget, {
             boxShadow: '0 0 0 rgba(212,183,122,0)',
             borderColor: 'rgba(212,183,122,0.5)',
             duration: 0.5
-        }, '-=0.3');
+        }, '-=0.4');
 
-    /* ⭐ Add team to group */
+    /* ⭐ Add team */
     const teamHtml =
         '<div class="champ-group-team-item">' +
             (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
@@ -1146,7 +1165,7 @@ async function champDistributeTeam(row, slotIndex) {
     const newTeam = groupTeamsEl.lastElementChild;
     gsap.fromTo(newTeam,
         { opacity: 0, scale: 0.5, y: -20 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.7)' }
+        { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(1.7)' }
     );
 
     /* ⭐ Reset card */
@@ -1155,6 +1174,14 @@ async function champDistributeTeam(row, slotIndex) {
         scale: 1,
         duration: 0.4
     });
+
+    if (cardTeam) {
+        gsap.to(cardTeam, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.3
+        });
+    }
 
     await champWait(400);
 }
@@ -1167,18 +1194,34 @@ async function champResetCardsForNextPot() {
     const cardInners = document.querySelectorAll('.champ-card-inner');
     const teamSlots = document.querySelectorAll('.champ-card-back-team');
 
-    gsap.to(cardInners, {
-        rotationY: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'power2.inOut'
+    /* ⭐ نظف */
+    teamSlots.forEach(function(el) { el.innerHTML = ''; });
+
+    /* ⭐ ارجع للواجهة */
+    await new Promise(function(resolve) {
+        gsap.to(cardInners, {
+            rotationY: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: 'power2.inOut',
+            onComplete: resolve
+        });
     });
 
-    setTimeout(function() {
-        teamSlots.forEach(function(el) { el.innerHTML = ''; });
-    }, 800);
+    await champWait(400);
 
-    await champWait(900);
+    /* ⭐ اقلب للظهر مرة ثانية */
+    await new Promise(function(resolve) {
+        gsap.to(cardInners, {
+            rotationY: 180,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: 'power2.inOut',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(300);
 }
 
 /* =========================================================
@@ -1201,22 +1244,96 @@ async function champFinale() {
         });
     }
 
-    await champWait(1500);
+    await champWait(1200);
 
-    const cardsStage = document.getElementById('champCardsStage');
-    if (cardsStage && cardsStage.parentElement) {
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'champions-draw-close';
-        closeBtn.innerHTML = xIcon('check-circle', 'bold') + ' <span>Done</span>';
-        closeBtn.onclick = champCloseDraw;
-        cardsStage.parentElement.appendChild(closeBtn);
+    /* ⭐ أظهر أزرار التحكم */
+    champShowDrawButtons();
+}
 
-        gsap.fromTo(closeBtn,
-            { opacity: 0, y: 20 },
-            { opacity: 1, y: 0, duration: 0.5 }
-        );
+/* =========================================================
+   Draw Buttons — Save + Reset
+========================================================= */
+
+function champShowDrawButtons() {
+    const old = document.getElementById('champDrawActions');
+    if (old) return;
+
+    const groupsStage = document.getElementById('champGroupsStage');
+    if (!groupsStage) return;
+
+    const actions = document.createElement('div');
+    actions.className = 'champ-draw-actions';
+    actions.id = 'champDrawActions';
+
+    actions.innerHTML =
+        '<button class="champ-btn-save" id="champBtnSave" onclick="champSaveAndClose()">' +
+            xIcon('floppy-disk', 'fill') + ' <span>حفظ القرعة</span>' +
+        '</button>' +
+        '<button class="champ-btn-reset" id="champBtnReset" onclick="champResetFromDraw()">' +
+            xIcon('arrows-clockwise', 'bold') + ' <span>إعادة القرعة</span>' +
+        '</button>';
+
+    groupsStage.parentElement.appendChild(actions);
+
+    gsap.fromTo(actions,
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 }
+    );
+}
+
+async function champSaveAndClose() {
+    const saveBtn = document.getElementById('champBtnSave');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = xIcon('hourglass', 'bold') + ' <span>جاري الحفظ...</span>';
+    }
+
+    const drawRows = champData.pendingDraw || [];
+
+    if (drawRows.length > 0) {
+        await champSaveDraw(drawRows);
+        champData.pendingDraw = null;
+        if (typeof showToast === 'function') {
+            showToast('تم حفظ القرعة', true, 2500);
+        }
+    }
+
+    const screen = document.getElementById('champDrawScreen');
+    if (screen) {
+        gsap.to(screen, {
+            opacity: 0,
+            duration: 0.4,
+            onComplete: function() {
+                screen.remove();
+                champLoaded = false;
+                loadChampions();
+            }
+        });
     }
 }
+
+function champResetFromDraw() {
+    if (!confirm('هل أنت متأكد؟ سيتم حذف القرعة الحالية والبدء من جديد.')) return;
+
+    const screen = document.getElementById('champDrawScreen');
+    if (screen) {
+        gsap.to(screen, {
+            opacity: 0,
+            duration: 0.4,
+            onComplete: function() {
+                screen.remove();
+                champData.pendingDraw = null;
+
+                setTimeout(function() {
+                    champPerformDraw();
+                }, 300);
+            }
+        });
+    }
+}
+
+window.champSaveAndClose = champSaveAndClose;
+window.champResetFromDraw = champResetFromDraw;
 
 /* =========================================================
    Effects
@@ -1231,7 +1348,7 @@ function champSpawnTrail(x, y) {
 
     gsap.fromTo(p,
         { opacity: 0.9, scale: 1 },
-        { opacity: 0, scale: 0.2, duration: 0.5, onComplete: function() { p.remove(); } }
+        { opacity: 0, scale: 0.2, duration: 0.6, onComplete: function() { p.remove(); } }
     );
 }
 
@@ -1244,7 +1361,7 @@ function champSpawnShockwave(x, y) {
 
     gsap.fromTo(w,
         { opacity: 0.8, scale: 0 },
-        { opacity: 0, scale: 4, duration: 0.8, onComplete: function() { w.remove(); } }
+        { opacity: 0, scale: 4, duration: 0.9, onComplete: function() { w.remove(); } }
     );
 }
 
@@ -1287,28 +1404,6 @@ async function champSaveDraw(drawRows) {
     const matches = buildRoundRobin(groups);
     await saveChampionsMatches(matches);
     champData.matches = matches;
-}
-
-async function champCloseDraw() {
-    const screen = document.getElementById('champDrawScreen');
-    if (screen) {
-        gsap.to(screen, {
-            opacity: 0,
-            duration: 0.4,
-            onComplete: async function() {
-                screen.remove();
-
-                const drawRows = champData.pendingDraw || [];
-                if (drawRows.length > 0) {
-                    await champSaveDraw(drawRows);
-                    champData.pendingDraw = null;
-                }
-
-                champLoaded = false;
-                loadChampions();
-            }
-        });
-    }
 }
 
 /* =========================================================
