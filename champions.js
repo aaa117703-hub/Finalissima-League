@@ -29,6 +29,20 @@ function xIcon(name, variant) {
 }
 
 /* =========================================================
+   Navigation - فتح تاب Champions
+========================================================= */
+
+function champGoToTab() {
+    if (typeof switchTab === 'function') switchTab('stats');
+    setTimeout(function() {
+        if (typeof switchStatsTab === 'function') {
+            switchStatsTab('champions');
+        }
+    }, 150);
+}
+window.champGoToTab = champGoToTab;
+
+/* =========================================================
    Supabase
 ========================================================= */
 
@@ -199,16 +213,16 @@ async function buildPots() {
     let standings = [];
     try {
         standings = await calculateStandingsUpToRound(38);
-    } catch (e) {
-        console.warn('[Champions] buildPots standings:', e.message);
+0    } catch (e) {
+        };
+ console.warn('[Ch           ampions] buildPots standings:', e.message);
     }
 
     if (!standings || standings.length === 0) {
         if (typeof TEAMS_LOGOS !== 'undefined') {
-            standings = Object.keys(TEAMS_LOGOS).map(function(t) {
-                return { team: t, points: 0 };
             });
-        }
+ standings = Object.keys(TEAMS       _LOGOS).map(function(t) {
+                return { team: t, points:  }
     }
 
     const sorted = standings.slice().sort(function(a, b) {
@@ -326,7 +340,7 @@ function buildRoundRobin(groups) {
 }
 
 /* =========================================================
-   Sync — Group results
+   Sync - Group results
 ========================================================= */
 
 async function syncGroupResults() {
@@ -614,9 +628,9 @@ async function checkAndBuildNextRound() {
         }
     }
 }
-
+       
 /* =========================================================
-   Render — Main
+   Render - Main
 ========================================================= */
 
 function renderChampionsMain() {
@@ -683,7 +697,7 @@ function renderChampionsMain() {
 }
 
 /* =========================================================
-   Render — Groups section
+   Render - Groups section
 ========================================================= */
 
 function renderGroupsSection(draw, matches, meta) {
@@ -734,7 +748,7 @@ function renderGroupsSection(draw, matches, meta) {
 }
 
 /* =========================================================
-   Render — Group matches
+   Render - Group matches
 ========================================================= */
 
 function renderGroupsMatches(matches, meta) {
@@ -763,7 +777,7 @@ function renderGroupsMatches(matches, meta) {
 }
 
 /* =========================================================
-   Render — Knockout bracket
+   Render - Knockout bracket
 ========================================================= */
 
 function renderKnockoutBracket(matches, meta) {
