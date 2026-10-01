@@ -1293,8 +1293,18 @@ async function champSaveAndClose() {
     if (drawRows.length > 0) {
         await champSaveDraw(drawRows);
         champData.pendingDraw = null;
+    /* ⭐ نفعّل البطولة تلقائياً */
+        const startGw = (typeof currentRound !== 'undefined' ? currentRound : 1) + 1;
+
+        await saveChampionsMeta({
+            started: true,
+            start_gw: startGw,
+            current_stage: 'groups',
+            current_round: 1
+        });
+
         if (typeof showToast === 'function') {
-            showToast('تم حفظ القرعة', true, 2500);
+            showToast('تم حفظ القرعة — بدأ دور المجموعات', true, 3000);
         }
     }
 
