@@ -1,7 +1,10 @@
 /* =========================================================
-   champions.css — FINALISSIMA LEAGUE CHAT (v=5)
-   🏆 Champions Cup — Banner Split Draw
+   champions.css — FINALISSIMA LEAGUE CHAT (v=6)
    ========================================================= */
+
+/* =========================================================
+   1) WRAPPER
+========================================================= */
 
 .champions-wrapper{
     width:100%;
@@ -12,7 +15,7 @@
 }
 
 /* =========================================================
-   START BUTTON
+   2) START BUTTON + STATUS
 ========================================================= */
 
 .champions-start-area{
@@ -94,7 +97,7 @@
 }
 
 /* =========================================================
-   🎬 DRAW SCREEN
+   3) 🎬 DRAW SCREEN
 ========================================================= */
 
 .champions-draw-screen{
@@ -197,6 +200,7 @@
     min-width:140px;
     aspect-ratio:3 / 4;
     perspective:1500px;
+    transform-style:preserve-3d;
     cursor:default;
     transition:transform .3s ease;
     will-change:transform, box-shadow;
@@ -208,6 +212,7 @@
     height:100%;
     transform-style:preserve-3d;
     transition:transform .8s cubic-bezier(0.4, 0.0, 0.2, 1);
+    will-change:transform;
 }
 
 .champ-card-front,
