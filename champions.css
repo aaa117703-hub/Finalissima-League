@@ -1,11 +1,7 @@
 /* =========================================================
-   champions.css — FINALISSIMA LEAGUE CHAT (v=4)
-   🏆 Champions Cup — Cinematic Card Flip Draw
+   champions.css — FINALISSIMA LEAGUE CHAT (v=5)
+   🏆 Champions Cup — Banner Split Draw
    ========================================================= */
-
-/* =========================================================
-   1) WRAPPER
-========================================================= */
 
 .champions-wrapper{
     width:100%;
@@ -16,7 +12,7 @@
 }
 
 /* =========================================================
-   2) START BUTTON + STATUS
+   START BUTTON
 ========================================================= */
 
 .champions-start-area{
@@ -54,18 +50,13 @@
     position:absolute;
     top:0;left:-100%;
     width:100%;height:100%;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(212,183,122,.5) 50%,
-        transparent 100%);
+    background:linear-gradient(90deg, transparent 0%, rgba(212,183,122,.5) 50%, transparent 100%);
     animation:champBtnShine 3s ease-in-out infinite;
 }
 
 .champions-start-btn:hover{
     transform:translateY(-2px);
-    box-shadow:
-        0 10px 30px rgba(139,26,47,.55),
-        inset 0 1px 0 rgba(255,255,255,.2);
+    box-shadow:0 10px 30px rgba(139,26,47,.55);
 }
 
 .champions-start-btn:active{
@@ -103,18 +94,17 @@
 }
 
 /* =========================================================
-   3) 🎬 DRAW SCREEN (Cinematic)
+   🎬 DRAW SCREEN
 ========================================================= */
 
 .champions-draw-screen{
     position:fixed;
     inset:0;
     z-index:999999;
-    background:
-        radial-gradient(ellipse at center,
-            #2A2A2A 0%,
-            #1A1A1A 50%,
-            #0A0A0A 100%);
+    background:radial-gradient(ellipse at center,
+        #2A2A2A 0%,
+        #1A1A1A 50%,
+        #0A0A0A 100%);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -131,9 +121,7 @@
     to{opacity:1;}
 }
 
-/* ═══════════════════════════════════════════════════════
-   TITLE
-   ═══════════════════════════════════════════════════════ */
+/* ═══ TITLE ═══ */
 
 .champ-draw-header{
     width:100%;
@@ -157,9 +145,7 @@
     direction:rtl;
 }
 
-/* ═══════════════════════════════════════════════════════
-   BANNER STAGE (الأصل — يظهر ثم يختفي)
-   ═══════════════════════════════════════════════════════ */
+/* ═══ BANNER STAGE ═══ */
 
 .champ-banner-stage{
     width:100%;
@@ -191,9 +177,7 @@
     pointer-events:none;
 }
 
-/* ═══════════════════════════════════════════════════════
-   CARDS STAGE (4 بطاقات)
-   ═══════════════════════════════════════════════════════ */
+/* ═══ CARDS STAGE ═══ */
 
 .champ-cards-stage{
     display:flex;
@@ -238,7 +222,7 @@
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    border:3px solid rgba(212,183,122,.4);
+    border:3px solid rgba(212,183,122,.5);
     box-shadow:
         0 15px 50px rgba(0,0,0,.6),
         0 0 30px rgba(212,183,122,.2);
@@ -246,23 +230,8 @@
 
 .champ-card-front{
     transform:rotateY(0deg);
-}
-
-.champ-card-number{
-    font-size:clamp(48px, 8vw, 96px);
-    font-weight:900;
-    letter-spacing:4px;
-    color:rgba(255,255,255,.15);
-    text-shadow:0 4px 20px rgba(0,0,0,.3);
-    font-family:'Inter', sans-serif;
-}
-
-.champ-card[data-index="1"] .champ-card-number{
-    color:rgba(42,42,42,.25);
-}
-
-.champ-card[data-index="2"] .champ-card-number{
-    color:rgba(42,42,42,.20);
+    background-color:#1A1A1A;
+    background-repeat:no-repeat;
 }
 
 .champ-card-back{
@@ -276,9 +245,10 @@
     flex-direction:column;
     align-items:center;
     justify-content:center;
-    gap:14px;
-    padding:20px;
+    gap:16px;
+    padding:24px 16px;
     width:100%;
+    height:100%;
     text-align:center;
 }
 
@@ -293,15 +263,13 @@
     font-size:clamp(13px, 2vw, 18px);
     font-weight:900;
     color:#FAF6F0;
-    letter-spacing:1px;
+    letter-spacing:1.5px;
     text-transform:uppercase;
     text-shadow:0 2px 6px rgba(0,0,0,.6);
     line-height:1.2;
 }
 
-/* ═══════════════════════════════════════════════════════
-   GROUPS STAGE (A / B / C / D)
-   ═══════════════════════════════════════════════════════ */
+/* ═══ GROUPS STAGE ═══ */
 
 .champ-groups-stage{
     display:flex;
@@ -385,9 +353,7 @@
     white-space:nowrap;
 }
 
-/* ═══════════════════════════════════════════════════════
-   CLOSE BUTTON
-   ═══════════════════════════════════════════════════════ */
+/* ═══ CLOSE BUTTON ═══ */
 
 .champions-draw-close{
     margin:30px auto 0;
@@ -417,17 +383,11 @@
     box-shadow:0 12px 32px rgba(212,183,122,.7);
 }
 
-.champions-draw-close:active{
-    transform:translateY(0) scale(.97);
-}
-
 .champions-draw-close i{
     font-size:18px;
 }
 
-/* =========================================================
-   4) FLYING TEAM (Clone)
-========================================================= */
+/* ═══ FLYING TEAM ═══ */
 
 .champ-flying-team{
     display:flex;
@@ -441,9 +401,8 @@
     border-radius:18px;
     box-shadow:
         0 0 50px rgba(212,183,122,.9),
-        0 15px 50px rgba(0,0,0,.7),
-        inset 0 0 30px rgba(212,183,122,.2);
-    will-change:transform, filter, opacity;
+        0 15px 50px rgba(0,0,0,.7);
+    will-change:transform;
     min-width:120px;
     transform-origin:center center;
 }
@@ -465,30 +424,19 @@
     white-space:nowrap;
 }
 
-/* =========================================================
-   5) TRAIL PARTICLE
-========================================================= */
+/* ═══ EFFECTS ═══ */
 
 .champ-trail-particle{
     position:fixed;
     width:14px;
     height:14px;
     border-radius:50%;
-    background:radial-gradient(circle,
-        #E5D4A5 0%,
-        #D4B77A 40%,
-        transparent 100%);
+    background:radial-gradient(circle, #E5D4A5 0%, #D4B77A 40%, transparent 100%);
     pointer-events:none;
     z-index:9999998;
     transform:translate(-50%,-50%);
-    box-shadow:
-        0 0 14px #D4B77A,
-        0 0 28px rgba(212,183,122,.5);
+    box-shadow:0 0 14px #D4B77A;
 }
-
-/* =========================================================
-   6) SHOCKWAVE
-========================================================= */
 
 .champ-shockwave{
     position:fixed;
@@ -496,20 +444,12 @@
     height:100px;
     border-radius:50%;
     border:5px solid #D4B77A;
-    background:radial-gradient(circle,
-        rgba(212,183,122,.4) 0%,
-        transparent 70%);
+    background:radial-gradient(circle, rgba(212,183,122,.4) 0%, transparent 70%);
     pointer-events:none;
     z-index:9999998;
     transform:translate(-50%,-50%);
-    box-shadow:
-        0 0 50px #D4B77A,
-        inset 0 0 40px rgba(212,183,122,.5);
+    box-shadow:0 0 50px #D4B77A;
 }
-
-/* =========================================================
-   7) CONFETTI
-========================================================= */
 
 .champ-confetti{
     position:fixed;
@@ -519,9 +459,8 @@
     will-change:transform;
     box-shadow:0 0 8px rgba(212,183,122,.5);
 }
-
 /* =========================================================
-   8) GROUPS SECTION (في القسم العادي)
+   5) GROUPS SECTION (في القسم العادي)
 ========================================================= */
 
 .champions-groups-section{
@@ -648,7 +587,7 @@
 }
 
 /* =========================================================
-   9) MATCHES
+   6) MATCHES
 ========================================================= */
 
 .champions-round-section{
@@ -751,7 +690,7 @@
 }
 
 /* =========================================================
-   10) KNOCKOUT BRACKET
+   7) KNOCKOUT BRACKET
 ========================================================= */
 
 .champions-bracket{
@@ -841,7 +780,7 @@
 }
 
 /* =========================================================
-   11) CHAMPION CARD
+   8) CHAMPION CARD
 ========================================================= */
 
 .champ-champion-card{
@@ -914,7 +853,7 @@
 }
 
 /* =========================================================
-   12) EMPTY / LOADING
+   9) EMPTY / LOADING
 ========================================================= */
 
 .champions-empty{
@@ -944,7 +883,7 @@
 }
 
 /* =========================================================
-   13) MOBILE
+   10) MOBILE
 ========================================================= */
 
 @media(max-width:768px){
@@ -977,11 +916,6 @@
         letter-spacing:0.5px;
     }
 
-    .champ-card-number{
-        font-size:36px;
-        letter-spacing:2px;
-    }
-
     .champ-groups-stage{
         gap:6px;
     }
@@ -1012,113 +946,97 @@
     }
 
     .champ-group-team-item img{
- .        width:16px;
-ch        height:16px;
+        width:16px;
+        height:16px;
     }
 
-   amp .champ-group-team-ch-item span{
-        font-size:8ampionpx;
+    .champ-group-team-item span{
+        font-size:8px;
         letter-spacing:0;
--label    }
+    }
 
     .champ-draw-title{
-        font{
--size:20px;
-        letter-sp       acing:1px;
+        font-size:20px;
+        letter-spacing:1px;
     }
 
-    font .champ-flying-team{
-       -size padding:10px 14px;
-        min-width::90px;
-        gap:5px10;
+    .champ-flying-team{
+        padding:10px 14px;
+        min-width:90px;
+        gap:5px;
     }
 
-    .champ-fpxlying-team img{
-        width:34;
-px;
+    .champ-flying-team img{
+        width:34px;
         height:34px;
-           }
+    }
 
-    .champ-flying-team span letter{
+    .champ-flying-team span{
         font-size:10px;
-   -sp }
+    }
 }
 
 @media(max-width:480px){
 
-   acing .champions-draw-screen{
-        padding::14px 8px 30px;
-   2 }
+    .champions-draw-screen{
+        padding:14px 8px 30px;
+    }
 
     .champ-draw-header{
-px        padding:12px 0 ;
-20px;
+        padding:12px 0 20px;
     }
 
-    .champ       -draw-title{
-        font-size:17px padding;
-   : }
-
-    .champ-cards5-stage{
-        gap:6pxpx;
-        margin:16px auto 24 px;
+    .champ-draw-title{
+        font-size:17px;
     }
 
-    .champ-card14px;
-{
-           min-width:60px;
-        max-width }
-
-:90px;
+    .champ-cards-stage{
+        gap:6px;
+        margin:16px auto 24px;
     }
 
-    .   champ-card-back-team img{
-        . width:28px;
-        height:28champions-dpx;
+    .champ-card{
+        min-width:60px;
+        max-width:90px;
+    }
+
+    .champ-card-back-team img{
+        width:28px;
+        height:28px;
     }
 
     .champ-card-back-team span{
         font-size:8px;
     }
 
-    .champ-card-number{
-        font-size:28raw-closepx;
-    }
-
-   {
- .champ-groups-stage       {
+    .champ-groups-stage{
         gap:4px;
     }
 
- padding:12   px .champ-group-target{
-         min-width:60px;
-        min28-height:170px;
-        paddingpx:8px 4px;
-        border-radius;
-:12px;
+    .champ-group-target{
+        min-width:60px;
+        min-height:170px;
+        padding:8px 4px;
+        border-radius:12px;
     }
 
-    .ch       amp-group-target-label{
-        font font-size:14px;
-        letter-spacing-size:2px;
+    .champ-group-target-label{
+        font-size:14px;
+        letter-spacing:2px;
     }
 
-   : .champ-group-team-item img{
-       12 width:14px;
+    .champ-group-team-item img{
+        width:14px;
         height:14px;
-px    }
+    }
 
-    .champ-group-team-item span;
-{
+    .champ-group-team-item span{
         font-size:7px;
-       }
+    }
 
     .champ-champion-name{
- }
         font-size:20px;
-        letter-sp}
-
-acing:2px;
+        letter-spacing:2px;
     }
 
     .champ-champion-logo{
@@ -1126,8 +1044,20 @@ acing:2px;
         height:80px;
     }
 
-   /* =========================================================
-   14) REDUCED MOTION
+    .champ-champion-label{
+        font-size:10px;
+        letter-spacing:2px;
+        padding:5px 14px;
+    }
+
+    .champions-draw-close{
+        padding:12px 28px;
+        font-size:12px;
+    }
+}
+
+/* =========================================================
+   11) REDUCED MOTION
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce){
@@ -1139,7 +1069,7 @@ acing:2px;
 }
 
 /* =========================================================
-   15) منع حفظ الصور
+   12) منع حفظ الصور
 ========================================================= */
 
 .champ-card-back-team img,
