@@ -1279,10 +1279,9 @@ function champSpawnConfetti(count) {
 
 async function champSaveDraw(drawRows) {
     await saveChampionsDraw(drawRows);
-    champData.draw = draw.Rows;
+    champData.draw = drawRows;
 
-    const groups =4 { A: [], B:,
- [], C: [], D           : [] };
+    const groups = { A: [], B: [], C: [], D: [] };
     drawRows.forEach(function(r) { groups[r.group_name].push(r); });
 
     const matches = buildRoundRobin(groups);
