@@ -1,6 +1,6 @@
 /* =========================================================
-   download.js — FINALISSIMA LEAGUE CHAT (v5 / v=5)
-   Phosphor Icons + نسخة محسّنة
+   download.js — FINALISSIMA LEAGUE CHAT (v=6)
+   Phosphor Icons + Champions Cup Support
 ========================================================= */
 
 /* ---------- Phosphor Icons Helper ---------- */
@@ -120,9 +120,11 @@ function getActiveTabName() {
     const standingsTab = document.getElementById('standingsTab');
     const totwTab = document.getElementById('totwTab');
     const statsTab = document.getElementById('statsTab');
+    const championsTab = document.getElementById('championsTab');
 
     if (totwTab && totwTab.classList.contains('active')) return 'totw';
     if (standingsTab && standingsTab.classList.contains('active')) return 'standings';
+    if (championsTab && championsTab.classList.contains('active')) return 'champions';
     if (statsTab && statsTab.classList.contains('active')) return 'stats';
     if (fixturesTab && fixturesTab.classList.contains('active')) return 'fixtures';
 
@@ -302,7 +304,7 @@ function showImageModal(blob, filename) {
     });
 }
 
-/* ⭐ دالة رئيسية — محسّنة */
+/* ⭐ دالة رئيسية — v=6 (يدعم Champions) */
 async function downloadAsImage(scaleFactor) {
     if (typeof scaleFactor !== 'number') scaleFactor = 3;
 
@@ -334,6 +336,11 @@ async function downloadAsImage(scaleFactor) {
         if (typeof renderStandings === 'function') renderStandings();
         element = document.getElementById('captureStandings');
         filenamePrefix = 'Standings';
+    }
+    else if (activeTabName === 'champions') {
+        /* ⭐ v=6: Champions Cup */
+        element = document.getElementById('championsContent');
+        filenamePrefix = 'Champions';
     }
     else if (activeTabName === 'stats') {
         const activeView = document.querySelector('.stats-view.active');
