@@ -1,6 +1,6 @@
 /* =========================================================
-   locks.js — FINALISSIMA LEAGUE CHAT (v5)
-   Phosphor Icons + قسم "month"
+   locks.js — FINALISSIMA LEAGUE CHAT (v=6)
+   Phosphor Icons + قسم "month" + Champions Cup
 ========================================================= */
 
 window.sectionLocks = {
@@ -8,7 +8,8 @@ window.sectionLocks = {
     standings: false,
     totw:      false,
     stats:     false,
-    month:     false
+    month:     false,
+    champions: false
 };
 
 window.pendingLocks = {
@@ -16,7 +17,8 @@ window.pendingLocks = {
     standings: false,
     totw:      false,
     stats:     false,
-    month:     false
+    month:     false,
+    champions: false
 };
 
 const LOCK_PIN = '024680';
@@ -29,7 +31,8 @@ const SECTIONS = [
     { key: 'standings', label: 'الترتيب',          icon: 'chart-bar' },
     { key: 'totw',      label: 'التشكيلة',         icon: 'star' },
     { key: 'stats',     label: 'الإحصائيات',       icon: 'chart-line-up' },
-    { key: 'month',     label: 'تشكيلة الشهر',     icon: 'trophy' }
+    { key: 'champions', label: 'كأس الأبطال',      icon: 'trophy' },
+    { key: 'month',     label: 'تشكيلة الشهر',     icon: 'medal' }
 ];
 
 /* =========================================================
