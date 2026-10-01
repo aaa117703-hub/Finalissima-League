@@ -1,6 +1,6 @@
 /* =========================================================
-   champions.css — FINALISSIMA LEAGUE CHAT (v=1)
-   🏆 Champions Cup — البطولة الأوروبية
+   champions.css — FINALISSIMA LEAGUE CHAT (v=2)
+   🏆 Champions Cup — البطولة الكاملة
    الألوان: عنابي + ذهبي (Qatar 2022)
 ========================================================= */
 
@@ -182,6 +182,13 @@
     font-weight:900;
 }
 
+.champions-status-text i{
+    font-size:16px;
+    color:#C8A95F;
+    vertical-align:middle;
+    margin-inline-end:4px;
+}
+
 /* =========================================================
    القرعة (Draw)
 ========================================================= */
@@ -217,6 +224,14 @@
     margin-bottom:18px;
     text-align:center;
     animation:champTitleGlow 2.5s ease-in-out infinite;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    justify-content:center;
+}
+
+.champions-draw-title i{
+    font-size:28px;
 }
 
 @keyframes champTitleGlow{
@@ -529,6 +544,15 @@
     text-align:center;
     text-transform:uppercase;
     border-bottom:2px solid #C8A95F;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+}
+
+.champions-group-card-header i{
+    font-size:18px;
+    color:#C8A95F;
 }
 
 .champions-group-table{
@@ -604,9 +628,35 @@
     margin-top:22px;
 }
 
+.champ-round-label{
+    font-size:13px;
+    font-weight:900;
+    color:#8B1A2F;
+    letter-spacing:1.5px;
+    text-transform:uppercase;
+    padding:10px 14px;
+    margin:16px 0 8px;
+    background:linear-gradient(90deg, #FAF6F0 0%, transparent 100%);
+    border-right:4px solid #C8A95F;
+    border-radius:8px 0 0 8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+.champ-round-label .champ-gw{
+    font-size:10px;
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color:#C8A95F;
+    padding:3px 10px;
+    border-radius:20px;
+    letter-spacing:1px;
+    border:1px solid #C8A95F;
+}
+
 .champions-match-row{
     display:grid;
-    grid-template-columns:1fr 60px 1fr;
+    grid-template-columns:1fr 70px 1fr;
     gap:8px;
     align-items:center;
     padding:10px 12px;
@@ -664,6 +714,7 @@
     background:#FAF6F0;
     border-radius:8px;
     border:1px solid #E5D4A5;
+    letter-spacing:1px;
 }
 
 .champions-match-score.pending{
@@ -684,6 +735,7 @@
     margin-top:22px;
     overflow-x:auto;
     padding:16px 8px 24px;
+    -webkit-overflow-scrolling:touch;
 }
 
 .champions-bracket-round{
@@ -762,6 +814,97 @@
 }
 
 /* =========================================================
+   بطاقة البطل
+========================================================= */
+
+.champ-champion-card{
+    margin-top:24px;
+    padding:28px 20px;
+    background:linear-gradient(135deg,
+        rgba(139,26,47,.15) 0%,
+        rgba(200,169,95,.2) 50%,
+        rgba(139,26,47,.15) 100%);
+    border:3px solid #C8A95F;
+    border-radius:20px;
+    text-align:center;
+    box-shadow:
+        0 10px 40px rgba(200,169,95,.4),
+        inset 0 0 30px rgba(200,169,95,.1);
+    position:relative;
+    overflow:hidden;
+    animation:champBannerIn .8s ease;
+}
+
+.champ-champion-card::before{
+    content:'';
+    position:absolute;
+    inset:-50%;
+    background:conic-gradient(
+        from 0deg,
+        transparent 0%,
+        rgba(200,169,95,.4) 25%,
+        transparent 50%,
+        rgba(200,169,95,.4) 75%,
+        transparent 100%
+    );
+    animation:champBorderRotate 8s linear infinite;
+    z-index:0;
+    pointer-events:none;
+}
+
+.champ-champion-card > *{
+    position:relative;
+    z-index:1;
+}
+
+.champ-champion-label{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 18px;
+    background:linear-gradient(135deg, #C8A95F 0%, #8B7340 100%);
+    color:#4A0A15;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    border-radius:50px;
+    margin-bottom:16px;
+    box-shadow:0 4px 14px rgba(200,169,95,.5);
+}
+
+.champ-champion-label i{
+    font-size:16px;
+    color:#4A0A15;
+}
+
+.champ-champion-logo{
+    width:100px;
+    height:100px;
+    object-fit:contain;
+    margin:8px 0;
+    filter:drop-shadow(0 6px 20px rgba(200,169,95,.6));
+    animation:champChampFloat 3s ease-in-out infinite;
+}
+
+@keyframes champChampFloat{
+    0%, 100%{transform:translateY(0);}
+    50%{transform:translateY(-6px);}
+}
+
+.champ-champion-name{
+    font-size:26px;
+    font-weight:900;
+    color:#8B1A2F;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    margin-top:8px;
+    text-shadow:
+        0 0 20px rgba(200,169,95,.6),
+        0 2px 6px rgba(0,0,0,.15);
+}
+
+/* =========================================================
    Empty / Loading
 ========================================================= */
 
@@ -814,6 +957,10 @@
     .champions-draw-title{
         font-size:16px;
         letter-spacing:2px;
+    }
+
+    .champions-draw-title i{
+        font-size:22px;
     }
 
     .champions-pots-row{
@@ -877,7 +1024,7 @@
     }
 
     .champions-match-row{
-        grid-template-columns:1fr 50px 1fr;
+        grid-template-columns:1fr 55px 1fr;
         padding:8px;
     }
 
@@ -901,6 +1048,32 @@
     .champions-section-title{
         font-size:14px;
     }
+
+    .champ-round-label{
+        font-size:11px;
+        padding:8px 10px;
+    }
+
+    .champ-champion-card{
+        padding:20px 14px;
+        margin-top:18px;
+    }
+
+    .champ-champion-logo{
+        width:80px;
+        height:80px;
+    }
+
+    .champ-champion-name{
+        font-size:20px;
+        letter-spacing:2px;
+    }
+
+    .champ-champion-label{
+        font-size:10px;
+        letter-spacing:2px;
+        padding:5px 14px;
+    }
 }
 
 /* =========================================================
@@ -911,7 +1084,8 @@
 .champions-group-team img,
 .champions-match-team img,
 .champions-bracket-team img,
-.champions-group-table .team-cell-mini img{
+.champions-group-table .team-cell-mini img,
+.champ-champion-logo{
     -webkit-user-select:none;
     -webkit-user-drag:none;
     -webkit-touch-callout:none;
