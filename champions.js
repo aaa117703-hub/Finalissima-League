@@ -1,9 +1,6 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=2)
-   🏆 Champions Cup — البطولة الكاملة
-   - القرعة UEFA Style
-   - مجموعات + إقصائيات + بطل
-   - يحسب النتائج تلقائياً من match_results
+   champions.js - FINALISSIMA LEAGUE CHAT (v=2)
+   Champions Cup
 ========================================================= */
 
 const CHAMP_PIN = '024680';
@@ -32,7 +29,7 @@ function xIcon(name, variant) {
 }
 
 /* =========================================================
-   Supabase — تحميل وحفظ
+   Supabase
 ========================================================= */
 
 async function loadChampionsMeta() {
@@ -163,7 +160,7 @@ async function resetChampions() {
 }
 
 /* =========================================================
-   جلب نقاط المنتخبات من match_results
+   Match results
 ========================================================= */
 
 async function fetchTeamScoresForRound(gw) {
@@ -193,7 +190,7 @@ async function fetchTeamScoresForRound(gw) {
 }
 
 /* =========================================================
-   التصنيف — Pots
+   Pots
 ========================================================= */
 
 async function buildPots() {
@@ -228,7 +225,7 @@ async function buildPots() {
 }
 
 /* =========================================================
-   القرعة
+   Draw
 ========================================================= */
 
 function shuffleArray(arr) {
@@ -329,7 +326,7 @@ function buildRoundRobin(groups) {
 }
 
 /* =========================================================
-   الحساب — نتائج المجموعات
+   Sync — Group results
 ========================================================= */
 
 async function syncGroupResults() {
@@ -390,7 +387,7 @@ async function syncGroupResults() {
 }
 
 /* =========================================================
-   ترتيب المجموعة
+   Group standings
 ========================================================= */
 
 function computeGroupStandings(draw, matches, groupName) {
@@ -443,7 +440,7 @@ function computeGroupStandings(draw, matches, groupName) {
 }
 
 /* =========================================================
-   بناء الإقصائيات
+   Build knockout
 ========================================================= */
 
 async function buildKnockoutStage(startGw) {
@@ -496,7 +493,7 @@ async function buildKnockoutStage(startGw) {
 }
 
 /* =========================================================
-   حساب الإقصائيات
+   Sync knockout
 ========================================================= */
 
 async function syncKnockoutResults() {
@@ -619,7 +616,7 @@ async function checkAndBuildNextRound() {
 }
 
 /* =========================================================
-   Render — الشاشة الرئيسية
+   Render — Main
 ========================================================= */
 
 function renderChampionsMain() {
@@ -632,39 +629,33 @@ function renderChampionsMain() {
 
     let html = '';
 
-    html += '<div class="champions-banner" id="champBanner">';
-    html += '<div class="champions-banner-inner">';
-    html += '<img class="champions-banner-img" src="./banner-fina.png" alt="Champions Cup">';
-    html += '</div>';
-    html += '</div>';
-
     if (!meta.started) {
         if (draw.length === 0) {
             html += '<div class="champions-start-area">';
             html += '<button class="champions-start-btn" onclick="champPerformDraw()">';
-            html += xIcon('shuffle', 'bold') + ' بدء القرعة';
+            html += xIcon('shuffle', 'bold') + ' ' + '\u0628\u062f\u0621 \u0627\u0644\u0642\u0631\u0639\u0629';
             html += '</button>';
-            html += '<div class="champions-status-text">اضغط لبدء قرعة البطولة</div>';
+            html += '<div class="champions-status-text">' + '\u0627\u0636\u063a\u0637 \u0644\u0628\u062f\u0621 \u0642\u0631\u0639\u0629 \u0627\u0644\u0628\u0637\u0648\u0644\u0629' + '</div>';
             html += '</div>';
         } else {
             html += '<div class="champions-start-area">';
             html += '<button class="champions-start-btn" onclick="champStartTournament()">';
-            html += xIcon('play-circle', 'fill') + ' ابدأ البطولة';
+            html += xIcon('play-circle', 'fill') + ' ' + '\u0627\u0628\u062f\u0623 \u0627\u0644\u0628\u0637\u0648\u0644\u0629';
             html += '</button>';
-            html += '<div class="champions-status-text">البطولة راح تبدأ من <strong>الجولة القادمة</strong></div>';
+            html += '<div class="champions-status-text">' + '\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0631\u0627\u062d \u062a\u0628\u062f\u0623 \u0645\u0646 \u0627\u0644\u062c\u0648\u0644\u0629 \u0627\u0644\u0642\u0627\u062f\u0645\u0629' + '</div>';
             html += '</div>';
         }
     } else {
         let stageText = '';
-        if (meta.current_stage === 'groups') stageText = 'دور المجموعات';
-        else if (meta.current_stage === 'qf') stageText = 'ربع النهائي';
-        else if (meta.current_stage === 'sf') stageText = 'نصف النهائي';
-        else if (meta.current_stage === 'final') stageText = 'النهائي';
-        else if (meta.current_stage === 'done') stageText = 'البطولة انتهت';
+        if (meta.current_stage === 'groups') stageText = '\u062f\u0648\u0631 \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0627\u062a';
+        else if (meta.current_stage === 'qf') stageText = '\u0631\u0628\u0639 \u0627\u0644\u0646\u0647\u0627\u0626\u064a';
+        else if (meta.current_stage === 'sf') stageText = '\u0646\u0635\u0641 \u0627\u0644\u0646\u0647\u0627\u0626\u064a';
+        else if (meta.current_stage === 'final') stageText = '\u0627\u0644\u0646\u0647\u0627\u0626\u064a';
+        else if (meta.current_stage === 'done') stageText = '\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0627\u0646\u062a\u0647\u062a';
 
         html += '<div class="champions-start-area">';
         html += '<div class="champions-status-text">';
-        html += xIcon('trophy', 'fill') + ' ' + stageText + ' — من GW<strong>' + meta.start_gw + '</strong>';
+        html += xIcon('trophy', 'fill') + ' ' + stageText + ' - GW<strong>' + meta.start_gw + '</strong>';
         html += '</div>';
         html += '</div>';
     }
@@ -682,7 +673,7 @@ function renderChampionsMain() {
     } else {
         html += '<div class="champions-empty">';
         html += xIcon('trophy', 'duotone');
-        html += '<div>البطولة جاهزة للانطلاق</div>';
+        html += '<div>' + '\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u062c\u0627\u0647\u0632\u0629 \u0644\u0644\u0627\u0646\u0637\u0644\u0627\u0642' + '</div>';
         html += '</div>';
     }
 
@@ -692,12 +683,12 @@ function renderChampionsMain() {
 }
 
 /* =========================================================
-   Render — المجموعات
+   Render — Groups section
 ========================================================= */
 
 function renderGroupsSection(draw, matches, meta) {
     let html = '<div class="champions-groups-section">';
-    html += '<div class="champions-section-title">' + xIcon('squares-four', 'bold') + ' المجموعات</div>';
+    html += '<div class="champions-section-title">' + xIcon('squares-four', 'bold') + ' ' + '\u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0627\u062a' + '</div>';
     html += '<div class="champions-groups-grid">';
 
     CHAMP_GROUPS.forEach(function(gName) {
@@ -743,7 +734,7 @@ function renderGroupsSection(draw, matches, meta) {
 }
 
 /* =========================================================
-   Render — مباريات المجموعات
+   Render — Group matches
 ========================================================= */
 
 function renderGroupsMatches(matches, meta) {
@@ -753,7 +744,7 @@ function renderGroupsMatches(matches, meta) {
     const startGw = meta.start_gw || 6;
 
     let html = '<div class="champions-round-section">';
-    html += '<div class="champions-section-title">' + xIcon('soccer-ball', 'bold') + ' مباريات المجموعات</div>';
+    html += '<div class="champions-section-title">' + xIcon('soccer-ball', 'bold') + ' ' + '\u0645\u0628\u0627\u0631\u064a\u0627\u062a \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0627\u062a' + '</div>';
 
     for (let r = 1; r <= 4; r++) {
         const roundMatches = groupMatches.filter(function(m) { return m.round_num === r; });
@@ -772,7 +763,7 @@ function renderGroupsMatches(matches, meta) {
 }
 
 /* =========================================================
-   Render — شجرة الإقصائيات
+   Render — Knockout bracket
 ========================================================= */
 
 function renderKnockoutBracket(matches, meta) {
@@ -781,7 +772,7 @@ function renderKnockoutBracket(matches, meta) {
     const finalMatches = matches.filter(function(m) { return m.stage === 'final'; });
 
     let html = '<div class="champions-round-section">';
-    html += '<div class="champions-section-title">' + xIcon('trophy', 'fill') + ' الأدوار الإقصائية</div>';
+    html += '<div class="champions-section-title">' + xIcon('trophy', 'fill') + ' ' + '\u0627\u0644\u0623\u062f\u0648\u0627\u0631 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0629' + '</div>';
 
     html += '<div class="champions-bracket">';
 
@@ -869,7 +860,7 @@ function renderMatchRow(m) {
 }
 
 /* =========================================================
-   الأنيميشن — القرعة
+   Draw animation
 ========================================================= */
 
 async function champPerformDraw() {
@@ -879,7 +870,7 @@ async function champPerformDraw() {
     const pots = await buildPots();
     if (!pots) {
         champDrawAnimating = false;
-        if (typeof showToast === 'function') showToast('فشل بناء التصنيف', false);
+        if (typeof showToast === 'function') showToast('\u0641\u0634\u0644 \u0628\u0646\u0627\u0621 \u0627\u0644\u062a\u0635\u0646\u064a\u0641', false);
         return;
     }
 
@@ -918,7 +909,7 @@ async function champPerformDraw() {
         '</div>' +
         '<div class="champions-groups-row">' + groupsHtml + '</div>' +
         '<button class="champions-draw-close" style="display:none;" id="champDrawClose" onclick="champCloseDraw()">' +
-            xIcon('check-circle', 'bold') + ' تم' +
+            xIcon('check-circle', 'bold') + ' ' + '\u062a\u0645' +
         '</button>';
 
     document.body.appendChild(screen);
@@ -1001,7 +992,7 @@ async function champAnimateSequence(drawRows) {
     champData.matches = matches;
 
     if (typeof showToast === 'function') {
-        showToast('تم حفظ القرعة', true, 2000);
+        showToast('\u062a\u0645 \u062d\u0641\u0638 \u0627\u0644\u0642\u0631\u0639\u0629', true, 2000);
     }
 }
 
@@ -1017,12 +1008,12 @@ function champCloseDraw() {
 }
 
 /* =========================================================
-   زر ابدأ البطولة
+   Start tournament
 ========================================================= */
 
 async function champStartTournament() {
     if (typeof currentRound === 'undefined') {
-        if (typeof showToast === 'function') showToast('currentRound غير متوفر', false);
+        if (typeof showToast === 'function') showToast('currentRound', false);
         return;
     }
 
@@ -1037,17 +1028,17 @@ async function champStartTournament() {
 
     if (ok) {
         if (typeof showToast === 'function') {
-            showToast('البطولة بدأت من GW' + startGw, true, 3000);
+            showToast('\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0628\u062f\u0623\u062a \u0645\u0646 GW' + startGw, true, 3000);
         }
         champLoaded = false;
         loadChampions();
     } else {
-        if (typeof showToast === 'function') showToast('فشل بدء البطولة', false);
+        if (typeof showToast === 'function') showToast('\u0641\u0634\u0644 \u0628\u062f\u0621 \u0627\u0644\u0628\u0637\u0648\u0644\u0629', false);
     }
 }
 
 /* =========================================================
-   الأزرار المخفية — على البنر
+   Hidden admin menu
 ========================================================= */
 
 function attachChampHiddenBtns() {
@@ -1082,21 +1073,21 @@ function attachChampHiddenBtns() {
 }
 
 function champShowAdminMenu() {
-    const pin = prompt('أدخل رمز التحكم:');
+    const pin = prompt('\u0623\u062f\u062e\u0644 \u0631\u0645\u0632 \u0627\u0644\u062a\u062d\u0643\u0645:');
     if (pin === null) return;
     if (pin !== CHAMP_PIN) {
-        alert('الرمز غلط');
+        alert('\u0627\u0644\u0631\u0645\u0632 \u063a\u0644\u0637');
         return;
     }
 
     const meta = champData.meta || {};
 
     const choice = prompt(
-        'اختر الإجراء:\n' +
-        '1 — تحديث النتائج\n' +
-        '2 — ابدأ الإقصائيات\n' +
-        '3 — إعادة القرعة\n' +
-        '0 — إلغاء'
+        '\u0627\u062e\u062a\u0631 \u0627\u0644\u0625\u062c\u0631\u0627\u0621:\n' +
+        '1 - \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0646\u062a\u0627\u0626\u062c\n' +
+        '2 - \u0627\u0628\u062f\u0623 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a\n' +
+        '3 - \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0642\u0631\u0639\u0629\n' +
+        '0 - \u0625\u0644\u063a\u0627\u0621'
     );
 
     if (choice === '1') champSyncNow();
@@ -1105,7 +1096,7 @@ function champShowAdminMenu() {
 }
 
 async function champSyncNow() {
-    if (typeof showToast === 'function') showToast('جاري تحديث النتائج...', false);
+    if (typeof showToast === 'function') showToast('\u062c\u0627\u0631\u064a \u062a\u062d\u062f\u064a\u062b \u0627\u0644\u0646\u062a\u0627\u0626\u062c...', false);
 
     const meta = champData.meta || {};
     let updated = 0;
@@ -1117,9 +1108,9 @@ async function champSyncNow() {
     }
 
     if (updated > 0) {
-        if (typeof showToast === 'function') showToast('تم تحديث ' + updated + ' مباراة', true, 2500);
+        if (typeof showToast === 'function') showToast('\u062a\u0645 \u062a\u062d\u062f\u064a\u062b ' + updated + ' \u0645\u0628\u0627\u0631\u0627\u0629', true, 2500);
     } else {
-        if (typeof showToast === 'function') showToast('لا توجد نتائج جديدة', false, 2500);
+        if (typeof showToast === 'function') showToast('\u0644\u0627 \u062a\u0648\u062c\u062f \u0646\u062a\u0627\u0626\u062c \u062c\u062f\u064a\u062f\u0629', false, 2500);
     }
 
     champLoaded = false;
@@ -1129,11 +1120,11 @@ async function champSyncNow() {
 async function champStartKnockout() {
     const meta = champData.meta || {};
     if (!meta.started) {
-        alert('البطولة ما بدأت بعد');
+        alert('\u0627\u0644\u0628\u0637\u0648\u0644\u0629 \u0645\u0627 \u0628\u062f\u0623\u062a \u0628\u0639\u062f');
         return;
     }
     if (meta.current_stage !== 'groups') {
-        alert('الإقصائيات بدأت بالفعل');
+        alert('\u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a \u0628\u062f\u0623\u062a \u0628\u0627\u0644\u0641\u0639\u0644');
         return;
     }
 
@@ -1141,42 +1132,42 @@ async function champStartKnockout() {
     const allPlayed = groupMatches.every(function(m) { return m.is_played; });
 
     if (!allPlayed) {
-        alert('ما زالت هناك مباريات مجموعات لم تنته');
+        alert('\u0645\u0627 \u0632\u0627\u0644\u062a \u0647\u0646\u0627\u0643 \u0645\u0628\u0627\u0631\u064a\u0627\u062a \u0645\u062c\u0645\u0648\u0639\u0627\u062a \u0644\u0645 \u062a\u0646\u062a\u0647');
         return;
     }
 
-    if (!confirm('⚠️ ابدأ الإقصائيات من الجولة القادمة؟')) return;
+    if (!confirm('\u0627\u0628\u062f\u0623 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a \u0645\u0646 \u0627\u0644\u062c\u0648\u0644\u0629 \u0627\u0644\u0642\u0627\u062f\u0645\u0629\u061f')) return;
 
     const startGw = (currentRound || 1) + 1;
 
     const ok = await buildKnockoutStage(startGw);
 
     if (ok) {
-        if (typeof showToast === 'function') showToast('الإقصائيات بدأت من GW' + startGw, true, 3000);
+        if (typeof showToast === 'function') showToast('\u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a \u0628\u062f\u0623\u062a \u0645\u0646 GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
     } else {
-        alert('فشل بناء الإقصائيات');
+        alert('\u0641\u0634\u0644 \u0628\u0646\u0627\u0621 \u0627\u0644\u0625\u0642\u0635\u0627\u0626\u064a\u0627\u062a');
     }
 }
 
 function champRequestReset() {
-    if (!confirm('⚠️ راح تمسح القرعة وكل المباريات. متأكد؟')) return;
+    if (!confirm('\u0631\u0627\u062d \u062a\u0645\u0633\u062d \u0627\u0644\u0642\u0631\u0639\u0629 \u0648\u0643\u0644 \u0627\u0644\u0645\u0628\u0627\u0631\u064a\u0627\u062a. \u0645\u062a\u0623\u0643\u062f\u061f')) return;
 
     resetChampions().then(function(ok) {
         if (ok) {
-            if (typeof showToast === 'function') showToast('تمت إعادة القرعة', true, 2500);
+            if (typeof showToast === 'function') showToast('\u062a\u0645\u062a \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0642\u0631\u0639\u0629', true, 2500);
             champData = { meta: null, draw: [], matches: [] };
             champLoaded = false;
             loadChampions();
         } else {
-            if (typeof showToast === 'function') showToast('فشل', false);
+            if (typeof showToast === 'function') showToast('\u0641\u0634\u0644', false);
         }
     });
 }
 
 /* =========================================================
-   التحميل
+   Load
 ========================================================= */
 
 async function loadChampions() {
@@ -1184,7 +1175,7 @@ async function loadChampions() {
     if (!container) return;
 
     if (!window.sbClient) {
-        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase غير متوفر</div></div>';
+        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Supabase</div></div>';
         return;
     }
 
@@ -1211,7 +1202,7 @@ async function loadChampions() {
 
     } catch (e) {
         console.error('[Champions] load error:', e);
-        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>فشل التحميل</div></div>';
+        container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>' + '\u0641\u0634\u0644 \u0627\u0644\u062a\u062d\u0645\u064a\u0644' + '</div></div>';
     }
 }
 
