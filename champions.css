@@ -1,7 +1,11 @@
 /* =========================================================
-   champions.css — FINALISSIMA LEAGUE CHAT (v=2)
-   🏆 Champions Cup — البطولة الكاملة
-   الألوان: عنابي + ذهبي (Qatar 2022)
+   champions.css — FINALISSIMA LEAGUE CHAT (v=3)
+   🏆 Champions Cup — Cinematic Edition
+   الألوان:
+   - Dark Charcoal: #1A1A1A
+   - Gold (Qatar): #D4B77A
+   - Maroon: #8B1A2F
+   - Sand: #FAF6F0
 ========================================================= */
 
 /* =========================================================
@@ -13,93 +17,7 @@
     padding:0 4px 20px;
     direction:rtl;
     font-family:inherit;
-}
-
-/* =========================================================
-   البنر + الإطار الأنيميشن الذهبي
-========================================================= */
-
-.champions-banner{
-    position:relative;
-    width:100%;
-    max-width:720px;
-    margin:0 auto 18px;
-    border-radius:20px;
-    overflow:hidden;
-    isolation:isolate;
-    animation:champBannerIn .8s ease;
-}
-
-.champions-banner::before{
-    content:'';
-    position:absolute;
-    inset:-3px;
-    border-radius:22px;
-    padding:3px;
-    background:conic-gradient(
-        from 0deg,
-        #C8A95F 0%,
-        #8B7340 12%,
-        #4A0A15 25%,
-        #8B1A2F 38%,
-        #C8A95F 50%,
-        #E5D4A5 62%,
-        #8B1A2F 75%,
-        #4A0A15 88%,
-        #C8A95F 100%
-    );
-    z-index:-1;
-    animation:champBorderRotate 6s linear infinite;
-    filter:blur(0.5px);
-}
-
-.champions-banner::after{
-    content:'';
-    position:absolute;
-    inset:-3px;
-    border-radius:22px;
-    padding:3px;
-    background:conic-gradient(
-        from 0deg,
-        rgba(200,169,95,0) 0%,
-        rgba(200,169,95,0.8) 25%,
-        rgba(200,169,95,0) 50%,
-        rgba(200,169,95,0.8) 75%,
-        rgba(200,169,95,0) 100%
-    );
-    z-index:-1;
-    animation:champBorderRotate 3s linear infinite reverse;
-    filter:blur(2px);
-}
-
-.champions-banner-inner{
-    position:relative;
-    border-radius:18px;
-    overflow:hidden;
-    background:linear-gradient(135deg, #4A0A15 0%, #2D0A0F 100%);
-    box-shadow:
-        inset 0 0 30px rgba(0,0,0,.5),
-        0 10px 40px rgba(139,26,47,.4);
-}
-
-.champions-banner-img{
-    display:block;
-    width:100%;
-    height:auto;
-    aspect-ratio:1000/333;
-    object-fit:cover;
-    pointer-events:none;
-    user-select:none;
-}
-
-@keyframes champBorderRotate{
-    0%{transform:rotate(0deg);}
-    100%{transform:rotate(360deg);}
-}
-
-@keyframes champBannerIn{
-    from{opacity:0;transform:scale(.94) translateY(12px);}
-    to{opacity:1;transform:scale(1) translateY(0);}
+    background:#FAF6F0;
 }
 
 /* =========================================================
@@ -120,7 +38,7 @@
     padding:16px 42px;
     background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color:#fff;
-    border:2px solid #C8A95F;
+    border:2px solid #D4B77A;
     border-radius:50px;
     font-size:15px;
     font-weight:900;
@@ -143,7 +61,7 @@
     width:100%;height:100%;
     background:linear-gradient(90deg,
         transparent 0%,
-        rgba(200,169,95,.5) 50%,
+        rgba(212,183,122,.5) 50%,
         transparent 100%);
     animation:champBtnShine 3s ease-in-out infinite;
 }
@@ -161,7 +79,7 @@
 
 .champions-start-btn i{
     font-size:20px;
-    color:#C8A95F;
+    color:#D4B77A;
 }
 
 @keyframes champBtnShine{
@@ -178,33 +96,36 @@
 }
 
 .champions-status-text strong{
-    color:#C8A95F;
+    color:#D4B77A;
     font-weight:900;
 }
 
 .champions-status-text i{
     font-size:16px;
-    color:#C8A95F;
+    color:#D4B77A;
     vertical-align:middle;
     margin-inline-end:4px;
 }
 
 /* =========================================================
-   القرعة (Draw)
+   🎬 Draw Screen (Cinematic)
 ========================================================= */
 
 .champions-draw-screen{
     position:fixed;
     inset:0;
     z-index:999999;
-    background:radial-gradient(ellipse at center, #2D0A0F 0%, #0a0000 100%);
+    background:radial-gradient(ellipse at center,
+        #2D0A0F 0%,
+        #1A0A0E 40%,
+        #0A0000 100%);
     display:flex;
     flex-direction:column;
     align-items:center;
-    justify-content:center;
+    justify-content:flex-start;
     padding:20px;
     overflow-y:auto;
-    animation:champDrawFadeIn .5s ease;
+    animation:champDrawFadeIn .6s ease;
 }
 
 @keyframes champDrawFadeIn{
@@ -212,16 +133,91 @@
     to{opacity:1;}
 }
 
+/* ⭐ Stars Background */
+.champ-stars-bg{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    overflow:hidden;
+}
+
+.champ-star{
+    position:absolute;
+    width:2px;
+    height:2px;
+    background:#D4B77A;
+    border-radius:50%;
+    opacity:0.4;
+    animation:champStarTwinkle 3s ease-in-out infinite;
+    box-shadow:0 0 6px #D4B77A;
+}
+
+@keyframes champStarTwinkle{
+    0%, 100%{opacity:0.2;transform:scale(0.8);}
+    50%{opacity:1;transform:scale(1.3);}
+}
+
+/* ⭐ Intro */
+.champ-intro{
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:10;
+    pointer-events:none;
+    background:radial-gradient(ellipse at center, rgba(0,0,0,.9) 0%, #000 100%);
+}
+
+.champ-intro-line{
+    font-size:clamp(48px, 12vw, 96px);
+    font-weight:900;
+    letter-spacing:8px;
+    color:#D4B77A;
+    text-transform:uppercase;
+    font-family:'Cairo', 'Inter', sans-serif;
+    text-align:center;
+    line-height:1;
+    text-shadow:
+        0 0 20px #D4B77A,
+        0 0 60px rgba(212,183,122,.6),
+        0 4px 20px rgba(0,0,0,.9);
+    will-change:transform, opacity, filter;
+}
+
+.champ-intro-cup{
+    color:#8B1A2F;
+    text-shadow:
+        0 0 20px #8B1A2F,
+        0 0 60px rgba(139,26,47,.8),
+        0 0 120px rgba(212,183,122,.6),
+        0 4px 20px rgba(0,0,0,.9);
+}
+
+/* ⭐ Stage */
+.champ-stage{
+    position:relative;
+    z-index:2;
+    width:100%;
+    max-width:1000px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding-top:10px;
+}
+
+/* ⭐ Title */
 .champions-draw-title{
     font-size:22px;
     font-weight:900;
-    color:#C8A95F;
+    color:#D4B77A;
     letter-spacing:3px;
     text-transform:uppercase;
     text-shadow:
-        0 0 20px rgba(200,169,95,.6),
+        0 0 20px rgba(212,183,122,.6),
         0 2px 8px rgba(0,0,0,.8);
-    margin-bottom:18px;
+    margin-bottom:22px;
     text-align:center;
     animation:champTitleGlow 2.5s ease-in-out infinite;
     display:flex;
@@ -235,11 +231,14 @@
 }
 
 @keyframes champTitleGlow{
-    0%, 100%{text-shadow:0 0 20px rgba(200,169,95,.6), 0 2px 8px rgba(0,0,0,.8);}
-    50%{text-shadow:0 0 35px rgba(200,169,95,1), 0 0 60px rgba(139,26,47,.6), 0 2px 8px rgba(0,0,0,.8);}
+    0%, 100%{text-shadow:0 0 20px rgba(212,183,122,.6), 0 2px 8px rgba(0,0,0,.8);}
+    50%{text-shadow:0 0 35px rgba(212,183,122,1), 0 0 60px rgba(139,26,47,.6), 0 2px 8px rgba(0,0,0,.8);}
 }
 
-/* Pots */
+/* =========================================================
+   Pots
+========================================================= */
+
 .champions-pots-row{
     display:flex;
     gap:10px;
@@ -248,6 +247,8 @@
     margin-bottom:24px;
     width:100%;
     max-width:900px;
+    position:relative;
+    z-index:3;
 }
 
 .champions-pot{
@@ -255,33 +256,22 @@
     min-width:110px;
     max-width:160px;
     padding:10px 8px;
-    background:linear-gradient(180deg, rgba(200,169,95,.12) 0%, rgba(139,26,47,.12) 100%);
-    border:2px solid rgba(200,169,95,.4);
+    background:linear-gradient(180deg, rgba(212,183,122,.08) 0%, rgba(139,26,47,.15) 100%);
+    border:2px solid rgba(212,183,122,.35);
     border-radius:14px;
     text-align:center;
     transition:all .3s ease;
-}
-
-.champions-pot.active{
-    border-color:#C8A95F;
-    box-shadow:
-        0 0 20px rgba(200,169,95,.6),
-        inset 0 0 15px rgba(200,169,95,.15);
-    animation:champPotPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes champPotPulse{
-    0%, 100%{transform:scale(1);}
-    50%{transform:scale(1.03);}
+    will-change:transform, box-shadow;
 }
 
 .champions-pot-label{
     font-size:11px;
     font-weight:900;
-    color:#C8A95F;
+    color:#D4B77A;
     letter-spacing:1.5px;
     margin-bottom:6px;
     text-transform:uppercase;
+    text-shadow:0 0 10px rgba(212,183,122,.5);
 }
 
 .champions-pot-teams{
@@ -291,12 +281,30 @@
 }
 
 .champions-pot-team{
+    display:flex;
+    align-items:center;
+    gap:5px;
     font-size:10px;
     font-weight:800;
-    color:rgba(255,255,255,.85);
-    padding:3px 4px;
+    color:rgba(255,255,255,.9);
+    padding:4px 6px;
     border-radius:6px;
     transition:all .3s ease;
+    text-align:right;
+}
+
+.champions-pot-team img{
+    width:16px;
+    height:16px;
+    object-fit:contain;
+    flex-shrink:0;
+}
+
+.champions-pot-team span{
+    flex:1;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
 }
 
 .champions-pot-team.drawn{
@@ -304,80 +312,220 @@
     text-decoration:line-through;
 }
 
-/* كرة الذهبية */
+/* =========================================================
+   الكرة الذهبية
+========================================================= */
+
 .champions-ball-area{
     position:relative;
-    height:110px;
+    height:140px;
     width:100%;
     display:flex;
     align-items:center;
     justify-content:center;
     margin:14px 0;
+    z-index:4;
 }
 
 .champions-ball{
-    width:90px;
-    height:90px;
+    width:100px;
+    height:100px;
     border-radius:50%;
     background:radial-gradient(circle at 35% 30%,
         #E5D4A5 0%,
-        #C8A95F 30%,
+        #D4B77A 30%,
         #8B7340 70%,
         #4A0A15 100%);
     box-shadow:
-        0 0 40px rgba(200,169,95,.8),
-        0 0 80px rgba(200,169,95,.4),
+        0 0 40px rgba(212,183,122,.8),
+        0 0 80px rgba(212,183,122,.4),
         inset -8px -8px 20px rgba(0,0,0,.4),
         inset 8px 8px 20px rgba(255,255,255,.3);
     display:flex;
     align-items:center;
     justify-content:center;
     position:relative;
-    animation:champBallSpin 3s linear infinite;
-    transition:all .5s ease;
+    z-index:2;
+    animation:champBallSpin 6s linear infinite;
+    will-change:transform;
 }
 
 .champions-ball i{
-    font-size:36px;
+    font-size:42px;
     color:#4A0A15;
     filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
 }
 
-.champions-ball.settled{
-    animation:champBallSettle .6s ease forwards;
-}
-
 @keyframes champBallSpin{
-    0%{transform:rotateY(0deg) rotateZ(0deg);}
-    100%{transform:rotateY(360deg) rotateZ(360deg);}
+    0%{transform:rotateY(0deg);}
+    100%{transform:rotateY(360deg);}
 }
 
-@keyframes champBallSettle{
-    0%{transform:scale(1.2);opacity:1;}
-    100%{transform:scale(0.6);opacity:0;}
+.champ-ball-glow{
+    position:absolute;
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    background:radial-gradient(circle,
+        rgba(212,183,122,.5) 0%,
+        rgba(212,183,122,.2) 40%,
+        transparent 70%);
+    pointer-events:none;
+    z-index:1;
+    filter:blur(10px);
+    animation:champBallGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes champBallGlowPulse{
+    0%, 100%{opacity:0.5;transform:scale(1);}
+    50%{opacity:1;transform:scale(1.15);}
 }
 
 .champions-ball-team{
     position:absolute;
     top:50%;left:50%;
     transform:translate(-50%,-50%);
-    font-size:16px;
+    font-size:14px;
     font-weight:900;
     color:#fff;
-    text-shadow:0 0 20px rgba(200,169,95,1), 0 2px 8px rgba(0,0,0,.9);
+    text-shadow:
+        0 0 20px rgba(212,183,122,1),
+        0 0 40px rgba(139,26,47,.8),
+        0 2px 8px rgba(0,0,0,.9);
     white-space:nowrap;
     letter-spacing:1px;
+    z-index:10;
+    padding:6px 14px;
+    background:rgba(26,26,26,.85);
+    border-radius:20px;
+    border:2px solid #D4B77A;
+}
+
+/* ⭐ Flying Team Clone */
+.champ-flying-team{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:12px 20px;
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    border:3px solid #D4B77A;
+    border-radius:16px;
+    box-shadow:
+        0 0 40px rgba(212,183,122,.9),
+        0 10px 40px rgba(0,0,0,.6),
+        inset 0 0 30px rgba(212,183,122,.2);
+    will-change:transform, filter, opacity;
+    min-width:140px;
+}
+
+.champ-flying-team img{
+    width:40px;
+    height:40px;
+    object-fit:contain;
+    filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));
+}
+
+.champ-flying-team span{
+    font-size:12px;
+    font-weight:900;
+    color:#fff;
+    letter-spacing:0.5px;
+    text-transform:uppercase;
+    text-shadow:0 2px 4px rgba(0,0,0,.6);
+    white-space:nowrap;
+}
+
+/* ⭐ Trail Particle */
+.champ-trail-particle{
+    position:fixed;
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    background:radial-gradient(circle, #E5D4A5 0%, #D4B77A 50%, transparent 100%);
+    pointer-events:none;
+    z-index:9999998;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 12px #D4B77A;
+}
+
+/* ⭐ Burst Particle */
+.champ-burst-particle{
+    position:fixed;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#D4B77A;
+    pointer-events:none;
+    z-index:9999999;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 12px #D4B77A, 0 0 20px rgba(139,26,47,.6);
+}
+
+/* ⭐ Shockwave */
+.champ-shockwave{
+    position:fixed;
+    width:80px;
+    height:80px;
+    border-radius:50%;
+    border:4px solid #D4B77A;
+    background:radial-gradient(circle,
+        rgba(212,183,122,.4) 0%,
+        transparent 70%);
+    pointer-events:none;
+    z-index:9999998;
+    transform:translate(-50%,-50%);
+    box-shadow:0 0 40px #D4B77A;
+}
+
+/* ⭐ Flash */
+.champ-flash{
+    position:fixed;
+    inset:0;
+    background:#fff;
+    pointer-events:none;
+    z-index:9999999;
     opacity:0;
-    animation:champTeamReveal .8s ease forwards;
 }
 
-@keyframes champTeamReveal{
-    0%{opacity:0;transform:translate(-50%,-50%) scale(.7);}
-    50%{opacity:1;transform:translate(-50%,-50%) scale(1.1);}
-    100%{opacity:1;transform:translate(-50%,-50%) scale(1);}
+/* ⭐ Confetti */
+.champ-confetti{
+    position:fixed;
+    border-radius:2px;
+    pointer-events:none;
+    z-index:9999999;
+    will-change:transform;
 }
 
-/* المجموعات */
+/* ⭐ Complete Message */
+.champ-complete{
+    margin-top:24px;
+    padding:16px 32px;
+    background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
+    color:#1A1A1A;
+    border-radius:50px;
+    font-size:16px;
+    font-weight:900;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow:
+        0 6px 24px rgba(212,183,122,.6),
+        inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+.champ-complete i{
+    font-size:22px;
+    color:#1A1A1A;
+}
+
+/* =========================================================
+   Groups Row (in draw screen)
+========================================================= */
+
 .champions-groups-row{
     display:flex;
     gap:12px;
@@ -386,39 +534,32 @@
     width:100%;
     max-width:900px;
     margin-top:14px;
+    position:relative;
+    z-index:3;
 }
 
 .champions-group-box{
     flex:1 1 0;
     min-width:140px;
     max-width:200px;
-    background:linear-gradient(180deg, rgba(139,26,47,.35) 0%, rgba(74,10,21,.55) 100%);
-    border:2px solid rgba(200,169,95,.5);
+    background:linear-gradient(180deg, rgba(139,26,47,.4) 0%, rgba(74,10,21,.6) 100%);
+    border:2px solid rgba(212,183,122,.5);
     border-radius:16px;
     padding:12px 10px;
     text-align:center;
     transition:all .4s ease;
     position:relative;
     overflow:hidden;
-}
-
-.champions-group-box.flash{
-    animation:champGroupFlash .9s ease;
-}
-
-@keyframes champGroupFlash{
-    0%{box-shadow:0 0 0 rgba(200,169,95,0);border-color:rgba(200,169,95,.5);}
-    50%{box-shadow:0 0 40px rgba(200,169,95,1), inset 0 0 30px rgba(200,169,95,.4);border-color:#C8A95F;}
-    100%{box-shadow:0 0 0 rgba(200,169,95,0);border-color:rgba(200,169,95,.5);}
+    will-change:transform, box-shadow;
 }
 
 .champions-group-label{
     font-size:18px;
     font-weight:900;
-    color:#C8A95F;
+    color:#D4B77A;
     letter-spacing:3px;
     margin-bottom:8px;
-    text-shadow:0 0 12px rgba(200,169,95,.6);
+    text-shadow:0 0 12px rgba(212,183,122,.7);
 }
 
 .champions-group-teams{
@@ -433,14 +574,14 @@
     align-items:center;
     gap:6px;
     padding:5px 8px;
-    background:rgba(0,0,0,.35);
+    background:rgba(26,26,26,.55);
     border-radius:8px;
     font-size:11px;
     font-weight:800;
     color:#fff;
     letter-spacing:0.3px;
-    animation:champTeamSlideIn .5s ease;
-    border:1px solid rgba(200,169,95,.15);
+    border:1px solid rgba(212,183,122,.25);
+    will-change:transform, opacity;
 }
 
 .champions-group-team img{
@@ -459,17 +600,12 @@
     white-space:nowrap;
 }
 
-@keyframes champTeamSlideIn{
-    from{opacity:0;transform:translateX(20px);}
-    to{opacity:1;transform:translateX(0);}
-}
-
-/* زر إغلاق القرعة */
+/* ⭐ زر إغلاق القرعة */
 .champions-draw-close{
     margin-top:22px;
     padding:12px 30px;
-    background:linear-gradient(135deg, #C8A95F 0%, #8B7340 100%);
-    color:#4A0A15;
+    background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
+    color:#1A1A1A;
     border:none;
     border-radius:50px;
     font-size:13px;
@@ -477,16 +613,16 @@
     letter-spacing:1px;
     cursor:pointer;
     font-family:inherit;
-    box-shadow:0 6px 20px rgba(200,169,95,.5);
+    box-shadow:0 6px 20px rgba(212,183,122,.5);
     transition:all .3s ease;
-    display:flex;
+    display:inline-flex;
     align-items:center;
     gap:8px;
 }
 
 .champions-draw-close:hover{
     transform:translateY(-2px);
-    box-shadow:0 10px 30px rgba(200,169,95,.7);
+    box-shadow:0 10px 30px rgba(212,183,122,.7);
 }
 
 .champions-draw-close i{
@@ -494,7 +630,7 @@
 }
 
 /* =========================================================
-   جدول المجموعات
+   القسم العادي — Group Tables
 ========================================================= */
 
 .champions-groups-section{
@@ -509,7 +645,7 @@
     text-transform:uppercase;
     margin-bottom:12px;
     padding-bottom:8px;
-    border-bottom:2px solid #C8A95F;
+    border-bottom:2px solid #D4B77A;
     display:flex;
     align-items:center;
     gap:10px;
@@ -517,7 +653,7 @@
 
 .champions-section-title i{
     font-size:20px;
-    color:#C8A95F;
+    color:#D4B77A;
 }
 
 .champions-groups-grid{
@@ -543,7 +679,7 @@
     padding:10px 14px;
     text-align:center;
     text-transform:uppercase;
-    border-bottom:2px solid #C8A95F;
+    border-bottom:2px solid #D4B77A;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -552,7 +688,7 @@
 
 .champions-group-card-header i{
     font-size:18px;
-    color:#C8A95F;
+    color:#D4B77A;
 }
 
 .champions-group-table{
@@ -587,8 +723,8 @@
 
 .champions-group-table tr.qualified{
     background:linear-gradient(90deg,
-        rgba(200,169,95,.25) 0%,
-        rgba(200,169,95,.08) 50%,
+        rgba(212,183,122,.25) 0%,
+        rgba(212,183,122,.08) 50%,
         #fff 100%);
 }
 
@@ -637,7 +773,7 @@
     padding:10px 14px;
     margin:16px 0 8px;
     background:linear-gradient(90deg, #FAF6F0 0%, transparent 100%);
-    border-right:4px solid #C8A95F;
+    border-right:4px solid #D4B77A;
     border-radius:8px 0 0 8px;
     display:flex;
     align-items:center;
@@ -647,11 +783,11 @@
 .champ-round-label .champ-gw{
     font-size:10px;
     background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
-    color:#C8A95F;
+    color:#D4B77A;
     padding:3px 10px;
     border-radius:20px;
     letter-spacing:1px;
-    border:1px solid #C8A95F;
+    border:1px solid #D4B77A;
 }
 
 .champions-match-row{
@@ -668,8 +804,8 @@
 }
 
 .champions-match-row:hover{
-    border-color:#C8A95F;
-    box-shadow:0 4px 14px rgba(200,169,95,.2);
+    border-color:#D4B77A;
+    box-shadow:0 4px 14px rgba(212,183,122,.2);
 }
 
 .champions-match-team{
@@ -748,14 +884,14 @@
 .champions-bracket-round-label{
     font-size:11px;
     font-weight:900;
-    color:#C8A95F;
+    color:#D4B77A;
     letter-spacing:2px;
     text-align:center;
     text-transform:uppercase;
     padding:6px;
     background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     border-radius:8px;
-    border:1px solid #C8A95F;
+    border:1px solid #D4B77A;
     margin-bottom:6px;
 }
 
@@ -785,8 +921,8 @@
 
 .champions-bracket-team.winner{
     background:linear-gradient(90deg,
-        rgba(200,169,95,.3) 0%,
-        rgba(200,169,95,.05) 100%);
+        rgba(212,183,122,.3) 0%,
+        rgba(212,183,122,.05) 100%);
     color:#4A0A15;
 }
 
@@ -822,14 +958,14 @@
     padding:28px 20px;
     background:linear-gradient(135deg,
         rgba(139,26,47,.15) 0%,
-        rgba(200,169,95,.2) 50%,
+        rgba(212,183,122,.2) 50%,
         rgba(139,26,47,.15) 100%);
-    border:3px solid #C8A95F;
+    border:3px solid #D4B77A;
     border-radius:20px;
     text-align:center;
     box-shadow:
-        0 10px 40px rgba(200,169,95,.4),
-        inset 0 0 30px rgba(200,169,95,.1);
+        0 10px 40px rgba(212,183,122,.4),
+        inset 0 0 30px rgba(212,183,122,.1);
     position:relative;
     overflow:hidden;
     animation:champBannerIn .8s ease;
@@ -842,9 +978,9 @@
     background:conic-gradient(
         from 0deg,
         transparent 0%,
-        rgba(200,169,95,.4) 25%,
+        rgba(212,183,122,.4) 25%,
         transparent 50%,
-        rgba(200,169,95,.4) 75%,
+        rgba(212,183,122,.4) 75%,
         transparent 100%
     );
     animation:champBorderRotate 8s linear infinite;
@@ -862,20 +998,20 @@
     align-items:center;
     gap:8px;
     padding:6px 18px;
-    background:linear-gradient(135deg, #C8A95F 0%, #8B7340 100%);
-    color:#4A0A15;
+    background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
+    color:#1A1A1A;
     font-size:12px;
     font-weight:900;
     letter-spacing:3px;
     text-transform:uppercase;
     border-radius:50px;
     margin-bottom:16px;
-    box-shadow:0 4px 14px rgba(200,169,95,.5);
+    box-shadow:0 4px 14px rgba(212,183,122,.5);
 }
 
 .champ-champion-label i{
     font-size:16px;
-    color:#4A0A15;
+    color:#1A1A1A;
 }
 
 .champ-champion-logo{
@@ -883,7 +1019,7 @@
     height:100px;
     object-fit:contain;
     margin:8px 0;
-    filter:drop-shadow(0 6px 20px rgba(200,169,95,.6));
+    filter:drop-shadow(0 6px 20px rgba(212,183,122,.6));
     animation:champChampFloat 3s ease-in-out infinite;
 }
 
@@ -900,8 +1036,18 @@
     text-transform:uppercase;
     margin-top:8px;
     text-shadow:
-        0 0 20px rgba(200,169,95,.6),
+        0 0 20px rgba(212,183,122,.6),
         0 2px 6px rgba(0,0,0,.15);
+}
+
+@keyframes champBannerIn{
+    from{opacity:0;transform:scale(.94) translateY(12px);}
+    to{opacity:1;transform:scale(1) translateY(0);}
+}
+
+@keyframes champBorderRotate{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
 }
 
 /* =========================================================
@@ -912,7 +1058,7 @@
     text-align:center;
     padding:40px 20px;
     background:linear-gradient(135deg, #FAF6F0 0%, #F5E6D3 100%);
-    border:2px dashed #C8A95F;
+    border:2px dashed #D4B77A;
     border-radius:16px;
     color:#6B0F1F;
     font-size:14px;
@@ -925,9 +1071,14 @@
 .champions-empty i{
     display:block;
     font-size:52px;
-    color:#C8A95F;
+    color:#D4B77A;
     margin-bottom:12px;
-    animation:champPotPulse 2s ease-in-out infinite;
+    animation:champEmptyPulse 2s ease-in-out infinite;
+}
+
+@keyframes champEmptyPulse{
+    0%, 100%{transform:scale(1);opacity:0.9;}
+    50%{transform:scale(1.05);opacity:1;}
 }
 
 /* =========================================================
@@ -936,50 +1087,50 @@
 
 @media(max-width:480px){
 
-    .champions-banner{
-        border-radius:16px;
-    }
-
-    .champions-banner::before,
-    .champions-banner::after{
-        border-radius:18px;
-    }
-
-    .champions-banner-inner{
-        border-radius:14px;
-    }
-
     .champions-start-btn{
         padding:14px 28px;
         font-size:13px;
     }
 
     .champions-draw-title{
-        font-size:16px;
+        font-size:14px;
         letter-spacing:2px;
+        margin-bottom:14px;
     }
 
     .champions-draw-title i{
-        font-size:22px;
+        font-size:20px;
     }
 
     .champions-pots-row{
-        gap:6px;
+        gap:5px;
+        margin-bottom:14px;
     }
 
     .champions-pot{
-        min-width:70px;
-        padding:8px 4px;
+        min-width:60px;
+        padding:6px 3px;
     }
 
     .champions-pot-label{
-        font-size:9px;
+        font-size:8px;
         letter-spacing:1px;
     }
 
     .champions-pot-team{
-        font-size:8px;
-        padding:2px;
+        font-size:7px;
+        padding:2px 3px;
+        gap:2px;
+    }
+
+    .champions-pot-team img{
+        width:12px;
+        height:12px;
+    }
+
+    .champions-ball-area{
+        height:110px;
+        margin:8px 0;
     }
 
     .champions-ball{
@@ -988,35 +1139,59 @@
     }
 
     .champions-ball i{
-        font-size:28px;
+        font-size:30px;
+    }
+
+    .champ-ball-glow{
+        width:100px;
+        height:100px;
     }
 
     .champions-ball-team{
-        font-size:13px;
+        font-size:11px;
+        padding:4px 10px;
+    }
+
+    .champ-flying-team{
+        padding:8px 14px;
+        min-width:100px;
+        gap:4px;
+    }
+
+    .champ-flying-team img{
+        width:28px;
+        height:28px;
+    }
+
+    .champ-flying-team span{
+        font-size:10px;
     }
 
     .champions-groups-row{
-        gap:8px;
+        gap:6px;
     }
 
     .champions-group-box{
-        min-width:140px;
-        flex:1 1 45%;
-        padding:10px 8px;
+        min-width:75px;
+        flex:1 1 22%;
+        padding:8px 5px;
     }
 
     .champions-group-label{
-        font-size:15px;
+        font-size:13px;
+        letter-spacing:2px;
+        margin-bottom:5px;
     }
 
     .champions-group-team{
-        font-size:10px;
-        padding:4px 6px;
+        font-size:8px;
+        padding:3px 4px;
+        gap:3px;
     }
 
     .champions-group-team img{
-        width:18px;
-        height:18px;
+        width:14px;
+        height:14px;
     }
 
     .champions-groups-grid{
@@ -1074,18 +1249,46 @@
         letter-spacing:2px;
         padding:5px 14px;
     }
+
+    .champ-complete{
+        font-size:13px;
+        padding:12px 22px;
+    }
+
+    .champ-intro-line{
+        font-size:clamp(36px, 14vw, 64px);
+        letter-spacing:5px;
+    }
+}
+
+/* =========================================================
+   Reduced Motion
+========================================================= */
+
+@media (prefers-reduced-motion: reduce){
+    .champ-star,
+    .champions-ball,
+    .champ-ball-glow,
+    .champions-draw-title,
+    .champions-start-btn::before,
+    .champ-champion-logo,
+    .champ-champion-card::before,
+    .champions-empty i{
+        animation:none !important;
+    }
 }
 
 /* =========================================================
    منع حفظ الصور
 ========================================================= */
 
-.champions-banner-img,
+.champions-pot-team img,
 .champions-group-team img,
 .champions-match-team img,
 .champions-bracket-team img,
 .champions-group-table .team-cell-mini img,
-.champ-champion-logo{
+.champ-champion-logo,
+.champ-flying-team img{
     -webkit-user-select:none;
     -webkit-user-drag:none;
     -webkit-touch-callout:none;
