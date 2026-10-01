@@ -1,6 +1,6 @@
 /* =========================================================
-   fixtures.js — FINALISSIMA LEAGUE CHAT (v13)
-   Phosphor Icons + Countdown + Champions Cup
+   fixtures.js — FINALISSIMA LEAGUE CHAT (v14)
+   Phosphor Icons + Countdown + Champions Cup + Anti-Flash
 ========================================================= */
 
 window.customMatchweeks = null;
@@ -31,6 +31,7 @@ async function loadCustomMatchweeksIntoMemory() {
     try {
         if (typeof loadCustomMatchweeks !== 'function') {
             console.warn('[Custom MW] loadCustomMatchweeks not available');
+            window.customMatchweeks = {};
             return;
         }
 
@@ -221,6 +222,17 @@ function renderFixtures() {
         if (fixturesTitle) fixturesTitle.innerText = 'MATCHWEEK ' + currentRound;
 
         list.innerHTML = '';
+
+        /* ⭐ v=14: إذا customMatchweeks لسه ما تحمّل → placeholder */
+        if (window.customMatchweeks === null || typeof window.customMatchweeks === 'undefined') {
+            list.innerHTML =
+                '<div class="round-hidden-msg">' +
+                    '<div class="round-hidden-icon">' + fixIcon('hourglass', 'fill') + '</div>' +
+                    '<div class="round-hidden-title">جاري التحميل...</div>' +
+                    '<div class="round-hidden-sub">يرجى الانتظار</div>' +
+                '</div>';
+            return;
+        }
 
         if (!canUserSeeRound(currentRound)) {
             list.innerHTML =
