@@ -1,8 +1,8 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=5)
-   🏆 Champions Cup — Cinematic Edition
-   GSAP + Bezier Flight + Trail + Shockwave
-========================================================= */
+   champions.js — FINALISSIMA LEAGUE CHAT (v=6)
+   🏆 Champions Cup — Cinematic Card Flip Draw
+   GSAP + Flip Cards + Spotlight + 5 Pots × 4 Teams
+   ========================================================= */
 
 const CHAMP_PIN = '024680';
 const CHAMP_GROUPS = ['A', 'B', 'C', 'D'];
@@ -10,7 +10,14 @@ const CHAMP_POT_SIZE = 4;
 const CHAMP_GROUP_SIZE = 5;
 const CHAMP_GS_GWS = [6, 7, 8, 9];
 
-let champData = { meta: null, draw: [], matches: [] };
+const CHAMP_CARD_COLORS = [
+    '#8B1A2F',
+    '#D4B77A',
+    '#FAF6F0',
+    '#2A2A2A'
+];
+
+let champData = { meta: null, draw: [], matches: [], pendingDraw: null };
 let champLoaded = false;
 let champDrawAnimating = false;
 
@@ -28,9 +35,7 @@ function xIcon(name, variant) {
 }
 
 function champGoToTab() {
-    if (typeof switchTab === 'function') {
-        switchTab('champions');
-    }
+    if (typeof switchTab === 'function') switchTab('champions');
 }
 window.champGoToTab = champGoToTab;
 
@@ -50,6 +55,15 @@ function champGetTeamLogo(code) {
 
 function champWait(ms) {
     return new Promise(function(r) { setTimeout(r, ms); });
+}
+
+function champShuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
 }
 
 /* =========================================================
@@ -172,7 +186,7 @@ async function resetChampions() {
 }
 
 /* =========================================================
-   Fetch team scores
+   Fetch Team Scores
 ========================================================= */
 
 async function fetchTeamScoresForRound(gw) {
@@ -198,100 +212,82 @@ async function fetchTeamScoresForRound(gw) {
 }
 
 /* =========================================================
-   Pots — v5 (uses item.key + item.pts)
+   Pots
 ========================================================= */
 
 async function buildPots() {
     let sortedTeams = [];
 
-    /* ⭐ محاولة استخدام calculateStandingsUpToRound */
     if (typeof calculateStandingsUpToRound === 'function') {
         try {
             const standings = await calculateStandingsUpToRound(38);
-
             if (standings && standings.length > 0) {
                 sortedTeams = standings.map(function(s) {
                     return s.key || s.team;
                 }).filter(function(t) { return t && t.length > 0; });
-                console.log('[Champions] standings loaded:', sortedTeams.length, 'teams');
             }
         } catch (e) {
             console.warn('[Champions] standings failed:', e.message);
         }
     }
 
-    /* ⭐ Fallback: teamsMap */
     if (sortedTeams.length === 0 && typeof teamsMap !== 'undefined') {
         sortedTeams = Object.keys(teamsMap);
-        console.log('[Champions] fallback to teamsMap:', sortedTeams.length, 'teams');
     }
 
-    /* ⭐ إذا ما زال فاضي → خطأ */
     if (sortedTeams.length === 0) {
-        console.error('[Champions] No teams available!');
+        console.error('[Champions] No teams available');
         return null;
     }
 
-    /* ⭐ تأكد 20 فريق */
-    if (sortedTeams.length < 20) {
-        console.warn('[Champions] Only', sortedTeams.length, 'teams — padding with teamsMap');
-        if (typeof teamsMap !== 'undefined') {
-            Object.keys(teamsMap).forEach(function(t) {
-                if (sortedTeams.indexOf(t) === -1) {
-                    sortedTeams.push(t);
-                }
-            });
-        }
+    if (sortedTeams.length < 20 && typeof teamsMap !== 'undefined') {
+        Object.keys(teamsMap).forEach(function(t) {
+            if (sortedTeams.indexOf(t) === -1) sortedTeams.push(t);
+        });
     }
 
-    /* ⭐ ابني 5 Pots */
     const pots = [[], [], [], [], []];
     sortedTeams.slice(0, 20).forEach(function(team, idx) {
         const potIdx = Math.floor(idx / CHAMP_POT_SIZE);
         if (potIdx < 5) pots[potIdx].push(team);
     });
 
-    console.log('[Champions] Pots:', pots.map(function(p) { return p.length; }));
-
     return pots;
 }
 
 /* =========================================================
-   Draw
+   Random Draw Generation (per Pot)
 ========================================================= */
 
-function shuffleArray(arr) {
-    const a = arr.slice();
-    for (let i = a.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
-    }
-    return a;
-}
-
-function performDraw(pots) {
+function champGenerateRandomDraw(pots) {
     const groups = { A: [], B: [], C: [], D: [] };
+    const drawRows = [];
+
     pots.forEach(function(potTeams, potIdx) {
-        const shuffled = shuffleArray(potTeams);
-        shuffled.forEach(function(team, idx) {
-            const groupLetter = CHAMP_GROUPS[idx % CHAMP_GROUPS.length];
-            groups[groupLetter].push({
+        const shuffledTeams = champShuffle(potTeams);
+        const shuffledGroups = champShuffle(CHAMP_GROUPS.slice());
+
+        for (let i = 0; i < shuffledTeams.length; i++) {
+            const team = shuffledTeams[i];
+            const groupLetter = shuffledGroups[i];
+
+            groups[groupLetter].push(team);
+
+            drawRows.push({
                 pot_number: potIdx + 1,
                 group_name: groupLetter,
                 team: team,
-                position: groups[groupLetter].length + 1
+                position: groups[groupLetter].length,
+                slot_index: i
             });
-        });
+        }
     });
-    const allRows = [];
-    CHAMP_GROUPS.forEach(function(g) {
-        groups[g].forEach(function(row) { allRows.push(row); });
-    });
-    return allRows;
+
+    return drawRows;
 }
 
 /* =========================================================
-   Round Robin (5 teams + BYE)
+   Round Robin
 ========================================================= */
 
 function buildRoundRobin(groups) {
@@ -315,32 +311,27 @@ function buildRoundRobin(groups) {
             const opp = rotating[rotating.length - 1];
 
             if (fixed !== '__BYE__' && opp !== '__BYE__') {
-                if (r % 2 === 0) {
-                    roundMatches.push({ home: fixed, away: opp });
-                } else {
-                    roundMatches.push({ home: opp, away: fixed });
-                }
+                roundMatches.push(r % 2 === 0
+                    ? { home: fixed, away: opp }
+                    : { home: opp, away: fixed });
             }
 
             for (let i = 0; i < halfSize - 1; i++) {
                 const t1 = rotating[i];
                 const t2 = rotating[rotating.length - 2 - i];
                 if (t1 === '__BYE__' || t2 === '__BYE__') continue;
-                if (r % 2 === 0) {
-                    roundMatches.push({ home: t1, away: t2 });
-                } else {
-                    roundMatches.push({ home: t2, away: t1 });
-                }
+                roundMatches.push(r % 2 === 0
+                    ? { home: t1, away: t2 }
+                    : { home: t2, away: t1 });
             }
 
             rotating.unshift(rotating.pop());
 
-            const roundNum = r + 1;
             roundMatches.forEach(function(m) {
                 matches.push({
                     stage: 'groups',
                     group_name: gName,
-                    round_num: roundNum,
+                    round_num: r + 1,
                     gw: null,
                     home_team: m.home,
                     away_team: m.away,
@@ -519,9 +510,7 @@ async function syncKnockoutResults() {
             standings.forEach(function(s, idx) {
                 if (s.key) rankMap[s.key] = idx;
             });
-        } catch (e) {
-            console.warn('[Champions] rankMap failed:', e.message);
-        }
+        } catch (e) {}
     }
 
     let updated = 0;
@@ -661,8 +650,7 @@ function renderChampionsMain() {
         html += '<div class="champions-start-area">';
         html += '<div class="champions-status-text">';
         html += xIcon('trophy', 'fill') + ' ' + stageText + ' - GW<strong>' + meta.start_gw + '</strong>';
-        html += '</div>';
-        html += '</div>';
+        html += '</div></div>';
     }
 
     if (draw.length > 0) {
@@ -685,10 +673,6 @@ function renderChampionsMain() {
     attachChampHiddenBtns();
 }
 
-/* =========================================================
-   Render Groups
-========================================================= */
-
 function renderGroupsSection(draw, matches, meta) {
     let html = '<div class="champions-groups-section">';
     html += '<div class="champions-section-title">' + xIcon('squares-four', 'bold') + ' <span>Groups</span></div>';
@@ -710,9 +694,8 @@ function renderGroupsSection(draw, matches, meta) {
             const logoFile = champGetTeamLogo(t.team);
             const teamName = champGetTeamName(t.team);
             const isQualified = idx < 2 && meta.current_stage !== 'groups';
-            const rowClass = isQualified ? 'qualified' : '';
 
-            html += '<tr class="' + rowClass + '">';
+            html += '<tr class="' + (isQualified ? 'qualified' : '') + '">';
             html += '<td>' + (idx + 1) + '</td>';
             html += '<td><div class="team-cell-mini">';
             if (logoFile) {
@@ -729,17 +712,12 @@ function renderGroupsSection(draw, matches, meta) {
             html += '</tr>';
         });
 
-        html += '</tbody></table>';
-        html += '</div>';
+        html += '</tbody></table></div>';
     });
 
     html += '</div></div>';
     return html;
 }
-
-/* =========================================================
-   Render Group Matches
-========================================================= */
 
 function renderGroupsMatches(matches, meta) {
     const groupMatches = matches.filter(function(m) { return m.stage === 'groups'; });
@@ -756,19 +734,12 @@ function renderGroupsMatches(matches, meta) {
 
         const gw = startGw + (r - 1);
         html += '<div class="champ-round-label">Round ' + r + ' <span class="champ-gw">GW' + gw + '</span></div>';
-
-        roundMatches.forEach(function(m) {
-            html += renderMatchRow(m);
-        });
+        roundMatches.forEach(function(m) { html += renderMatchRow(m); });
     }
 
     html += '</div>';
     return html;
 }
-
-/* =========================================================
-   Render Knockout
-========================================================= */
 
 function renderKnockoutBracket(matches, meta) {
     const qfMatches = matches.filter(function(m) { return m.stage === 'qf'; });
@@ -867,7 +838,7 @@ function renderMatchRow(m) {
 }
 
 /* =========================================================
-   🎬 CINEMATIC DRAW — GSAP Edition
+   🎬 CINEMATIC DRAW v=6 — Card Flip + Spotlight
 ========================================================= */
 
 async function champPerformDraw() {
@@ -887,31 +858,25 @@ async function champPerformDraw() {
         return;
     }
 
-    const drawRows = performDraw(pots);
+    const drawRows = champGenerateRandomDraw(pots);
 
-    champBuildDrawScreen(pots);
+    /* ⭐ نحفظ البيانات مؤقتاً */
+    champData.pendingDraw = drawRows;
 
-    /* ⭐ شغل التسلسل السينمائي */
-    await champRunCinematicSequence(drawRows);
+    /* ⭐ بناء الشاشة */
+    champBuildDrawScreen();
 
-    /* ⭐ احفظ النتائج */
-    await saveChampionsDraw(drawRows);
-    champData.draw = drawRows;
-
-    const groups = { A: [], B: [], C: [], D: [] };
-    drawRows.forEach(function(r) { groups[r.group_name].push(r); });
-    const matches = buildRoundRobin(groups);
-    await saveChampionsMatches(matches);
-    champData.matches = matches;
+    /* ⭐ تشغيل الأنيميشن */
+    await champRunCinematicDraw(drawRows, pots);
 
     champDrawAnimating = false;
 }
 
 /* =========================================================
-   Build Draw Screen HTML
+   Build Draw Screen
 ========================================================= */
 
-function champBuildDrawScreen(pots) {
+function champBuildDrawScreen() {
     const old = document.getElementById('champDrawScreen');
     if (old) old.remove();
 
@@ -919,457 +884,307 @@ function champBuildDrawScreen(pots) {
     screen.className = 'champions-draw-screen';
     screen.id = 'champDrawScreen';
 
-    /* ⭐ Stars background */
-    let starsHtml = '<div class="champ-stars-bg" id="champStarsBg"></div>';
+    let html = '';
 
-    /* ⭐ Intro overlay */
-    let introHtml = '<div class="champ-intro" id="champIntro">' +
-        '<div class="champ-intro-text" id="champIntroText"></div>' +
-    '</div>';
+    html += '<div class="champ-draw-header" id="champDrawHeader">';
+    html += '<div class="champ-draw-title" id="champDrawTitle">قرعة كأس أبطال الفيناليغ</div>';
+    html += '</div>';
 
-    /* ⭐ Main content */
-    let potsHtml = '';
-    pots.forEach(function(potTeams, idx) {
-        potsHtml += '<div class="champions-pot" id="champPot' + (idx + 1) + '">';
-        potsHtml += '<div class="champions-pot-label">Pot ' + (idx + 1) + '</div>';
-        potsHtml += '<div class="champions-pot-teams">';
-        potTeams.forEach(function(code) {
-            const name = champGetTeamName(code);
-            const logo = champGetTeamLogo(code);
-            potsHtml += '<div class="champions-pot-team" data-team="' + code + '">';
-            if (logo) {
-                potsHtml += '<img src="./' + logo + '" onerror="this.style.display=\'none\'">';
-            }
-            potsHtml += '<span>' + name + '</span>';
-            potsHtml += '</div>';
-        });
-        potsHtml += '</div></div>';
-    });
+    html += '<div class="champ-banner-stage" id="champBannerStage">';
 
-    let groupsHtml = '';
+    html += '<div class="champ-banner-original" id="champBannerOriginal">';
+    html += '<img src="./banner-fina.png" alt="Champions Cup">';
+    html += '</div>';
+
+    html += '<div class="champ-cards-stage" id="champCardsStage">';
+    for (let i = 0; i < 4; i++) {
+        const color = CHAMP_CARD_COLORS[i];
+        html += '<div class="champ-card" id="champCard' + i + '" data-index="' + i + '" style="--card-color:' + color + ';">';
+        html += '<div class="champ-card-inner">';
+        html += '<div class="champ-card-front" style="background:' + color + ';">';
+        html += '<div class="champ-card-number">0' + (i + 1) + '</div>';
+        html += '</div>';
+        html += '<div class="champ-card-back">';
+        html += '<div class="champ-card-back-team" id="champCardTeam' + i + '"></div>';
+        html += '</div>';
+        html += '</div></div>';
+    }
+    html += '</div>';
+
+    html += '<div class="champ-groups-stage" id="champGroupsStage">';
     CHAMP_GROUPS.forEach(function(g) {
-        groupsHtml += '<div class="champions-group-box" id="champGroup' + g + '">';
-        groupsHtml += '<div class="champions-group-label">' + g + '</div>';
-        groupsHtml += '<div class="champions-group-teams" id="champTeams' + g + '"></div>';
-        groupsHtml += '</div>';
+        html += '<div class="champ-group-target" id="champGroupTarget' + g + '" data-group="' + g + '">';
+        html += '<div class="champ-group-target-label">' + g + '</div>';
+        html += '<div class="champ-group-target-teams" id="champGroupTeams' + g + '"></div>';
+        html += '</div>';
     });
+    html += '</div>';
 
-    screen.innerHTML =
-        starsHtml +
-        introHtml +
-        '<div class="champ-stage" id="champStage">' +
-            '<div class="champions-draw-title" id="champDrawTitle">' +
-                xIcon('trophy', 'fill') + ' <span>CHAMPIONS CUP DRAW</span>' +
-            '</div>' +
-            '<div class="champions-pots-row">' + potsHtml + '</div>' +
-            '<div class="champions-ball-area">' +
-                '<div class="champions-ball" id="champBall">' +
-                    xIcon('soccer-ball', 'fill') +
-                '</div>' +
-                '<div class="champ-ball-glow" id="champBallGlow"></div>' +
-            '</div>' +
-            '<div class="champions-groups-row">' + groupsHtml + '</div>' +
-        '</div>';
+    html += '</div>';
 
+    screen.innerHTML = html;
     document.body.appendChild(screen);
-
-    champSpawnStars(60);
 }
 
 /* =========================================================
-   Stars Background
+   Cinematic Draw Sequence
 ========================================================= */
 
-function champSpawnStars(count) {
-    const bg = document.getElementById('champStarsBg');
-    if (!bg) return;
-    bg.innerHTML = '';
-    for (let i = 0; i < count; i++) {
-        const star = document.createElement('div');
-        star.className = 'champ-star';
-        star.style.left = Math.random() * 100 + '%';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.animationDelay = (Math.random() * 3) + 's';
-        star.style.animationDuration = (2 + Math.random() * 3) + 's';
-        bg.appendChild(star);
-    }
-}
+async function champRunCinematicDraw(drawRows, pots) {
+    const banner = document.getElementById('champBannerOriginal');
+    const cards = document.querySelectorAll('.champ-card');
+    const header = document.getElementById('champDrawHeader');
 
-/* =========================================================
-   🎬 Cinematic Sequence
-========================================================= */
-
-async function champRunCinematicSequence(drawRows) {
-    if (typeof gsap === 'undefined') return;
-
-    const intro = document.getElementById('champIntro');
-    const introText = document.getElementById('champIntroText');
-    const stage = document.getElementById('champStage');
-    const ball = document.getElementById('champBall');
-    const ballGlow = document.getElementById('champBallGlow');
-
-    /* ═══════════════════════════════════════════════════════
-       SCENE 1: INTRO
-       ═══════════════════════════════════════════════════════ */
-
-    gsap.set(stage, { opacity: 0 });
-    gsap.set(intro, { opacity: 1 });
-
-    /* "CHAMPIONS" */
-    introText.innerHTML = '<div class="champ-intro-line">CHAMPIONS</div>';
-    const line1 = introText.querySelector('.champ-intro-line');
-    gsap.set(line1, { opacity: 0, y: 80, scale: 0.7, filter: 'blur(20px)' });
+    /* ⭐ المشهد 1: الافتتاحية */
+    gsap.set(header, { opacity: 0, y: -30 });
+    gsap.set(banner, { opacity: 0, scale: 0.8 });
 
     await new Promise(function(resolve) {
-        gsap.to(line1, {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 1.5,
-            ease: 'power4.out',
-            onComplete: resolve
-        });
+        gsap.timeline({ onComplete: resolve })
+            .to(header, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' })
+            .to(banner, { opacity: 1, scale: 1, duration: 1.4, ease: 'power3.out' }, '-=0.8');
     });
 
-    await champWait(500);
+    await champWait(1000);
 
-    /* Flash + "CUP" */
-    gsap.to(line1, {
-        scale: 1.5,
-        opacity: 0,
-        filter: 'blur(30px)',
-        duration: 0.4,
-        ease: 'power2.in'
-    });
-
-    await champWait(200);
-
-    introText.innerHTML = '<div class="champ-intro-line champ-intro-cup">CUP</div>';
-    const line2 = introText.querySelector('.champ-intro-line');
-    gsap.set(line2, { opacity: 0, scale: 2, filter: 'blur(40px)' });
-
+    /* ⭐ المشهد 2: الانقسام */
     await new Promise(function(resolve) {
-        gsap.to(line2, {
-            opacity: 1,
-            scale: 1,
-            filter: 'blur(0px)',
-            duration: 0.8,
-            ease: 'power3.out',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(800);
-
-    /* Fade out intro */
-    await new Promise(function(resolve) {
-        gsap.to(intro, {
+        gsap.to(banner, {
             opacity: 0,
-            duration: 0.6,
+            scale: 1.1,
+            filter: 'blur(20px)',
+            duration: 0.8,
             onComplete: resolve
         });
     });
 
-    intro.remove();
+    banner.style.display = 'none';
 
-    /* ═══════════════════════════════════════════════════════
-       SCENE 2: BALL ENTRY
-       ═══════════════════════════════════════════════════════ */
-
-    gsap.set(stage, { opacity: 1 });
-
-    /* Ball drop from top */
-    gsap.set(ball, { y: -400, opacity: 0, scale: 0.5 });
-    gsap.set(ballGlow, { opacity: 0, scale: 0.5 });
+    /* ⭐ ظهور البطاقات */
+    gsap.set(cards, { opacity: 0, y: 60, rotateY: 0 });
 
     await new Promise(function(resolve) {
-        const tl = gsap.timeline({ onComplete: resolve });
-
-        tl.to(ball, {
+        gsap.to(cards, {
+            opacity: 1,
             y: 0,
-            opacity: 1,
-            scale: 1,
             duration: 0.9,
-            ease: 'bounce.out'
-        })
-        .to(ballGlow, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.8,
-            ease: 'power2.out'
-        }, '-=0.5')
-        .to(ballGlow, {
-            scale: 1.3,
-            opacity: 0.7,
-            duration: 1.2,
-            repeat: 2,
-            yoyo: true,
-            ease: 'power1.inOut'
-        }, '-=0.3');
-    });
-
-    /* ═══════════════════════════════════════════════════════
-       SCENE 3: POTS SPOTLIGHT
-       ═══════════════════════════════════════════════════════ */
-
-    for (let p = 1; p <= 5; p++) {
-        const potEl = document.getElementById('champPot' + p);
-        if (!potEl) continue;
-
-        await new Promise(function(resolve) {
-            gsap.timeline({ onComplete: resolve })
-                .to(potEl, {
-                    boxShadow: '0 0 40px rgba(212, 183, 122, 1)',
-                    borderColor: '#D4B77A',
-                    scale: 1.05,
-                    duration: 0.4,
-                    ease: 'power2.out'
-                })
-                .to(potEl, {
-                    boxShadow: '0 0 0 rgba(212, 183, 122, 0)',
-                    borderColor: 'rgba(212, 183, 122, 0.4)',
-                    scale: 1,
-                    duration: 0.5,
-                    delay: 0.2,
-                    ease: 'power2.in'
-                });
+            stagger: 0.15,
+            ease: 'back.out(1.4)',
+            onComplete: resolve
         });
-
-        await champWait(100);
-    }
-
-    await champWait(400);
-
-    /* ═══════════════════════════════════════════════════════
-       SCENE 4-5: PICK + FLIGHT (لكل فريق)
-       ═══════════════════════════════════════════════════════ */
-
-    const sorted = drawRows.slice().sort(function(a, b) {
-        if (a.pot_number !== b.pot_number) return a.pot_number - b.pot_number;
-        return a.position - b.position;
-    });
-
-    for (let i = 0; i < sorted.length; i++) {
-        const row = sorted[i];
-        await champAnimateOnePick(row, i + 1);
-    }
-
-    /* ═══════════════════════════════════════════════════════
-       SCENE 6: FINALE
-       ═══════════════════════════════════════════════════════ */
-
-    await champFinale();
-}
-
-/* =========================================================
-   🎯 Animate One Pick — Scene 4 + Scene 5
-========================================================= */
-
-async function champAnimateOnePick(row, index) {
-    const ball = document.getElementById('champBall');
-    const ballGlow = document.getElementById('champBallGlow');
-    const potEl = document.getElementById('champPot' + row.pot_number);
-    const groupBox = document.getElementById('champGroup' + row.group_name);
-    const groupTeamsEl = document.getElementById('champTeams' + row.group_name);
-
-    if (!ball || !potEl || !groupBox || !groupTeamsEl) return;
-
-    const teamName = champGetTeamName(row.team);
-    const teamLogo = champGetTeamLogo(row.team);
-
-    /* ═══ SCENE 4: SHAKE + REVEAL ═══ */
-
-    /* Highlight POT */
-    gsap.to(potEl, {
-        boxShadow: '0 0 40px rgba(212, 183, 122, 1)',
-        borderColor: '#D4B77A',
-        scale: 1.08,
-        duration: 0.3,
-        ease: 'power2.out'
-    });
-
-    /* Highlight source team in pot */
-    const teamEl = potEl.querySelector('[data-team="' + row.team + '"]');
-    if (teamEl) {
-        gsap.to(teamEl, {
-            backgroundColor: 'rgba(212, 183, 122, 0.3)',
-            scale: 1.1,
-            duration: 0.3
-        });
-    }
-
-    /* Ball shake */
-    await new Promise(function(resolve) {
-        const tl = gsap.timeline({ onComplete: resolve });
-        tl.to(ball, {
-            x: 6,
-            duration: 0.05,
-            repeat: 7,
-            yoyo: true,
-            ease: 'power1.inOut'
-        })
-        .to(ball, {
-            rotate: 720,
-            scale: 1.15,
-            duration: 0.5,
-            ease: 'power2.inOut'
-        }, '-=0.4');
-    });
-
-    /* ═══ LIGHT BURST ═══ */
-
-    /* Flash */
-    const flash = document.createElement('div');
-    flash.className = 'champ-flash';
-    document.body.appendChild(flash);
-    gsap.fromTo(flash, { opacity: 1 }, {
-        opacity: 0,
-        duration: 0.4,
-        onComplete: function() { flash.remove(); }
-    });
-
-    /* Particles explosion */
-    champExplodeParticles(ball, 30);
-
-    /* Show team name inside ball */
-    const nameLabel = document.createElement('div');
-    nameLabel.className = 'champions-ball-team';
-    nameLabel.textContent = teamName;
-    ball.appendChild(nameLabel);
-
-    gsap.fromTo(nameLabel,
-        { opacity: 0, scale: 0.5, y: 20 },
-        { opacity: 1, scale: 1.2, y: 0, duration: 0.4, ease: 'back.out(1.7)' }
-    );
-
-    /* Glow intensify */
-    gsap.to(ballGlow, {
-        scale: 2,
-        opacity: 1,
-        duration: 0.4,
-        ease: 'power2.out'
     });
 
     await champWait(600);
 
-    /* ═══ SCENE 5: FLIGHT (Bezier) ═══ */
+    /* ⭐ المشهد 3: قلب البطاقات */
+    await new Promise(function(resolve) {
+        gsap.to(cards, {
+            rotateY: 180,
+            duration: 1.2,
+            stagger: 0.15,
+            ease: 'power2.inOut',
+            onComplete: resolve
+        });
+    });
 
-    /* Ball position (source) */
-    const ballRect = ball.getBoundingClientRect();
-    const startX = ballRect.left + ballRect.width / 2;
-    const startY = ballRect.top + ballRect.height / 2;
+    await champWait(600);
 
-    /* Destination: group box */
-    const groupRect = groupBox.getBoundingClientRect();
-    const endX = groupRect.left + groupRect.width / 2;
-    const endY = groupRect.top + groupRect.height / 2;
+    /* ⭐ المشهد 4: لكل Pot */
+    const potGroups = {};
+    drawRows.forEach(function(row) {
+        if (!potGroups[row.pot_number]) potGroups[row.pot_number] = [];
+        potGroups[row.pot_number].push(row);
+    });
 
-    /* Create flying team element */
+    for (let potNum = 1; potNum <= 5; potNum++) {
+        const potRows = potGroups[potNum] || [];
+        if (potRows.length === 0) continue;
+
+        /* ترتيب حسب slot_index */
+        potRows.sort(function(a, b) { return a.slot_index - b.slot_index; });
+
+        /* عرض منتخبات الـ Pot */
+        await champShowPotTeams(potNum, potRows);
+
+        /* توزيع كل منتخب */
+        for (let i = 0; i < potRows.length; i++) {
+            await champDistributeTeam(potRows[i], i);
+        }
+
+        /* إخفاء البطاقات للـ Pot القادم */
+        await champResetCardsForNextPot();
+
+        await champWait(400);
+    }
+
+    /* ⭐ المشهد 5: النهاية */
+    await champFinale();
+}
+
+/* =========================================================
+   Show Pot Teams in Cards
+========================================================= */
+
+async function champShowPotTeams(potNum, potRows) {
+    const titleEl = document.getElementById('champDrawTitle');
+    if (titleEl) {
+        titleEl.textContent = 'POT ' + potNum;
+        gsap.fromTo(titleEl,
+            { opacity: 0.5, scale: 0.9 },
+            { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }
+        );
+    }
+
+    const cards = document.querySelectorAll('.champ-card');
+    for (let i = 0; i < 4; i++) {
+        const card = cards[i];
+        const teamSlot = document.getElementById('champCardTeam' + i);
+        if (!card || !teamSlot) continue;
+
+        const row = potRows[i];
+        if (!row) continue;
+
+        const teamName = champGetTeamName(row.team);
+        const teamLogo = champGetTeamLogo(row.team);
+
+        teamSlot.innerHTML =
+            (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
+            '<span>' + teamName + '</span>';
+
+        card.dataset.team = row.team;
+        card.dataset.group = row.group_name;
+    }
+
+    await champWait(1000);
+}
+
+/* =========================================================
+   Distribute One Team
+========================================================= */
+
+async function champDistributeTeam(row, slotIndex) {
+    const card = document.getElementById('champCard' + slotIndex);
+    const groupTarget = document.getElementById('champGroupTarget' + row.group_name);
+    const groupTeamsEl = document.getElementById('champGroupTeams' + row.group_name);
+
+    if (!card || !groupTarget || !groupTeamsEl) return;
+
+    /* ⭐ Spotlight يدور بين البطاقات */
+    const allCards = document.querySelectorAll('.champ-card');
+
+    for (let cycle = 0; cycle < 2; cycle++) {
+        for (let c = 0; c < 4; c++) {
+            gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.1 });
+            gsap.to(allCards[c], {
+                boxShadow: '0 0 40px rgba(212,183,122,0.9)',
+                scale: 1.08,
+                duration: 0.15
+            });
+            await champWait(120);
+        }
+    }
+
+    /* ⭐ توقف على البطاقة المختارة */
+    gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.2 });
+    gsap.to(card, {
+        boxShadow: '0 0 60px rgba(212,183,122,1)',
+        scale: 1.15,
+        duration: 0.3,
+        ease: 'power2.out'
+    });
+
+    await champWait(500);
+
+    /* ⭐ Clone للمنتخب */
+    const cardRect = card.getBoundingClientRect();
+    const groupRect = groupTarget.getBoundingClientRect();
+
+    const teamName = champGetTeamName(row.team);
+    const teamLogo = champGetTeamLogo(row.team);
+
     const flyingTeam = document.createElement('div');
     flyingTeam.className = 'champ-flying-team';
     flyingTeam.innerHTML =
         (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
         '<span>' + teamName + '</span>';
+
     flyingTeam.style.position = 'fixed';
-    flyingTeam.style.left = '0';
-    flyingTeam.style.top = '0';
-    flyingTeam.style.transform = 'translate(' + (startX - 80) + 'px, ' + (startY - 30) + 'px)';
+    flyingTeam.style.left = cardRect.left + 'px';
+    flyingTeam.style.top = cardRect.top + 'px';
+    flyingTeam.style.width = cardRect.width + 'px';
+    flyingTeam.style.height = cardRect.height + 'px';
     flyingTeam.style.zIndex = '9999999';
     flyingTeam.style.pointerEvents = 'none';
     document.body.appendChild(flyingTeam);
 
-    /* Fade out name inside ball */
-    gsap.to(nameLabel, { opacity: 0, scale: 0.5, duration: 0.3 });
-    gsap.to(ballGlow, { scale: 1, opacity: 0.5, duration: 0.3 });
+    const startX = cardRect.left + cardRect.width / 2;
+    const startY = cardRect.top + cardRect.height / 2;
+    const endX = groupRect.left + groupRect.width / 2;
+    const endY = groupRect.top + groupRect.height / 2;
 
-    /* ⭐ FLIGHT with custom bezier */
+    /* ⭐ الأنيميشن */
     await new Promise(function(resolve) {
-        const flightDuration = 1.5;
+        const duration = 1.3;
         const startTime = performance.now();
-
-        /* Bezier control point — arc above */
         const midX = (startX + endX) / 2;
-        const midY = Math.min(startY, endY) - 180;
+        const midY = Math.min(startY, endY) - 150;
 
-        /* Trail array */
-        const trail = [];
-
-        function animateFlight(now) {
+        function animate(now) {
             const elapsed = now - startTime;
-            const t = Math.min(elapsed / flightDuration, 1);
-            const eased = champEaseInOutCubic(t);
+            const t = Math.min(elapsed / duration, 1);
+            const eased = t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
-            /* Cubic Bezier */
             const mt = 1 - eased;
-            const x = mt * mt * mt * startX +
-                      3 * mt * mt * eased * midX +
-                      3 * mt * eased * eased * midX +
-                      eased * eased * eased * endX;
-            const y = mt * mt * mt * startY +
-                      3 * mt * mt * eased * midY +
-                      3 * mt * eased * eased * midY +
-                      eased * eased * eased * endY;
+            const x = mt*mt*mt*startX + 3*mt*mt*eased*midX + 3*mt*eased*eased*midX + eased*eased*eased*endX;
+            const y = mt*mt*mt*startY + 3*mt*mt*eased*midY + 3*mt*eased*eased*midY + eased*eased*eased*endY;
 
+            const sc = 1 + Math.sin(eased * Math.PI) * 0.3;
             const rot = eased * 360;
-            const sc = 1.3 - eased * 0.3;
 
             flyingTeam.style.transform =
-                'translate(' + (x - 80) + 'px, ' + (y - 30) + 'px) rotate(' + rot + 'deg) scale(' + sc + ')';
-            flyingTeam.style.filter = 'brightness(' + (2 - eased * 1) + ') drop-shadow(0 0 ' + (20 - eased * 20) + 'px #D4B77A)';
+                'translate(' + (x - cardRect.left - cardRect.width/2) + 'px, ' +
+                (y - cardRect.top - cardRect.height/2) + 'px) scale(' + sc + ') rotate(' + rot + 'deg)';
 
-            /* Trail particle */
-            if (index % 2 === 0 || t < 1) {
-                if (!trail.lastTime || now - trail.lastTime > 30) {
-                    champSpawnTrailParticle(x, y);
-                    trail.lastTime = now;
-                }
+            if (elapsed % 40 < 20) {
+                champSpawnTrail(x, y);
             }
 
             if (t < 1) {
-                requestAnimationFrame(animateFlight);
+                requestAnimationFrame(animate);
             } else {
                 resolve();
             }
         }
-
-        requestAnimationFrame(animateFlight);
+        requestAnimationFrame(animate);
     });
 
-    /* ═══ IMPACT + SHOCKWAVE ═══ */
-
-    /* Remove flying team */
-    flyingTeam.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
-    flyingTeam.style.opacity = '0';
-    flyingTeam.style.transform += ' scale(0.5)';
-    setTimeout(function() { flyingTeam.remove(); }, 250);
-
-    /* Shockwave */
+    /* ⭐ الوصول */
+    flyingTeam.remove();
     champSpawnShockwave(endX, endY);
 
-    /* Group pulse */
+    /* ⭐ المجموعة تنبض */
     gsap.timeline()
-        .to(groupBox, {
+        .to(groupTarget, {
             scale: 1.15,
-            boxShadow: '0 0 60px rgba(212, 183, 122, 1), inset 0 0 40px rgba(212, 183, 122, 0.5)',
+            boxShadow: '0 0 60px rgba(212,183,122,1)',
             borderColor: '#D4B77A',
-            duration: 0.25,
+            duration: 0.3,
             ease: 'power2.out'
         })
-        .to(groupBox, {
+        .to(groupTarget, {
             scale: 1,
             duration: 0.5,
             ease: 'elastic.out(1, 0.5)'
         })
-        .to(groupBox, {
-            boxShadow: '0 0 0 rgba(212, 183, 122, 0)',
-            borderColor: 'rgba(212, 183, 122, 0.5)',
-            duration: 0.6
+        .to(groupTarget, {
+            boxShadow: '0 0 0 rgba(212,183,122,0)',
+            borderColor: 'rgba(212,183,122,0.5)',
+            duration: 0.5
         }, '-=0.3');
 
-    /* Add team to group */
+    /* ⭐ الفريق في المجموعة */
     const teamHtml =
-        '<div class="champions-group-team">' +
+        '<div class="champ-group-team-item">' +
             (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
             '<span>' + teamName + '</span>' +
         '</div>';
@@ -1381,73 +1196,57 @@ async function champAnimateOnePick(row, index) {
         { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.7)' }
     );
 
-    /* Reset ball */
-    gsap.to(ball, {
-        rotate: 0,
+    /* ⭐ البطاقة ترجع */
+    gsap.to(card, {
+        boxShadow: 'none',
         scale: 1,
-        x: 0,
-        duration: 0.4,
-        ease: 'power2.out'
+        duration: 0.4
     });
 
-    /* Mark source as drawn */
-    if (teamEl) {
-        gsap.to(teamEl, {
-            opacity: 0.3,
-            scale: 1,
-            backgroundColor: 'rgba(0,0,0,0)',
-            duration: 0.4
-        });
-    }
-
-    /* Un-highlight POT */
-    gsap.to(potEl, {
-        boxShadow: '0 0 0 rgba(212, 183, 122, 0)',
-        borderColor: 'rgba(212, 183, 122, 0.4)',
-        scale: 1,
-        duration: 0.5
-    });
-
-    /* Clear ball content (after flight) */
     await champWait(400);
-    ball.innerHTML = xIcon('soccer-ball', 'fill');
 }
 
 /* =========================================================
-   🎉 Finale
+   Reset Cards for Next Pot
+========================================================= */
+
+async function champResetCardsForNextPot() {
+    const teamSlots = document.querySelectorAll('.champ-card-back-team');
+    teamSlots.forEach(function(el) { el.innerHTML = ''; });
+
+    await champWait(200);
+}
+
+/* =========================================================
+   Finale
 ========================================================= */
 
 async function champFinale() {
-    /* Confetti */
     champSpawnConfetti(80);
+
+    const titleEl = document.getElementById('champDrawTitle');
+    if (titleEl) {
+        gsap.to(titleEl, {
+            opacity: 0,
+            y: -20,
+            duration: 0.4,
+            onComplete: function() {
+                titleEl.textContent = 'اكتملت القرعة';
+                gsap.to(titleEl, { opacity: 1, y: 0, duration: 0.6 });
+            }
+        });
+    }
 
     await champWait(1500);
 
-    /* Show "DRAW COMPLETE" */
-    const stage = document.getElementById('champStage');
-    if (stage) {
-        const completeEl = document.createElement('div');
-        completeEl.className = 'champ-complete';
-        completeEl.innerHTML = xIcon('check-circle', 'fill') + ' <span>DRAW COMPLETE</span>';
-        stage.appendChild(completeEl);
+    const cardsStage = document.getElementById('champCardsStage');
+    if (cardsStage && cardsStage.parentElement) {
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'champions-draw-close';
+        closeBtn.innerHTML = xIcon('check-circle', 'bold') + ' <span>Done</span>';
+        closeBtn.onclick = champCloseDraw;
+        cardsStage.parentElement.appendChild(closeBtn);
 
-        gsap.fromTo(completeEl,
-            { opacity: 0, scale: 0.5, y: 40 },
-            { opacity: 1, scale: 1, y: 0, duration: 0.8, ease: 'back.out(1.7)' }
-        );
-    }
-
-    await champWait(2000);
-
-    /* Show Close button */
-    const closeBtn = document.createElement('button');
-    closeBtn.className = 'champions-draw-close';
-    closeBtn.innerHTML = xIcon('check-circle', 'bold') + ' <span>Done</span>';
-    closeBtn.onclick = champCloseDraw;
-
-    const stageEl = document.getElementById('champStage');
-    if (stageEl) {
-        stageEl.appendChild(closeBtn);
         gsap.fromTo(closeBtn,
             { opacity: 0, y: 20 },
             { opacity: 1, y: 0, duration: 0.5 }
@@ -1456,10 +1255,10 @@ async function champFinale() {
 }
 
 /* =========================================================
-   Effects (Trail, Particles, Shockwave, Confetti)
+   Effects
 ========================================================= */
 
-function champSpawnTrailParticle(x, y) {
+function champSpawnTrail(x, y) {
     const p = document.createElement('div');
     p.className = 'champ-trail-particle';
     p.style.left = x + 'px';
@@ -1468,44 +1267,8 @@ function champSpawnTrailParticle(x, y) {
 
     gsap.fromTo(p,
         { opacity: 0.9, scale: 1 },
-        {
-            opacity: 0,
-            scale: 0.2,
-            duration: 0.5,
-            ease: 'power2.out',
-            onComplete: function() { p.remove(); }
-        }
+        { opacity: 0, scale: 0.2, duration: 0.5, onComplete: function() { p.remove(); } }
     );
-}
-
-function champExplodeParticles(source, count) {
-    const rect = source.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-
-    for (let i = 0; i < count; i++) {
-        const p = document.createElement('div');
-        p.className = 'champ-burst-particle';
-        p.style.left = cx + 'px';
-        p.style.top = cy + 'px';
-        document.body.appendChild(p);
-
-        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.3;
-        const distance = 80 + Math.random() * 100;
-
-        gsap.fromTo(p,
-            { opacity: 1, scale: 1, x: 0, y: 0 },
-            {
-                opacity: 0,
-                scale: 0.3,
-                x: Math.cos(angle) * distance,
-                y: Math.sin(angle) * distance,
-                duration: 0.8 + Math.random() * 0.4,
-                ease: 'power2.out',
-                onComplete: function() { p.remove(); }
-            }
-        );
-    }
 }
 
 function champSpawnShockwave(x, y) {
@@ -1517,19 +1280,12 @@ function champSpawnShockwave(x, y) {
 
     gsap.fromTo(w,
         { opacity: 0.8, scale: 0 },
-        {
-            opacity: 0,
-            scale: 4,
-            duration: 0.8,
-            ease: 'power2.out',
-            onComplete: function() { w.remove(); }
-        }
+        { opacity: 0, scale: 4, duration: 0.8, onComplete: function() { w.remove(); } }
     );
 }
 
 function champSpawnConfetti(count) {
-    const colors = ['#D4B77A', '#8B1A2F', '#FAF6F0', '#E5D4A5', '#6B0F1F'];
-
+    const colors = ['#D4B77A', '#8B1A2F', '#FAF6F0', '#2A2A2A'];
     for (let i = 0; i < count; i++) {
         const c = document.createElement('div');
         c.className = 'champ-confetti';
@@ -1554,34 +1310,44 @@ function champSpawnConfetti(count) {
 }
 
 /* =========================================================
-   Easing
+   Save Draw to Supabase
 ========================================================= */
 
-function champEaseInOutCubic(t) {
-    return t < 0.5
-        ? 4 * t * t * t
-        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+async function champSaveDraw(drawRows) {
+    await saveChampionsDraw(drawRows);
+    champData.draw = drawRows;
+
+    const groups = { A: [], B: [], C: [], D: [] };
+    drawRows.forEach(function(r) { groups[r.group_name].push(r); });
+
+    const matches = buildRoundRobin(groups);
+    await saveChampionsMatches(matches);
+    champData.matches = matches;
 }
 
 /* =========================================================
    Close Draw
 ========================================================= */
 
-function champCloseDraw() {
+async function champCloseDraw() {
     const screen = document.getElementById('champDrawScreen');
     if (screen) {
         gsap.to(screen, {
             opacity: 0,
             duration: 0.4,
-            onComplete: function() {
+            onComplete: async function() {
                 screen.remove();
+
+                const drawRows = champData.pendingDraw || [];
+                if (drawRows.length > 0) {
+                    await champSaveDraw(drawRows);
+                    champData.pendingDraw = null;
+                }
+
                 champLoaded = false;
                 loadChampions();
             }
         });
-    } else {
-        champLoaded = false;
-        loadChampions();
     }
 }
 
@@ -1605,9 +1371,7 @@ async function champStartTournament() {
     });
 
     if (ok) {
-        if (typeof showToast === 'function') {
-            showToast('Tournament started from GW' + startGw, true, 3000);
-        }
+        if (typeof showToast === 'function') showToast('Tournament started from GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
     } else {
@@ -1622,7 +1386,6 @@ async function champStartTournament() {
 function attachChampHiddenBtns() {
     const banner = document.querySelector('.text-slide[data-tab="champions"]');
     if (!banner) return;
-
     if (banner.dataset.champAdminAttached === '1') return;
     banner.dataset.champAdminAttached = '1';
 
@@ -1634,11 +1397,8 @@ function attachChampHiddenBtns() {
     let pressTimer = null;
 
     const startPress = function() {
-        pressTimer = setTimeout(function() {
-            champShowAdminMenu();
-        }, 1500);
+        pressTimer = setTimeout(function() { champShowAdminMenu(); }, 1500);
     };
-
     const cancelPress = function() {
         if (pressTimer) clearTimeout(pressTimer);
         pressTimer = null;
@@ -1656,10 +1416,7 @@ function attachChampHiddenBtns() {
 function champShowAdminMenu() {
     const pin = prompt('Enter PIN:');
     if (pin === null) return;
-    if (pin !== CHAMP_PIN) {
-        alert('Wrong PIN');
-        return;
-    }
+    if (pin !== CHAMP_PIN) { alert('Wrong PIN'); return; }
 
     const choice = prompt(
         'Choose action:\n' +
@@ -1680,11 +1437,8 @@ async function champSyncNow() {
     const meta = champData.meta || {};
     let updated = 0;
 
-    if (meta.current_stage === 'groups') {
-        updated = await syncGroupResults();
-    } else {
-        updated = await syncKnockoutResults();
-    }
+    if (meta.current_stage === 'groups') updated = await syncGroupResults();
+    else updated = await syncKnockoutResults();
 
     if (updated > 0) {
         if (typeof showToast === 'function') showToast('Updated ' + updated + ' matches', true, 2500);
@@ -1698,23 +1452,12 @@ async function champSyncNow() {
 
 async function champStartKnockout() {
     const meta = champData.meta || {};
-    if (!meta.started) {
-        alert('Tournament not started');
-        return;
-    }
-    if (meta.current_stage !== 'groups') {
-        alert('Knockout already started');
-        return;
-    }
+    if (!meta.started) { alert('Tournament not started'); return; }
+    if (meta.current_stage !== 'groups') { alert('Knockout already started'); return; }
 
     const groupMatches = champData.matches.filter(function(m) { return m.stage === 'groups'; });
     const allPlayed = groupMatches.every(function(m) { return m.is_played; });
-
-    if (!allPlayed) {
-        alert('Group matches still pending');
-        return;
-    }
-
+    if (!allPlayed) { alert('Group matches still pending'); return; }
     if (!confirm('Start Knockout from next round?')) return;
 
     const startGw = (currentRound || 1) + 1;
@@ -1731,11 +1474,10 @@ async function champStartKnockout() {
 
 function champRequestReset() {
     if (!confirm('Reset draw and all matches?')) return;
-
     resetChampions().then(function(ok) {
         if (ok) {
             if (typeof showToast === 'function') showToast('Draw reset', true, 2500);
-            champData = { meta: null, draw: [], matches: [] };
+            champData = { meta: null, draw: [], matches: [], pendingDraw: null };
             champLoaded = false;
             loadChampions();
         } else {
@@ -1757,10 +1499,7 @@ async function loadChampions() {
         return;
     }
 
-    if (champLoaded) {
-        renderChampionsMain();
-        return;
-    }
+    if (champLoaded) { renderChampionsMain(); return; }
 
     container.innerHTML = '<div class="champions-empty">' + xIcon('hourglass', 'duotone') + '<div>Loading Champions Cup...</div></div>';
 
