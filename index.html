@@ -583,7 +583,7 @@ img,
         <div class="text-slide" data-tab="stats" onclick="switchTab('stats')">
             <img src="./banner-stats.png" alt="Statistics" class="banner-img">
         </div>
-        <div class="text-slide" data-tab="champions" onclick="champGoToTab()">
+        <div class="text-slide" data-tab="champions" onclick="switchTab('champions')">
             <img src="./banner-fina.png" alt="Champions Cup" class="banner-img">
         </div>
     </div>
@@ -718,7 +718,6 @@ img,
             <button class="stats-tab-btn" data-tab="month" onclick="switchStatsTab('month')">Month</button>
             <button class="stats-tab-btn" data-tab="charts" onclick="switchStatsTab('charts')">Charts</button>
             <button class="stats-tab-btn" data-tab="clubs" onclick="switchStatsTab('clubs')">Nations</button>
-            <button class="stats-tab-btn" data-tab="champions" onclick="switchStatsTab('champions')"><i class="ph-fill ph-trophy" style="margin-inline-end:4px;"></i>Champions</button>
             <button class="stats-tab-btn" data-tab="compare" onclick="switchStatsTab('compare')">Compare</button>
             <button class="stats-tab-btn" data-tab="search" onclick="switchStatsTab('search')">Search</button>
             <button class="stats-tab-btn" data-tab="records" onclick="switchStatsTab('records')">Records</button>
@@ -800,12 +799,6 @@ img,
                 <div id="clubModal"></div>
             </div>
 
-            <div id="statsView-champions" class="stats-view">
-                <div class="champions-wrapper">
-                    <div id="championsContent"></div>
-                </div>
-            </div>
-
             <div id="statsView-compare" class="stats-view">
                 <div id="h2hContent"></div>
             </div>
@@ -836,6 +829,13 @@ img,
 
         </div>
 
+    </div>
+
+    <!-- ⭐ Champions Cup — قسم مستقل -->
+    <div id="championsTab" class="tab-content">
+        <div class="champions-wrapper">
+            <div id="championsContent"></div>
+        </div>
     </div>
 
 </div>
@@ -977,20 +977,20 @@ img,
 
 <script src="config.js?v=4"></script>
 <script src="text-carousel.js?v=4"></script>
-<script src="locks.js?v=5"></script>
+<script src="locks.js?v=6"></script>
 <script src="teams.js?v=2"></script>
 <script src="matchweeks.js?v=4"></script>
 <script src="supabase.js?v=8"></script>
-<script src="fixtures.js?v=12"></script>
+<script src="fixtures.js?v=13"></script>
 <script src="standings.js?v=2"></script>
-<script src="download.js?v=5"></script>
+<script src="download.js?v=6"></script>
 <script src="players-teams.js?v=3"></script>
 <script src="totw.js?v=124"></script>
 <script src="trends.js?v=3"></script>
 <script src="fpl-database.js?v=2"></script>
 <script src="manager-squad.js?v=5"></script>
 <script src="manager-hub.js?v=2"></script>
-<script src="stats.js?v=21"></script>
+<script src="stats.js?v=22"></script>
 <script src="charts.js?v=5"></script>
 <script src="clubs.js?v=12"></script>
 <script src="team-view.js?v=2"></script>
@@ -999,7 +999,7 @@ img,
 <script src="admin-matchweeks.js?v=4"></script>
 <script src="head-to-head.js?v=4"></script>
 <script src="countdown.js?v=2"></script>
-<script src="champions.js?v=3"></script>
+<script src="champions.js?v=4"></script>
 
 </body>
 </html>
