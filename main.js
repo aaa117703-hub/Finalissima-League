@@ -1,5 +1,6 @@
 /* =========================================================
-   main.js — FINALISSIMA LEAGUE CHAT
+   main.js — FINALISSIMA LEAGUE CHAT (v4)
+   Anti-Flash Fix: render بعد القفل + النتائج
 ========================================================= */
 
 async function init() {
@@ -13,12 +14,11 @@ async function init() {
         }
     }
 
-    /* ====== 2. Round dropdown + Render ====== */
+    /* ====== 2. Round dropdown فقط (بدون render) ====== */
     if (typeof initRoundDropdown === 'function') initRoundDropdown();
-    if (typeof renderFixtures === 'function')   renderFixtures();
-    if (typeof renderStandings === 'function')  renderStandings();
+    /* ⭐ v=4: حذفنا renderFixtures() + renderStandings() من هنا */
 
-    /* ====== 3. Eruda (اختياري) ====== */
+    /* ====== 3. Eruda ====== */
     if (typeof setupEruda === 'function') {
         try { setupEruda(); } catch (e) { console.warn('[Eruda]', e); }
     }
@@ -42,26 +42,37 @@ async function init() {
     /* ====== 6. Supabase ====== */
     if (!window.sbClient) {
         console.warn('[Main] Supabase client not available — working offline');
+        window.customMatchweeks = {};  /* ⭐ fallback */
+        if (typeof renderFixtures === 'function') renderFixtures();
+        if (typeof renderStandings === 'function') renderStandings();
         return;
     }
 
-    /* ⭐ جديد: تحميل الجولات المخصصة من Supabase */
+    /* ⭐ 6a. أول شي — تحميل القفل */
     if (typeof loadCustomMatchweeksIntoMemory === 'function') {
         try {
             await loadCustomMatchweeksIntoMemory();
-            if (typeof renderFixtures === 'function') renderFixtures();
+            console.log('[Main] customMatchweeks ready');
         } catch (e) {
-            console.warn('[Main] Custom matchweeks load failed:', e.message);
+            console.warn('[Main] Custom MW load failed:', e.message);
+            window.customMatchweeks = {};  /* ⭐ fallback */
         }
+    } else {
+        window.customMatchweeks = {};  /* ⭐ fallback */
     }
 
+    /* ⭐ 6b. بعدها — تحميل النتائج */
     if (typeof loadScoresFromSupabase !== 'function') {
         console.warn('[Main] loadScoresFromSupabase not available');
+        if (typeof renderFixtures === 'function') renderFixtures();
+        if (typeof renderStandings === 'function') renderStandings();
         return;
     }
 
     if (typeof window.matchweeks === 'undefined') {
         console.warn('[Main] matchweeks not loaded');
+        if (typeof renderFixtures === 'function') renderFixtures();
+        if (typeof renderStandings === 'function') renderStandings();
         return;
     }
 
@@ -73,10 +84,14 @@ async function init() {
 
         if (testError) {
             console.warn('[Main] DB Connection:', testError.message);
+            if (typeof renderFixtures === 'function') renderFixtures();
+            if (typeof renderStandings === 'function') renderStandings();
             return;
         }
     } catch (connErr) {
         console.warn('[Main] Network:', connErr.message);
+        if (typeof renderFixtures === 'function') renderFixtures();
+        if (typeof renderStandings === 'function') renderStandings();
         return;
     }
 
@@ -91,13 +106,14 @@ async function init() {
             } catch (lsErr) {
                 console.warn('[Main] localStorage full:', lsErr.message);
             }
-
-            if (typeof renderFixtures === 'function')  renderFixtures();
-            if (typeof renderStandings === 'function') renderStandings();
         }
     } catch (e) {
         console.warn('[Main] Load failed:', e.message);
     }
+
+    /* ⭐ 6c. الرندر النهائي — بعد القفل + النتائج */
+    if (typeof renderFixtures === 'function')  renderFixtures();
+    if (typeof renderStandings === 'function') renderStandings();
 }
 
 if (document.readyState === 'loading') {
