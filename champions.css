@@ -1,6 +1,6 @@
 /* =========================================================
    champions.css — FINALISSIMA LEAGUE CHAT (v=9)
-   التصميم العام + 3 Tabs
+   التصميم العام للقسم + 2 Tabs (المواجهات + الترتيب)
 ========================================================= */
 
 /* =========================================================
@@ -16,60 +16,46 @@
 }
 
 /* =========================================================
-   2) START BUTTON
+   2) ADMIN ACTIONS (أزرار الأدمن فقط)
 ========================================================= */
 
-.champions-start-area{
-    text-align:center;
-    margin:18px 0 24px;
-    padding:0 12px;
+.champ-admin-actions{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    align-items:center;
+    margin:20px auto 24px;
+    padding:0 16px;
+    flex-wrap:wrap;
+    direction:rtl;
 }
 
-.champions-start-btn{
+.champ-admin-btn{
     display:inline-flex;
     align-items:center;
     justify-content:center;
     gap:10px;
-    padding:16px 42px;
-    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
-    color:#fff;
-    border:2px solid #D4B77A;
+    padding:15px 36px;
     border-radius:50px;
-    font-size:15px;
+    font-size:14px;
     font-weight:900;
     letter-spacing:1.2px;
-    text-transform:uppercase;
     cursor:pointer;
-    font-family:inherit;
-    box-shadow:
-        0 6px 24px rgba(139,26,47,.45),
-        inset 0 1px 0 rgba(255,255,255,.15);
+    font-family:'Cairo', 'Tajawal', sans-serif;
     transition:all .3s ease;
+    border:2px solid #D4B77A;
     position:relative;
     overflow:hidden;
+    min-width:180px;
 }
 
-.champions-start-btn::before{
+.champ-admin-btn::before{
     content:'';
     position:absolute;
     top:0;left:-100%;
     width:100%;height:100%;
-    background:linear-gradient(90deg, transparent 0%, rgba(212,183,122,.5) 50%, transparent 100%);
+    background:linear-gradient(90deg, transparent 0%, rgba(255,255,255,.25) 50%, transparent 100%);
     animation:champBtnShine 3s ease-in-out infinite;
-}
-
-.champions-start-btn:hover{
-    transform:translateY(-2px);
-    box-shadow:0 10px 30px rgba(139,26,47,.55);
-}
-
-.champions-start-btn:active{
-    transform:translateY(0) scale(.98);
-}
-
-.champions-start-btn i{
-    font-size:20px;
-    color:#D4B77A;
 }
 
 @keyframes champBtnShine{
@@ -77,12 +63,86 @@
     50%, 100%{left:100%;}
 }
 
+.champ-admin-start{
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    color:#FAF6F0;
+    box-shadow:
+        0 6px 24px rgba(139,26,47,.5),
+        inset 0 1px 0 rgba(255,255,255,.15);
+}
+
+.champ-admin-start:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 32px rgba(139,26,47,.7);
+}
+
+.champ-admin-reset{
+    background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
+    color:#1A1A1A;
+    box-shadow:
+        0 6px 24px rgba(212,183,122,.5),
+        inset 0 1px 0 rgba(255,255,255,.3);
+}
+
+.champ-admin-reset:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 32px rgba(212,183,122,.7);
+}
+
+.champ-admin-btn:active{
+    transform:translateY(0) scale(.98);
+}
+
+.champ-admin-btn i{
+    font-size:18px;
+}
+
+.champ-admin-footer{
+    display:flex;
+    justify-content:center;
+    margin:26px auto 0;
+    padding:0 16px;
+}
+
+.champ-admin-btn-small{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:11px 22px;
+    background:linear-gradient(135deg, #FAF6F0 0%, #FFFFFF 100%);
+    color:#8B1A2F;
+    border:2px solid #D4B77A;
+    border-radius:50px;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:0.8px;
+    cursor:pointer;
+    font-family:'Cairo', 'Tajawal', sans-serif;
+    transition:all .3s ease;
+}
+
+.champ-admin-btn-small:hover{
+    background:#FAF6F0;
+    transform:translateY(-1px);
+    box-shadow:0 4px 14px rgba(212,183,122,.3);
+}
+
+.champ-admin-btn-small i{
+    font-size:16px;
+}
+
+/* =========================================================
+   3) STATUS TEXT
+========================================================= */
+
 .champions-status-text{
     margin-top:14px;
     font-size:13px;
     font-weight:800;
     color:#8B1A2F;
     letter-spacing:0.4px;
+    text-align:center;
 }
 
 .champions-status-text strong{
@@ -98,7 +158,7 @@
 }
 
 /* =========================================================
-   3) ⭐ 3 TABS (المواجهات / الترتيب / إعدادات)
+   4) ⭐ 2 TABS (المواجهات / الترتيب)
 ========================================================= */
 
 .champ-view-tabs{
@@ -106,7 +166,7 @@
     gap:8px;
     justify-content:center;
     align-items:center;
-    margin:16px 0 18px;
+    margin:16px 0 20px;
     padding:0 8px;
     flex-wrap:wrap;
     direction:rtl;
@@ -114,20 +174,20 @@
 
 .champ-view-btn{
     flex:1 1 0;
-    min-width:100px;
-    max-width:180px;
+    min-width:120px;
+    max-width:200px;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    gap:6px;
-    padding:11px 16px;
+    gap:8px;
+    padding:12px 18px;
     background:#FFFFFF;
     color:#8B1A2F;
     border:2px solid #E5D4A5;
     border-radius:14px;
     font-size:13px;
     font-weight:900;
-    letter-spacing:0.5px;
+    letter-spacing:0.6px;
     cursor:pointer;
     font-family:'Cairo', 'Tajawal', sans-serif;
     transition:all .25s ease;
@@ -161,29 +221,6 @@
     color:#D4B77A;
 }
 
-/* ⭐ زر الإعدادات - صغير ومربع */
-.champ-view-btn.champ-view-settings{
-    flex:0 0 auto;
-    min-width:44px;
-    max-width:44px;
-    width:44px;
-    height:44px;
-    padding:0;
-    border-radius:12px;
-    background:#FFFFFF;
-    border:2px solid #E5D4A5;
-}
-
-.champ-view-btn.champ-view-settings:hover{
-    background:#FAF6F0;
-    border-color:#D4B77A;
-}
-
-.champ-view-btn.champ-view-settings i{
-    font-size:22px;
-    color:#8B1A2F;
-}
-
 /* Panels */
 .champ-view-panel{
     animation:champPanelFade .3s ease;
@@ -195,7 +232,7 @@
 }
 
 /* =========================================================
-   4) GROUPS SECTION
+   5) GROUPS SECTION
 ========================================================= */
 
 .champions-groups-section{
@@ -322,7 +359,7 @@
 }
 
 /* =========================================================
-   5) MATCHES
+   6) MATCHES
 ========================================================= */
 
 .champions-round-section{
@@ -415,7 +452,7 @@
 }
 
 /* =========================================================
-   6) KNOCKOUT BRACKET
+   7) KNOCKOUT BRACKET
 ========================================================= */
 
 .champions-bracket{
@@ -452,10 +489,10 @@
 
 .champions-bracket-match{
     background:#fff;
-    border:1.5   px solid #E5D4A5;
-    border-radius position:10px;
+    border:1.5px solid #E5D4A5;
+    border-radius:10px;
     overflow:hidden;
-:    box-shadow:0 3px 10px rgba(139,26,47,.08);
+    box-shadow:0 3px 10px rgba(139,26,47,.08);
 }
 
 .champions-bracket-team{
@@ -505,7 +542,7 @@
 }
 
 /* =========================================================
-   7) CHAMPION CARD
+   8) CHAMPION CARD
 ========================================================= */
 
 .champ-champion-card{
@@ -521,7 +558,7 @@
     box-shadow:
         0 10px 40px rgba(212,183,122,.4),
         inset 0 0 30px rgba(212,183,122,.1);
-relative;
+    position:relative;
     overflow:hidden;
     animation:champCardIn .8s ease;
 }
@@ -578,12 +615,12 @@ relative;
 }
 
 /* =========================================================
-   8) EMPTY / LOADING
+   9) EMPTY / LOADING
 ========================================================= */
 
 .champions-empty{
     text-align:center;
-    padding:40px 20px;
+    padding:50px 24px;
     background:linear-gradient(135deg, #FAF6F0 0%, #F5E6D3 100%);
     border:2px dashed #D4B77A;
     border-radius:16px;
@@ -596,9 +633,9 @@ relative;
 
 .champions-empty i{
     display:block;
-    font-size:52px;
+    font-size:56px;
     color:#D4B77A;
-    margin-bottom:12px;
+    margin-bottom:14px;
     animation:champEmptyPulse 2s ease-in-out infinite;
 }
 
@@ -608,10 +645,16 @@ relative;
 }
 
 /* =========================================================
-   9) MOBILE
+   10) MOBILE
 ========================================================= */
 
 @media(max-width:768px){
+
+    .champ-admin-btn{
+        padding:13px 28px;
+        font-size:13px;
+        min-width:160px;
+    }
 
     .champ-view-tabs{
         gap:6px;
@@ -619,25 +662,14 @@ relative;
     }
 
     .champ-view-btn{
-        min-width:90px;
-        padding:10px 12px;
+        min-width:100px;
+        padding:11px 14px;
         font-size:12px;
-        gap:4px;
+        gap:6px;
     }
 
     .champ-view-btn i{
         font-size:15px;
-    }
-
-    .champ-view-btn.champ-view-settings{
-        width:40px;
-        height:40px;
-        min-width:40px;
-        max-width:40px;
-    }
-
-    .champ-view-btn.champ-view-settings i{
-        font-size:20px;
     }
 
     .champions-groups-grid{
@@ -645,8 +677,8 @@ relative;
     }
 
     .champions-match-row{
-        grid-template-columns:1fr 55px 1fr;
-        padding:8px;
+        grid-template-columns:1fr 60px 1fr;
+        padding:9px 10px;
     }
 
     .champions-match-team{
@@ -671,33 +703,48 @@ relative;
     }
 
     .champ-round-label{
-        font-size:11px;
-        padding:8px 10px;
+        font-size:12px;
+        padding:9px 12px;
     }
 
     .champ-champion-card{
-        padding:20px 14px;
-        margin-top:18px;
+        padding:22px 16px;
+        margin-top:20px;
     }
 
     .champ-champion-logo{
-        width:80px;
-        height:80px;
+        width:85px;
+        height:85px;
     }
 
     .champ-champion-name{
-        font-size:20px;
+        font-size:22px;
         letter-spacing:2px;
     }
 
     .champ-champion-label{
-        font-size:10px;
+        font-size:11px;
         letter-spacing:2px;
-        padding:5px 14px;
+        padding:5px 16px;
+    }
+
+    .champ-admin-btn-small{
+        padding:10px 18px;
+        font-size:11px;
     }
 }
 
 @media(max-width:480px){
+
+    .champ-admin-actions{
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .champ-admin-btn{
+        width:100%;
+        max-width:none;
+    }
 
     .champ-view-btn span{
         display:none;
@@ -705,34 +752,79 @@ relative;
 
     .champ-view-btn{
         min-width:0;
-        flex:0 0 auto;
-        padding:10px 14px;
+        flex:1 1 0;
+        padding:12px 14px;
     }
 
     .champ-view-btn i{
-        font-size:18px;
+        font-size:20px;
     }
 
     .champ-view-tabs{
         gap:8px;
     }
+
+    .champ-round-label{
+        font-size:11px;
+        padding:8px 10px;
+    }
+
+    .champions-match-row{
+        grid-template-columns:1fr 55px 1fr;
+        padding:8px;
+    }
+
+    .champions-match-team{
+        font-size:10px;
+    }
+
+    .champions-match-team img{
+        width:18px;
+        height:18px;
+    }
+
+    .champions-match-score{
+        font-size:12px;
+        padding:3px 5px;
+    }
+
+    .champ-champion-card{
+        padding:18px 12px;
+    }
+
+    .champ-champion-logo{
+        width:70px;
+        height:70px;
+    }
+
+    .champ-champion-name{
+        font-size:18px;
+        letter-spacing:1.5px;
+    }
+
+    .champions-empty i{
+        font-size:48px;
+    }
+
+    .champions-empty{
+        padding:40px 18px;
+    }
 }
 
 /* =========================================================
-   10) REDUCED MOTION
+   11) REDUCED MOTION
 ========================================================= */
 
 @media (prefers-reduced-motion: reduce){
-    .champions-start-btn::before,
-    .champ-champion-logo,
     .champions-empty i,
-    .champ-view-panel{
+    .champ-champion-logo,
+    .champ-admin-btn::before{
         animation:none !important;
     }
 }
 
 /* =========================================================
-   11) منع حفظ الصور
+   12) منع حفظ الصور
 ========================================================= */
 
 .champions-group-table .team-cell-mini img,
