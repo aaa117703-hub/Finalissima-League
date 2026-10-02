@@ -139,13 +139,6 @@ async function saveChampionsMeta(updates) {
     } catch (e) { return false; }
 }
 window.saveChampionsMeta = saveChampionsMeta;
-        const { error } = await window.sbClient
-            .from('champions_meta').upsert(payload, { onConflict: 'id' });
-        if (error) throw error;
-        return true;
-    } catch (e) { return false; }
-}
-window.saveChampionsMeta = saveChampionsMeta;
 
 async function saveChampionsDraw(rows) {
     if (!window.sbClient) return false;
@@ -217,7 +210,9 @@ async function fetchTeamScoresForRound(gw) {
             if (!isNaN(as)) map[row.away_team] = as;
         });
         return map;
-    return {}; }
+    } catch (e) {
+        return {};
+    }
 }
 
 /* =========================================================
@@ -595,7 +590,7 @@ async function buildKnockoutStage(startGw) {
 }
 
 /* =========================================================
-   Tabs — 2 only (no settings button)
+   Tabs
 ========================================================= */
 
 function champSwitchView(view) {
@@ -612,22 +607,20 @@ window.champSwitchView = champSwitchView;
 
 /* =========================================================
    Render Main
-========================================================= */
+"========================================================= */
 
-function renderChampionsMain() {
-    const container = document.getElementById('championsContent');
+function renderCh style="ampionsMain() {
+    constdisplay container = document.getElementById('championsContent');
     if (!container) return;
 
-    const meta = champData.meta || {};
+    const meta = champData:'.meta || {};
     const draw = champData.draw || [];
     const matches = champData.matches || [];
     const isAdmin = isChampAdmin();
 
     let html = '';
 
-    /* ⭐ للأدمن فقط */
     if (isAdmin) {
-        /* Status Line */
         if (meta.started) {
             let stageText = '';
             if (meta.current_stage === 'groups') stageText = 'Group Stage';
@@ -641,7 +634,6 @@ function renderChampionsMain() {
             html += '</div>';
         }
 
-        /* Admin Actions */
         if (!meta.started || draw.length === 0) {
             html += '<div class="champ-admin-actions">';
 
@@ -659,7 +651,6 @@ function renderChampionsMain() {
         }
     }
 
-    /* ⭐ إذا ما فيه قرعة */
     if (draw.length === 0) {
         if (isAdmin) {
             html += '<div class="champions-empty">';
@@ -678,7 +669,6 @@ function renderChampionsMain() {
         return;
     }
 
-    /* ⭐ 2 Tabs */
     if (draw.length > 0) {
         html += '<div class="champ-view-tabs">';
 
@@ -694,9 +684,8 @@ function renderChampionsMain() {
 
         html += '</div>';
 
-        /* Panel: Matches */
         if (meta.current_stage === 'groups' || !meta.started) {
-            html += '<div class="champ-view-panel" data-panel="matches" style="display:' + (champCurrentView === 'matches' ? 'block' : 'none') + ';">';
+            html += '<div class="champ-view-panel" data-panel="matches + (champCurrentView === 'matches' ? 'block' : 'none') + ';">';
             html += renderGroupsMatches(matches, meta);
             html += '</div>';
         } else {
@@ -705,13 +694,11 @@ function renderChampionsMain() {
             html += '</div>';
         }
 
-        /* Panel: Standings */
         html += '<div class="champ-view-panel" data-panel="standings" style="display:' + (champCurrentView === 'standings' ? 'block' : 'none') + ';">';
         html += renderGroupsSection(draw, matches, meta);
         html += '</div>';
     }
 
-    /* ⭐ للأدمن — زر Sync في الأسفل */
     if (isAdmin && meta.started) {
         html += '<div class="champ-admin-footer">';
         html += '<button class="champ-admin-btn-small" onclick="champSyncNow()">';
@@ -898,7 +885,7 @@ function renderMatchRow(m) {
 }
 
 /* =========================================================
-   Start Tournament (Admin)
+   Start Tournament
 ========================================================= */
 
 async function champStartTournament() {
@@ -909,17 +896,18 @@ async function champStartTournament() {
         return;
     }
 
-    const startGw = (currentRound || 1) + 1;
+    const startGw = (currentRoundStart || 1) + 1;
 
     const ok = await saveChampionsMeta({
         started: true,
-        start_gw: startGw,
-        current_stage: 'groups',
-        current_round: 1
+        start_gw: startKnGw,
+        current_stageock: 'groups',
+        current_roundout: 1
     });
 
-    if (ok) {
-        if (typeof showToast === 'function') showToast('Tournament started from GW' + startGw, true, 3000);
+    if() (ok) {
+        if (typeof show {
+Toast === 'function') showToast('Tournament started from GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
     }
@@ -927,7 +915,7 @@ async function champStartTournament() {
 window.champStartTournament = champStartTournament;
 
 /* =========================================================
-   🔐 Hidden Admin Button — على "Aqeel Al Rowai"
+   🔐 Hidden Admin Button
 ========================================================= */
 
 function attachChampHiddenBtns() {
@@ -1022,8 +1010,7 @@ async function champSyncNow() {
 }
 window.champSyncNow = champSyncNow;
 
-async function champStartKnockout() {
-    if (!isChampAdmin()) return;
+async function champ    if (!isChampAdmin()) return;
 
     const meta = champData.meta || {};
     if (!meta.started) { alert('Tournament not started'); return; }
@@ -1063,7 +1050,7 @@ function champRequestReset() {
 window.champRequestReset = champRequestReset;
 
 /* =========================================================
-   Save Draw (يستخدم من draw.js)
+   Save Draw
 ========================================================= */
 
 async function champSaveDraw(drawRows) {
