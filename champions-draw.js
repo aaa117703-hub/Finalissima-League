@@ -406,10 +406,8 @@ function champBuildDrawScreen(pots) {
 
     let html = '';
 
-    /* Background Canvas */
     html += '<canvas id="champBgCanvas" class="champ-bg-canvas"></canvas>';
 
-    /* Preloader */
     html += '<div class="champ-preloader" id="champPreloader">';
     html += '<div class="champ-preloader-logo" id="champPreloaderLogo">';
     html += '<div class="champ-preloader-ring"></div>';
@@ -419,20 +417,16 @@ function champBuildDrawScreen(pots) {
     html += '<div class="champ-preloader-status" id="champPreloaderStatus">جاري التحضير...</div>';
     html += '</div>';
 
-    /* Intro Overlay */
     html += '<div class="champ-intro-overlay" id="champIntroOverlay" style="display:none;">';
     html += '<div class="champ-intro-text" id="champIntroText"></div>';
     html += '</div>';
 
-    /* Main Content */
     html += '<div class="champ-main-content" id="champMainContent" style="opacity:0;">';
 
-    /* Title */
     html += '<div class="champ-draw-header" id="champDrawHeader">';
     html += '<div class="champ-draw-title" id="champDrawTitle">قرعة كأس أبطال الفيناليغ</div>';
     html += '</div>';
 
-    /* Trophy */
     html += '<div class="champ-trophy-stage" id="champTrophyStage">';
     html += '<div class="champ-trophy-glow"></div>';
     html += '<div class="champ-trophy" id="champTrophy">';
@@ -440,7 +434,6 @@ function champBuildDrawScreen(pots) {
     html += '</div>';
     html += '</div>';
 
-    /* Pots */
     html += '<div class="champ-pots-stage" id="champPotsStage">';
     pots.forEach(function(potTeams, potIdx) {
         const potNum = potIdx + 1;
@@ -468,7 +461,6 @@ function champBuildDrawScreen(pots) {
     });
     html += '</div>';
 
-    /* Groups */
     html += '<div class="champ-groups-stage" id="champGroupsStage">';
     CHAMP_GROUPS.forEach(function(g) {
         html += '<div class="champ-group-target" id="champGroupTarget' + g + '" data-group="' + g + '">';
@@ -588,7 +580,7 @@ async function champStagePreloader() {
 }
 
 /* =========================================================
-   STAGE 1: Intro Cinematic
+   STAGE 1: Intro
 ========================================================= */
 
 async function champStageIntro() {
@@ -676,7 +668,7 @@ async function champStageIntro() {
 }
 
 /* =========================================================
-   STAGE 2: Trophy Reveal
+   STAGE 2: Trophy
 ========================================================= */
 
 async function champStageTrophy() {
@@ -859,7 +851,6 @@ async function champStagePickTeam(row, potNum) {
     );
     if (allPotCards.length === 0) return;
 
-    /* PHASE 1: Roulette Spin */
     const spotCount = allPotCards.length;
     const totalCycles = 3;
 
@@ -897,7 +888,6 @@ async function champStagePickTeam(row, potNum) {
         }
     }
 
-    /* Final Slow Spin */
     for (let i = 0; i < spotCount; i++) {
         if (champDrawState.skipRequested) return;
 
@@ -920,7 +910,6 @@ async function champStagePickTeam(row, potNum) {
         await champWait(250);
     }
 
-    /* PHASE 2: Selection Lock */
     const targetCard = document.querySelector(
         '.champ-team-card[data-team="' + row.team + '"]'
     );
@@ -952,7 +941,6 @@ async function champStagePickTeam(row, potNum) {
 
     await champWait(300);
 
-    /* PHASE 3: Prepare Flight */
     const teamName = champGetTeamName(row.team);
     const teamLogo = champGetTeamLogo(row.team);
 
@@ -969,7 +957,6 @@ async function champStagePickTeam(row, potNum) {
     const endX = groupRect.left + groupRect.width / 2;
     const endY = groupRect.top + groupRect.height / 2;
 
-    /* PHASE 4: Flyer */
     const flyer = document.createElement('div');
     flyer.className = 'champ-flyer';
     flyer.id = 'champFlyer';
@@ -1011,10 +998,8 @@ async function champStagePickTeam(row, potNum) {
 
     await champWait(200);
 
-    /* PHASE 5: Flight */
     await champAnimateFlight(flyer, startX, startY, endX, endY, cardRect);
 
-    /* PHASE 6: Impact */
     flyer.remove();
     champPlayImpact();
     champVibrate([40, 20, 40]);
@@ -1046,7 +1031,6 @@ async function champStagePickTeam(row, potNum) {
             duration: 0.5
         }, '-=0.4');
 
-    /* PHASE 7: Add Team */
     const teamHtml =
         '<div class="champ-group-team-item">' +
             (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
@@ -1060,7 +1044,6 @@ async function champStagePickTeam(row, potNum) {
         { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(2)' }
     );
 
-    /* PHASE 8: Mark Selected */
     await new Promise(function(resolve) {
         gsap.to(targetCard, {
             background: 'rgba(20,10,12,.55)',
@@ -1233,7 +1216,7 @@ function champFlashScreen() {
 }
 
 /* =========================================================
-   Spawn Effects
+   Effects
 ========================================================= */
 
 function champSpawnTrail(x, y) {
@@ -1413,7 +1396,7 @@ function champShowDrawButtons() {
    Save & Close
 ========================================================= */
 
-wasync function champSaveAndClose() {
+async function champSaveAndClose() {
     if (!champIsAdmin()) return;
 
     const saveBtn = document.getElementById('champBtnSave');
@@ -1441,7 +1424,7 @@ wasync function champSaveAndClose() {
 
         await saveChampionsMeta({
             started: true,
-            start_g: startGw,
+            start_gw: startGw,
             current_stage: 'groups',
             current_round: 1
         });
@@ -1593,7 +1576,7 @@ function champCleanup() {
         el.remove();
     });
 
-    champDrawState.~playing = false;
+    champDrawState.playing = false;
     champDrawState.skipRequested = false;
     champDrawState.currentPot = 0;
 }
