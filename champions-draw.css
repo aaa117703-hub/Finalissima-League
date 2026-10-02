@@ -1,21 +1,20 @@
 /* =========================================================
-   champions-draw.css — FINALISSIMA LEAGUE CHAT (v=3)
-   ✨ نظيف + ماسي + إطار هندسي
+   champions-draw.css — FINALISSIMA LEAGUE CHAT (v=4)
+   ✨ Pots أفقي + مجموعات عمودية
 ========================================================= */
 
 /* ═══════════════════════════════════════════════════════
-   1) DRAW SCREEN — خلفية نظيفة
+   1) DRAW SCREEN
    ═══════════════════════════════════════════════════════ */
 
 .champions-draw-screen{
     position:fixed;
     inset:0;
     z-index:999999;
-    background:
-        radial-gradient(ellipse at center,
-            rgba(139,26,47,0.25) 0%,
-            rgba(74,10,21,0.15) 35%,
-            #0A0A0A 70%);
+    background:radial-gradient(ellipse at center,
+        rgba(139,26,47,0.20) 0%,
+        rgba(74,10,21,0.10) 40%,
+        #0A0A0A 80%);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -23,8 +22,8 @@
     padding:20px 16px 40px;
     overflow-y:auto;
     overflow-x:hidden;
-    animation:champDrawFadeIn .8s ease;
-    direction:ltr;
+    animation:champDrawFadeIn .6s ease;
+    direction:rtl;
 }
 
 @keyframes champDrawFadeIn{
@@ -37,286 +36,242 @@
 .champ-draw-header{
     width:100%;
     text-align:center;
-    padding:20px 0 30px;
+    padding:14px 0 22px;
     flex-shrink:0;
     position:relative;
     z-index:10;
 }
 
 .champ-draw-title{
-    font-size:clamp(24px, 5vw, 46px);
+    font-size:clamp(22px, 4vw, 36px);
     font-weight:900;
     color:#D4B77A;
-    letter-spacing:3px;
+    letter-spacing:2px;
     text-align:center;
     line-height:1.3;
     text-shadow:
-        0 0 20px rgba(212,183,122,.7),
-        0 0 40px rgba(212,183,122,.3),
-        0 2px 10px rgba(0,0,0,.9);
+        0 0 20px rgba(212,183,122,.6),
+        0 2px 8px rgba(0,0,0,.9);
     font-family:'Cairo', 'Tajawal', sans-serif;
     direction:rtl;
 }
 
-/* ═══ BANNER ═══ */
+/* ═══ POTS STAGE ═══ */
 
-.champ-banner-stage{
+.champ-pots-stage{
     width:100%;
-    max-width:1100px;
+    max-width:1200px;
     display:flex;
     flex-direction:column;
-    align-items:center;
-    flex-shrink:0;
+    gap:20px;
+    margin-bottom:30px;
     position:relative;
     z-index:10;
 }
 
-.champ-banner-original{
-    width:100%;
-    max-width:1000px;
-    aspect-ratio:3 / 1;
-    border-radius:24px;
-    overflow:hidden;
-    box-shadow:
-        0 20px 80px rgba(212,183,122,.4),
-        0 0 60px rgba(139,26,47,.3);
-    border:2px solid #D4B77A;
-    margin:0 auto;
-    position:relative;
+.champ-pot-row{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
 }
 
-.champ-banner-original img{
+.champ-pot-label{
+    font-size:13px;
+    font-weight:900;
+    color:#D4B77A;
+    letter-spacing:3px;
+    text-transform:uppercase;
+    text-align:right;
+    padding:0 4px;
+    text-shadow:0 0 10px rgba(212,183,122,.5);
+}
+
+.champ-pot-teams{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:12px;
     width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
+}
+
+/* ═══ TEAM CARD ═══ */
+
+.champ-team-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 16px;
+    background:linear-gradient(135deg,
+        rgba(139,26,47,.30) 0%,
+        rgba(139,26,47,.15) 100%);
+    border:1.5px solid #D4B77A;
+    border-radius:16px;
+    transition:all .3s ease;
+    position:relative;
+    overflow:hidden;
+    min-height:60px;
+    will-change:transform, box-shadow, background, border-color, opacity;
+}
+
+.champ-team-card::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(135deg,
+        rgba(212,183,122,.06) 0%,
+        transparent 100%);
     pointer-events:none;
 }
 
-/* ═══ CARDS STAGE ═══ */
-
-.champ-cards-stage{
-    display:flex;
-    gap:18px;
-    justify-content:center;
-    align-items:center;
-    width:100%;
-    max-width:1100px;
-    margin:35px auto 45px;
-    perspective:1500px;
+.champ-team-card img{
+    width:36px;
+    height:36px;
+    object-fit:contain;
     flex-shrink:0;
-    position:relative;
-    z-index:10;
-}
-
-.champ-card{
-    flex:1 1 0;
-    max-width:240px;
-    min-width:140px;
-    aspect-ratio:3 / 4;
-    perspective:1500px;
-    transform-style:preserve-3d;
-    cursor:default;
-    transition:transform .3s ease;
-    will-change:transform, box-shadow;
-    position:relative;
-    border-radius:22px;
-}
-
-/* ⭐ الإطار — ماسي (Diamond Sweep) */
-.champ-card::before{
-    content:'';
-    position:absolute;
-    inset:-3px;
-    border-radius:24px;
-    z-index:-1;
-    background:
-        conic-gradient(
-            from 45deg at 50% 50%,
-            #D4B77A 0deg,
-            #8B1A2F 90deg,
-            #D4B77A 180deg,
-            #8B1A2F 270deg,
-            #D4B77A 360deg
-        );
-    opacity:0.85;
-    animation:champDiamondSweep 6s linear infinite;
-}
-
-/* ⭐ توهج خفيف */
-.champ-card::after{
-    content:'';
-    position:absolute;
-    inset:-6px;
-    border-radius:28px;
-    z-index:-2;
-    background:conic-gradient(
-        from 45deg at 50% 50%,
-        rgba(212,183,122,0) 0deg,
-        rgba(212,183,122,0.5) 90deg,
-        rgba(139,26,47,0.5) 180deg,
-        rgba(212,183,122,0.5) 270deg,
-        rgba(212,183,122,0) 360deg
-    );
-    filter:blur(10px);
-    opacity:0.6;
-    animation:champDiamondSweep 6s linear infinite reverse;
-}
-
-@keyframes champDiamondSweep{
-    0%{transform:rotate(0deg);}
-    100%{transform:rotate(360deg);}
-}
-
-.champ-card-inner{
-    position:relative;
-    width:100%;
-    height:100%;
-    transform-style:preserve-3d;
-    transition:transform .8s cubic-bezier(0.4, 0.0, 0.2, 1);
-    will-change:transform;
-    border-radius:22px;
-}
-
-.champ-card-front,
-.champ-card-back{
-    position:absolute;
-    inset:0;
-    border-radius:22px;
-    backface-visibility:hidden;
-    -webkit-backface-visibility:hidden;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    overflow:hidden;
-    border:1px solid rgba(212,183,122,.3);
-    box-shadow:
-        0 20px 60px rgba(0,0,0,.8),
-        inset 0 0 40px rgba(0,0,0,.5);
-}
-
-.champ-card-front{
-    transform:rotateY(0deg);
-    background-color:#1A1A1A;
-    background-repeat:no-repeat;
-}
-
-.champ-card-back{
-    transform:rotateY(180deg);
-    background:linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 60%, #4A0A15 100%);
-    border-color:#D4B77A;
-    position:relative;
-}
-
-.champ-card-back-team{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:18px;
-    padding:24px 16px;
-    width:100%;
-    height:100%;
-    text-align:center;
+    filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
     position:relative;
     z-index:2;
 }
 
-.champ-card-back-team img{
-    width:clamp(55px, 9vw, 90px);
-    height:clamp(55px, 9vw, 90px);
-    object-fit:contain;
-}
-
-.champ-card-back-team span{
-    font-size:clamp(14px, 2vw, 19px);
+.champ-team-card-name{
+    flex:1;
+    font-size:14px;
     font-weight:900;
     color:#FAF6F0;
-    letter-spacing:2px;
+    letter-spacing:0.8px;
     text-transform:uppercase;
-    text-shadow:0 2px 8px rgba(0,0,0,.9);
-    line-height:1.2;
+    text-align:right;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    text-shadow:0 2px 4px rgba(0,0,0,.7);
+    position:relative;
+    z-index:2;
+}
+
+.champ-team-card-check{
+    width:24px;
+    height:24px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-shrink:0;
+    opacity:0;
+    transform:scale(0);
+    transition:all .35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position:relative;
+    z-index:2;
+}
+
+.champ-team-card-check i{
+    font-size:24px;
+    color:#D4B77A;
+    filter:drop-shadow(0 0 8px rgba(212,183,122,.8));
+}
+
+/* ⭐ Spotlight */
+.champ-team-card.spotlight{
+    border-color:#F5E6D3;
+    box-shadow:
+        0 0 30px rgba(212,183,122,1),
+        0 0 60px rgba(212,183,122,.6),
+        inset 0 0 20px rgba(212,183,122,.2);
+    background:linear-gradient(135deg,
+        rgba(139,26,47,.55) 0%,
+        rgba(139,26,47,.30) 100%);
+    transform:scale(1.03);
+}
+
+/* ⭐ Selected (بعد الاختيار) */
+.champ-team-card.selected{
+    background:rgba(20,10,12,.6);
+    border-color:rgba(212,183,122,.2);
+    opacity:0.55;
+}
+
+.champ-team-card.selected img{
+    filter:grayscale(0.4) brightness(0.7);
+}
+
+.champ-team-card.selected .champ-team-card-name{
+    color:rgba(250,246,240,.4);
+}
+
+.champ-team-card.selected .champ-team-card-check{
+    opacity:1;
+    transform:scale(1);
 }
 
 /* ═══ GROUPS STAGE ═══ */
 
 .champ-groups-stage{
-    display:flex;
-    gap:14px;
-    justify-content:center;
-    align-items:stretch;
     width:100%;
-    max-width:1100px;
+    max-width:1200px;
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:14px;
     margin:0 auto;
-    flex-shrink:0;
     position:relative;
     z-index:10;
 }
 
 .champ-group-target{
-    flex:1 1 0;
-    min-width:150px;
-    max-width:250px;
-    min-height:280px;
     background:linear-gradient(180deg,
         rgba(42,42,42,.9) 0%,
         rgba(26,26,26,.95) 100%);
     border:2px solid rgba(212,183,122,.4);
     border-radius:20px;
-    padding:16px 12px;
+    padding:14px 10px;
+    min-height:240px;
+    display:flex;
+    flex-direction:column;
     transition:all .3s ease;
+    will-change:transform, box-shadow;
     position:relative;
     overflow:hidden;
-    will-change:transform, box-shadow;
 }
 
 .champ-group-target-label{
-    font-size:22px;
+    font-size:20px;
     font-weight:900;
     color:#D4B77A;
     letter-spacing:4px;
     text-align:center;
-    padding-bottom:12px;
-    margin-bottom:12px;
+    padding-bottom:10px;
+    margin-bottom:10px;
     border-bottom:2px solid rgba(212,183,122,.3);
     text-shadow:0 0 12px rgba(212,183,122,.5);
-    position:relative;
-    z-index:2;
 }
 
 .champ-group-target-teams{
     display:flex;
     flex-direction:column;
-    gap:8px;
-    min-height:200px;
-    position:relative;
-    z-index:2;
+    gap:6px;
+    flex:1;
 }
 
 .champ-group-team-item{
     display:flex;
     align-items:center;
-    gap:10px;
-    padding:8px 12px;
+    gap:8px;
+    padding:6px 10px;
     background:linear-gradient(135deg,
         rgba(212,183,122,.15) 0%,
         rgba(139,26,47,.15) 100%);
-    border:1.5px solid rgba(212,183,122,.35);
-    border-radius:12px;
+    border:1px solid rgba(212,183,122,.3);
+    border-radius:10px;
     will-change:transform, opacity;
 }
 
 .champ-group-team-item img{
-    width:26px;
-    height:26px;
+    width:22px;
+    height:22px;
     object-fit:contain;
     flex-shrink:0;
 }
 
 .champ-group-team-item span{
     flex:1;
-    font-size:12px;
+    font-size:11px;
     font-weight:800;
     color:#FAF6F0;
     letter-spacing:0.5px;
@@ -336,50 +291,44 @@
     justify-content:center;
     align-items:center;
     width:100%;
-    max-width:700px;
-    margin:30px auto 0;
+    max-width:600px;
+    margin:24px auto 0;
     flex-wrap:wrap;
-    flex-shrink:0;
     direction:rtl;
     position:relative;
     z-index:100;
-    padding:0 16px;
-    box-sizing:border-box;
 }
 
 .champ-btn-save,
 .champ-btn-reset{
-    flex:1 1 200px;
-    max-width:280px;
+    flex:1 1 180px;
+    max-width:250px;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    gap:10px;
-    padding:16px 28px;
+    gap:8px;
+    padding:14px 24px;
     border-radius:50px;
-    font-size:14px;
+    font-size:13px;
     font-weight:900;
-    letter-spacing:1.2px;
-    text-transform:uppercase;
+    letter-spacing:1px;
     cursor:pointer;
     font-family:'Cairo', 'Tajawal', sans-serif;
     transition:all .3s ease;
     border:2px solid transparent;
-    position:relative;
-    overflow:hidden;
-    min-width:180px;
+    min-width:160px;
 }
 
 .champ-btn-save{
     background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
     color:#1A1A1A;
     border-color:#FAF6F0;
-    box-shadow:0 8px 24px rgba(212,183,122,.5);
+    box-shadow:0 6px 20px rgba(212,183,122,.5);
 }
 
 .champ-btn-save:hover:not(:disabled){
     transform:translateY(-2px);
-    box-shadow:0 12px 32px rgba(212,183,122,.7);
+    box-shadow:0 10px 28px rgba(212,183,122,.7);
 }
 
 .champ-btn-save:disabled{
@@ -391,68 +340,25 @@
     background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color:#FAF6F0;
     border-color:#D4B77A;
-    box-shadow:0 8px 24px rgba(139,26,47,.5);
+    box-shadow:0 6px 20px rgba(139,26,47,.5);
 }
 
 .champ-btn-reset:hover{
     transform:translateY(-2px);
-    box-shadow:0 12px 32px rgba(139,26,47,.7);
-}
-
-.champ-btn-save:active,
-.champ-btn-reset:active{
-    transform:translateY(0) scale(.98);
+    box-shadow:0 10px 28px rgba(139,26,47,.7);
 }
 
 .champ-btn-save i,
 .champ-btn-reset i{
-    font-size:20px;
+    font-size:18px;
 }
 
-/* ═══ LED (Flying Team) ═══ */
-
-.champ-led{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    padding:14px 20px;
-    background:linear-gradient(135deg, #8B1A2F 0%, #4A0A15 100%);
-    border:3px solid #D4B77A;
-    border-radius:20px;
-    box-shadow:
-        0 0 60px rgba(212,183,122,.9),
-        0 20px 60px rgba(0,0,0,.8);
-    will-change:transform, opacity;
-    min-width:130px;
-    transform-origin:center center;
-}
-
-.champ-led img{
-    width:48px;
-    height:48px;
-    object-fit:contain;
-}
-
-.champ-led span{
-    font-size:12px;
-    font-weight:900;
-    color:#FAF6F0;
-    letter-spacing:1.2px;
-    text-transform:uppercase;
-    text-shadow:
-        0 0 12px rgba(212,183,122,.8),
-        0 2px 6px rgba(0,0,0,.9);
-    white-space:nowrap;
-}
-
-/* ═══ EFFECTS (بسيطة) ═══ */
+/* ═══ EFFECTS ═══ */
 
 .champ-trail-particle{
     position:fixed;
-    width:14px;
-    height:14px;
+    width:12px;
+    height:12px;
     border-radius:50%;
     background:radial-gradient(circle,
         #E5D4A5 0%,
@@ -462,8 +368,8 @@
     z-index:9999998;
     transform:translate(-50%,-50%);
     box-shadow:
-        0 0 14px #D4B77A,
-        0 0 28px rgba(212,183,122,.5);
+        0 0 12px #D4B77A,
+        0 0 24px rgba(212,183,122,.5);
 }
 
 .champ-shockwave{
@@ -500,74 +406,68 @@
     will-change:transform;
 }
 
-/* ═══ INTRO ═══ */
+/* ═══ REDUCED MOTION ═══ */
 
-.champ-intro{
-    position:absolute;
-    inset:0;
-    z-index:100;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#000;
+@media (prefers-reduced-motion: reduce){
+    .champ-team-card.spotlight{
+        animation:none !important;
+    }
+}
+
+/* ═══ منع حفظ الصور ═══ */
+
+.champ-team-card img,
+.champ-group-team-item img{
+    -webkit-user-select:none;
+    -webkit-user-drag:none;
+    -webkit-touch-callout:none;
+    user-select:none;
     pointer-events:none;
 }
-
-.champ-intro-line{
-    font-size:clamp(48px, 12vw, 110px);
-    font-weight:900;
-    letter-spacing:10px;
-    color:#D4B77A;
-    text-transform:uppercase;
-    font-family:'Cairo', 'Tajawal', sans-serif;
-    text-align:center;
-    line-height:1;
-    text-shadow:
-        0 0 30px #D4B77A,
-        0 0 80px rgba(212,183,122,.6),
-        0 4px 20px rgba(0,0,0,.9);
-    will-change:transform, opacity, filter;
-}
-
-.champ-intro-cup{
-    color:#8B1A2F;
-    text-shadow:
-        0 0 30px #8B1A2F,
-        0 0 80px rgba(139,26,47,.8),
-        0 4px 20px rgba(0,0,0,.9);
-}
-
-/* ═══ MOBILE ═══ */
+/* ═══════════════════════════════════════════════════════
+   MOBILE
+   ═══════════════════════════════════════════════════════ */
 
 @media(max-width:768px){
-    .champ-cards-stage{
-        gap:12px;
-        margin:25px auto 35px;
+
+    .champ-pot-teams{
+        gap:8px;
     }
 
-    .champ-card{
-        min-width:75px;
-        max-width:125px;
+    .champ-team-card{
+        padding:10px 12px;
+        gap:8px;
+        min-height:52px;
+        border-radius:14px;
     }
 
-    .champ-card-back-team{
-        gap:10px;
-        padding:12px;
+    .champ-team-card img{
+        width:28px;
+        height:28px;
     }
 
-    .champ-card-back-team span{
-        font-size:10px;
-        letter-spacing:1px;
+    .champ-team-card-name{
+        font-size:11px;
+        letter-spacing:0.5px;
+    }
+
+    .champ-team-card-check i{
+        font-size:20px;
+    }
+
+    .champ-pot-label{
+        font-size:11px;
+        letter-spacing:2px;
     }
 
     .champ-groups-stage{
-        gap:6px;
+        gap:10px;
     }
 
     .champ-group-target{
-        min-width:70px;
+        padding:12px 8px;
         min-height:200px;
-        padding:10px 6px;
+        border-radius:16px;
     }
 
     .champ-group-target-label{
@@ -576,8 +476,112 @@
     }
 
     .champ-group-team-item{
-        padding:5px 6px;
+        padding:5px 8px;
+        gap:6px;
+    }
+
+    .champ-group-team-item img{
+        width:18px;
+        height:18px;
+    }
+
+    .champ-group-team-item span{
+        font-size:10px;
+    }
+
+    .champ-draw-title{
+        font-size:20px;
+    }
+
+    .champ-btn-save,
+    .champ-btn-reset{
+        padding:12px 18px;
+        font-size:12px;
+        min-width:140px;
+    }
+}
+
+@media(max-width:480px){
+
+    .champions-draw-screen{
+        padding:14px 8px 30px;
+    }
+
+    .champ-draw-header{
+        padding:10px 0 16px;
+    }
+
+    .champ-draw-title{
+        font-size:17px;
+        letter-spacing:1.5px;
+    }
+
+    .champ-pot-teams{
+        grid-template-columns:repeat(2, 1fr);
+        gap:6px;
+    }
+
+    .champ-team-card{
+        padding:8px 10px;
+        gap:6px;
+        min-height:46px;
+        border-radius:12px;
+    }
+
+    .champ-team-card img{
+        width:24px;
+        height:24px;
+    }
+
+    .champ-team-card-name{
+        font-size:10px;
+    }
+
+    .champ-team-card-check{
+        width:20px;
+        height:20px;
+    }
+
+    .champ-team-card-check i{
+        font-size:18px;
+    }
+
+    .champ-pot-label{
+        font-size:10px;
+        letter-spacing:1.5px;
+    }
+
+    .champ-pots-stage{
+        gap:14px;
+        margin-bottom:20px;
+    }
+
+    .champ-pot-row{
+        gap:6px;
+    }
+
+    .champ-groups-stage{
+        grid-template-columns:repeat(2, 1fr);
+        gap:8px;
+    }
+
+    .champ-group-target{
+        padding:10px 6px;
+        min-height:170px;
+        border-radius:14px;
+    }
+
+    .champ-group-target-label{
+        font-size:14px;
+        letter-spacing:2px;
+        padding-bottom:8px;
+        margin-bottom:8px;
+    }
+
+    .champ-group-team-item{
+        padding:4px 6px;
         gap:4px;
+        border-radius:8px;
     }
 
     .champ-group-team-item img{
@@ -587,124 +591,27 @@
 
     .champ-group-team-item span{
         font-size:8px;
-    }
-
-    .champ-draw-title{
-        font-size:20px;
-    }
-
-    .champ-led{
-        padding:10px 14px;
-        min-width:90px;
-        gap:5px;
-    }
-
-    .champ-led img{
-        width:32px;
-        height:32px;
-    }
-
-    .champ-led span{
-        font-size:10px;
-    }
-
-    .champ-draw-actions{
-        gap:10px;
-    }
-
-    .champ-btn-save,
-    .champ-btn-reset{
-        flex:1 1 140px;
-        padding:14px 20px;
-        font-size:12px;
-        min-width:140px;
-    }
-}
-
-@media(max-width:480px){
-    .champions-draw-screen{
-        padding:14px 8px 30px;
-    }
-
-    .champ-draw-header{
-        padding:12px 0 20px;
-    }
-
-    .champ-draw-title{
-        font-size:17px;
-    }
-
-    .champ-cards-stage{
-        gap:8px;
-        margin:18px auto 26px;
-    }
-
-    .champ-card{
-        min-width:60px;
-        max-width:95px;
-    }
-
-    .champ-card-back-team img{
-        width:32px;
-        height:32px;
-    }
-
-    .champ-card-back-team span{
-        font-size:8px;
-        letter-spacing:0.5px;
-    }
-
-    .champ-groups-stage{
-        gap:4px;
-    }
-
-    .champ-group-target{
-        min-width:60px;
-        min-height:170px;
-        padding:8px 4px;
-    }
-
-    .champ-group-target-label{
-        font-size:14px;
-        letter-spacing:2px;
-    }
-
-    .champ-group-team-item img{
-        width:14px;
-        height:14px;
-    }
-
-    .champ-group-team-item span{
-        font-size:7px;
+        letter-spacing:0;
     }
 
     .champ-draw-actions{
         flex-direction:column;
         gap:8px;
+        margin:18px auto 0;
     }
 
     .champ-btn-save,
     .champ-btn-reset{
         width:100%;
         max-width:none;
-    }
-}
-
-/* ═══ REDUCED MOTION ═══ */
-
-@media (prefers-reduced-motion: reduce){
-    .champ-card::before,
-    .champ-card::after{
-        animation:none !important;
+        padding:12px 18px;
     }
 }
 
 /* ═══ منع حفظ الصور ═══ */
 
-.champ-card-back-team img,
-.champ-group-team-item img,
-.champ-led img,
-.champ-banner-original img{
+.champ-team-card img,
+.champ-group-team-item img{
     -webkit-user-select:none;
     -webkit-user-drag:none;
     -webkit-touch-callout:none;
