@@ -1,1466 +1,1649 @@
 /* =========================================================
-   champions-draw.css — FINALISSIMA LEAGUE CHAT (v=5)
-   🎬 WORLD-CLASS CINEMATIC DRAW — الجزء 1
+   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=5)
+   🎬 WORLD-CLASS CINEMATIC DRAW
 ========================================================= */
 
-/* ═══════════════════════════════════════════════════════
-   1) DRAW SCREEN — الأساسية
-   ═══════════════════════════════════════════════════════ */
-
-.champions-draw-screen{
-    position:fixed;
-    inset:0;
-    z-index:999999;
-    background:
-        radial-gradient(ellipse at center,
-            rgba(139,26,47,0.18) 0%,
-            rgba(74,10,21,0.10) 40%,
-            #0A0A0A 75%);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:flex-start;
-    padding:20px 16px 40px;
-    overflow-y:auto;
-    overflow-x:hidden;
-    animation:champDrawFadeIn .6s ease;
-    direction:rtl;
-    font-family:'Cairo', 'Tajawal', sans-serif;
-    will-change:transform;
-}
-
-@keyframes champDrawFadeIn{
-    from{opacity:0;}
-    to{opacity:1;}
-}
-
-/* ═══════════════════════════════════════════════════════
-   2) BACKGROUND CANVAS
-   ═══════════════════════════════════════════════════════ */
-
-.champ-bg-canvas{
-    position:fixed;
-    inset:0;
-    z-index:1;
-    pointer-events:none;
-    opacity:0.7;
-}
-
-/* ═══════════════════════════════════════════════════════
-   3) PRELOADER
-   ═══════════════════════════════════════════════════════ */
-
-.champ-preloader{
-    position:fixed;
-    inset:0;
-    z-index:9999999;
-    background:#0A0A0A;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:40px;
-    padding:30px;
-}
-
-.champ-preloader-logo{
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    width:180px;
-    height:180px;
-}
-
-.champ-preloader-ring{
-    position:absolute;
-    inset:0;
-    border:3px solid transparent;
-    border-top-color:#D4B77A;
-    border-right-color:rgba(212,183,122,.5);
-    border-radius:50%;
-    animation:champPreloaderSpin 1.5s linear infinite;
-    box-shadow:
-        0 0 40px rgba(212,183,122,.5),
-        inset 0 0 30px rgba(212,183,122,.2);
-}
-
-.champ-preloader-ring::before{
-    content:'';
-    position:absolute;
-    inset:12px;
-    border:2px solid transparent;
-    border-bottom-color:rgba(139,26,47,.8);
-    border-left-color:rgba(139,26,47,.4);
-    border-radius:50%;
-    animation:champPreloaderSpin 2s linear infinite reverse;
-}
-
-@keyframes champPreloaderSpin{
-    0%{transform:rotate(0deg);}
-    100%{transform:rotate(360deg);}
-}
-
-.champ-preloader-text{
-    font-size:20px;
-    font-weight:900;
-    color:#D4B77A;
-    letter-spacing:4px;
-    text-transform:uppercase;
-    text-shadow:
-        0 0 20px rgba(212,183,122,.7),
-        0 0 40px rgba(212,183,122,.3);
-    animation:champPreloaderPulse 1.5s ease-in-out infinite;
-    z-index:2;
-}
-
-@keyframes champPreloaderPulse{
-    0%, 100%{opacity:0.7;transform:scale(1);}
-    50%{opacity:1;transform:scale(1.05);}
-}
-
-.champ-preloader-bar{
-    width:80%;
-    max-width:400px;
-    height:6px;
-    background:rgba(212,183,122,.15);
-    border-radius:10px;
-    overflow:hidden;
-    position:relative;
-    border:1px solid rgba(212,183,122,.3);
-}
-
-.champ-preloader-fill{
-    height:100%;
-    width:0%;
-    background:linear-gradient(90deg,
-        #8B1A2F 0%,
-        #D4B77A 50%,
-        #F5E6D3 100%);
-    border-radius:10px;
-    box-shadow:
-        0 0 20px rgba(212,183,122,.8),
-        0 0 40px rgba(212,183,122,.4);
-    transition:width .5s ease;
-    position:relative;
-}
-
-.champ-preloader-fill::after{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(255,255,255,.4) 50%,
-        transparent 100%);
-    animation:champPreloaderShimmer 1.5s ease-in-out infinite;
-}
-
-@keyframes champPreloaderShimmer{
-    0%{transform:translateX(-100%);}
-    100%{transform:translateX(100%);}
-}
-
-.champ-preloader-status{
-    font-size:13px;
-    font-weight:800;
-    color:#D4B77A;
-    letter-spacing:2px;
-    opacity:0.8;
-    text-align:center;
-}
-
-/* ═══════════════════════════════════════════════════════
-   4) INTRO OVERLAY
-   ═══════════════════════════════════════════════════════ */
-
-.champ-intro-overlay{
-    position:fixed;
-    inset:0;
-    z-index:9999998;
-    background:radial-gradient(ellipse at center,
-        rgba(0,0,0,0.85) 0%,
-        #000 100%);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    pointer-events:none;
-}
-
-.champ-intro-text{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:20px;
-    text-align:center;
-    padding:20px;
-}
-
-.champ-intro-line{
-    font-size:clamp(48px, 11vw, 120px);
-    font-weight:900;
-    letter-spacing:12px;
-    color:#D4B77A;
-    text-transform:uppercase;
-    font-family:'Cairo', 'Tajawal', sans-serif;
-    line-height:1;
-    text-shadow:
-        0 0 30px #D4B77A,
-        0 0 80px rgba(212,183,122,.6),
-        0 0 140px rgba(212,183,122,.3),
-        0 4px 30px rgba(0,0,0,.9);
-    will-change:transform, opacity, filter;
-}
-
-.champ-intro-cup{
-    color:#8B1A2F;
-    text-shadow:
-        0 0 30px #8B1A2F,
-        0 0 80px rgba(139,26,47,.8),
-        0 0 140px rgba(212,183,122,.5),
-        0 4px 30px rgba(0,0,0,.9);
-}
-
-.champ-intro-subline{
-    font-size:clamp(28px, 6vw, 56px);
-    font-weight:900;
-    letter-spacing:8px;
-    color:#D4B77A;
-    text-transform:uppercase;
-    text-shadow:
-        0 0 20px rgba(212,183,122,.8),
-        0 2px 10px rgba(0,0,0,.9);
-}
-
-.champ-intro-year{
-    font-size:clamp(36px, 8vw, 80px);
-    font-weight:900;
-    letter-spacing:6px;
-    color:#8B1A2F;
-    font-family:'Inter', sans-serif;
-    text-shadow:
-        0 0 30px rgba(139,26,47,.9),
-        0 0 60px rgba(212,183,122,.6),
-        0 4px 20px rgba(0,0,0,.9);
-}
-
-/* ═══════════════════════════════════════════════════════
-   5) MAIN CONTENT
-   ═══════════════════════════════════════════════════════ */
-
-.champ-main-content{
-    position:relative;
-    z-index:10;
-    width:100%;
-    max-width:1200px;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    will-change:opacity;
-}
-
-/* ═══════════════════════════════════════════════════════
-   6) TITLE
-   ═══════════════════════════════════════════════════════ */
-
-.champ-draw-header{
-    width:100%;
-    text-align:center;
-    padding:14px 0 22px;
-    flex-shrink:0;
-    position:relative;
-    z-index:11;
-}
-
-.champ-draw-title{
-    font-size:clamp(22px, 4vw, 38px);
-    font-weight:900;
-    color:#D4B77A;
-    letter-spacing:3px;
-    text-align:center;
-    line-height:1.3;
-    text-shadow:
-        0 0 20px rgba(212,183,122,.6),
-        0 0 40px rgba(212,183,122,.3),
-        0 2px 10px rgba(0,0,0,.9);
-    font-family:'Cairo', 'Tajawal', sans-serif;
-    direction:rtl;
-}
-
-/* ═══════════════════════════════════════════════════════
-   7) TROPHY STAGE
-   ═══════════════════════════════════════════════════════ */
-
-.champ-trophy-stage{
-    position:relative;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    width:100%;
-    height:220px;
-    margin:10px 0 20px;
-    flex-shrink:0;
-}
-
-.champ-trophy-glow{
-    position:absolute;
-    width:300px;
-    height:300px;
-    border-radius:50%;
-    background:radial-gradient(circle,
-        rgba(212,183,122,.35) 0%,
-        rgba(212,183,122,.15) 30%,
-        transparent 70%);
-    filter:blur(20px);
-    animation:champTrophyGlowPulse 2s ease-in-out infinite;
-    pointer-events:none;
-}
-
-@keyframes champTrophyGlowPulse{
-    0%, 100%{transform:scale(1);opacity:0.7;}
-    50%{transform:scale(1.15);opacity:1;}
-}
-
-.champ-trophy{
-    position:relative;
-    z-index:2;
-    width:180px;
-    height:180px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    filter:
-        drop-shadow(0 0 30px rgba(212,183,122,.9))
-        drop-shadow(0 0 60px rgba(212,183,122,.5))
-        drop-shadow(0 10px 30px rgba(0,0,0,.8));
-    will-change:transform, filter;
-}
-
-.champ-trophy i{
-    font-size:160px;
-    background:linear-gradient(135deg,
-        #F5E6D3 0%,
-        #D4B77A 30%,
-        #8B7340 60%,
-        #D4B77A 90%);
-    -webkit-background-clip:text;
-    background-clip:text;
-    -webkit-text-fill-color:transparent;
-    color:transparent;
-}
-
-/* ═══════════════════════════════════════════════════════
-   8) POTS STAGE
-   ═══════════════════════════════════════════════════════ */
-
-.champ-pots-stage{
-    width:100%;
-    display:flex;
-    flex-direction:column;
-    gap:18px;
-    margin-bottom:30px;
-    position:relative;
-    z-index:11;
-}
-
-.champ-pot-row{
-    display:flex;
-    flex-direction:column;
-    gap:8px;
-    padding:6px;
-    border-radius:18px;
-    transition:box-shadow .4s ease;
-    will-change:box-shadow;
-}
-
-.champ-pot-label{
-    font-size:14px;
-    font-weight:900;
-    color:#D4B77A;
-    letter-spacing:4px;
-    text-transform:uppercase;
-    text-align:right;
-    padding:0 8px 4px;
-    text-shadow:0 0 12px rgba(212,183,122,.5);
-    transition:color .3s ease, transform .3s ease, text-shadow .3s ease;
-}
-
-.champ-pot-teams{
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:12px;
-    width:100%;
-}
-
-/* ═══════════════════════════════════════════════════════
-   9) TEAM CARD
-   ═══════════════════════════════════════════════════════ */
-
-.champ-team-card{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:12px 14px;
-    background:linear-gradient(135deg,
-        rgba(139,26,47,.32) 0%,
-        rgba(139,26,47,.18) 100%);
-    border:1.5px solid #D4B77A;
-    border-radius:16px;
-    transition:all .3s ease;
-    position:relative;
-    overflow:hidden;
-    min-height:64px;
-    will-change:transform, box-shadow, background, border-color, opacity;
-}
-
-.champ-team-card::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:linear-gradient(135deg,
-        rgba(212,183,122,.08) 0%,
-        transparent 60%);
-    pointer-events:none;
-}
-
-.champ-team-card img{
-    width:40px;
-    height:40px;
-    object-fit:contain;
-    flex-shrink:0;
-    filter:brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,.5));
-    position:relative;
-    z-index:2;
-    transition:filter .4s ease, opacity .4s ease, transform .4s ease;
-}
-
-.champ-team-card-name{
-    flex:1;
-    font-size:14px;
-    font-weight:900;
-    color:#FAF6F0;
-    letter-spacing:0.6px;
-    text-transform:uppercase;
-    text-align:right;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    text-shadow:0 2px 4px rgba(0,0,0,.7);
-    position:relative;
-    z-index:2;
-    transition:color .4s ease, opacity .4s ease;
-}
-
-.champ-team-card-check{
-    width:24px;
-    height:24px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    flex-shrink:0;
-    opacity:0;
-    transform:scale(0);
-    transition:all .4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position:absolute;
-    top:50%;
-    left:8px;
-    transform-origin:center;
-    margin-top:-12px;
-    z-index:3;
-}
-
-.champ-team-card-check i{
-    font-size:26px;
-    color:#D4B77A;
-    filter:
-        drop-shadow(0 0 6px rgba(212,183,122,.9))
-        drop-shadow(0 0 12px rgba(212,183,122,.5));
-}
-
-/* ⭐ Selected State */
-.champ-team-card.selected{
-    background:rgba(20,10,12,.55);
-    border-color:rgba(212,183,122,.15);
-    opacity:0.45;
-    transform:scale(0.98);
-}
-
-.champ-team-card.selected img{
-    filter:grayscale(0.7) brightness(0.55);
-    opacity:0.5;
-}
-
-.champ-team-card.selected .champ-team-card-name{
-    color:rgba(250,246,240,.3);
-}
-
-.champ-team-card.selected .champ-team-card-check{
-    opacity:1;
-    transform:scale(1);
-    margin-top:-12px;
-}
-
-/* ═══════════════════════════════════════════════════════
-   10) GROUPS STAGE
-   ═══════════════════════════════════════════════════════ */
-
-.champ-groups-stage{
-    width:100%;
-    display:grid;
-    grid-template-columns:repeat(4, 1fr);
-    gap:14px;
-    margin:0 auto;
-    position:relative;
-    z-index:11;
-}
-
-.champ-group-target{
-    background:linear-gradient(180deg,
-        rgba(42,42,42,.9) 0%,
-        rgba(26,26,26,.95) 100%);
-    border:2px solid rgba(212,183,122,.4);
-    border-radius:20px;
-    padding:14px 10px;
-    min-height:250px;
-    display:flex;
-    flex-direction:column;
-    transition:all .3s ease;
-    will-change:transform, box-shadow;
-    position:relative;
-    overflow:hidden;
-}
-
-.champ-group-target::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:radial-gradient(ellipse at top,
-        rgba(212,183,122,.06) 0%,
-        transparent 60%);
-    pointer-events:none;
-}
-
-.champ-group-target-label{
-    font-size:22px;
-    font-weight:900;
-    color:#D4B77A;
-    letter-spacing:4px;
-    text-align:center;
-    padding-bottom:10px;
-    margin-bottom:10px;
-    border-bottom:2px solid rgba(212,183,122,.3);
-    text-shadow:0 0 15px rgba(212,183,122,.6);
-    position:relative;
-    z-index:2;
-}
-
-.champ-group-target-teams{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    flex:1;
-    position:relative;
-    z-index:2;
-}
-
-.champ-group-team-item{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    padding:7px 10px;
-    background:linear-gradient(135deg,
-        rgba(212,183,122,.15) 0%,
-        rgba(139,26,47,.15) 100%);
-    border:1px solid rgba(212,183,122,.3);
-    border-radius:10px;
-    will-change:transform, opacity;
-    box-shadow:0 2px 6px rgba(0,0,0,.25);
-}
-
-.champ-group-team-item img{
-    width:22px;
-    height:22px;
-    object-fit:contain;
-    flex-shrink:0;
-    filter:brightness(1.1);
-}
-
-.champ-group-team-item span{
-    flex:1;
-    font-size:11px;
-    font-weight:800;
-    color:#FAF6F0;
-    letter-spacing:0.4px;
-    text-transform:uppercase;
-    text-align:right;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    white-space:nowrap;
-    text-shadow:0 1px 3px rgba(0,0,0,.5);
-}
-
-/* ═══════════════════════════════════════════════════════
-   11) DRAW ACTIONS
-   ═══════════════════════════════════════════════════════ */
-
-.champ-draw-actions{
-    display:flex;
-    gap:16px;
-    justify-content:center;
-    align-items:center;
-    width:100%;
-    max-width:600px;
-    margin:30px auto 0;
-    flex-wrap:wrap;
-    direction:rtl;
-    position:relative;
-    z-index:100;
-    padding:0 16px;
-}
-
-.champ-btn-save,
-.champ-btn-reset{
-    flex:1 1 180px;
-    max-width:250px;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    gap:8px;
-    padding:14px 26px;
-    border-radius:50px;
-    font-size:14px;
-    font-weight:900;
-    letter-spacing:1px;
-    cursor:pointer;
-    font-family:'Cairo', 'Tajawal', sans-serif;
-    transition:all .3s ease;
-    border:2px solid transparent;
-    min-width:160px;
-    position:relative;
-    overflow:hidden;
-}
-
-.champ-btn-save::before,
-.champ-btn-reset::before{
-    content:'';
-    position:absolute;
-    top:0;
-    left:-100%;
-    width:100%;
-    height:100%;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(255,255,255,.25) 50%,
-        transparent 100%);
-    transition:left .6s ease;
-}
-
-.champ-btn-save:hover:not(:disabled)::before,
-.champ-btn-reset:hover::before{
-    left:100%;
-}
-
-.champ-btn-save{
-    background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
-    color:#1A1A1A;
-    border-color:#FAF6F0;
-    box-shadow:
-        0 6px 20px rgba(212,183,122,.5),
-        inset 0 1px 0 rgba(255,255,255,.3);
-}
-
-.champ-btn-save:hover:not(:disabled){
-    transform:translateY(-2px);
-    box-shadow:
-        0 10px 28px rgba(212,183,122,.7),
-        inset 0 1px 0 rgba(255,255,255,.4);
-}
-
-.champ-btn-save:disabled{
-    opacity:0.7;
-    cursor:wait;
-}
-
-.champ-btn-reset{
-    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
-    color:#FAF6F0;
-    border-color:#D4B77A;
-    box-shadow:
-        0 6px 20px rgba(139,26,47,.5),
-        inset 0 1px 0 rgba(255,255,255,.15);
-}
-
-.champ-btn-reset:hover{
-    transform:translateY(-2px);
-    box-shadow:
-        0 10px 28px rgba(139,26,47,.7),
-        inset 0 1px 0 rgba(255,255,255,.2);
-}
-
-.champ-btn-save:active:not(:disabled),
-.champ-btn-reset:active{
-    transform:translateY(0) scale(.97);
-}
-
-.champ-btn-save i,
-.champ-btn-reset i{
-    font-size:18px;
-}
 /* =========================================================
-   الجزء 2: Effects + Buttons + Responsive
-   ========================================================= */
+   State
+========================================================= */
 
-/* ═══════════════════════════════════════════════════════
-   12) EFFECTS — Trail Particle
-   ═══════════════════════════════════════════════════════ */
+let champDrawState = {
+    playing: false,
+    currentPot: 0,
+    currentTeam: null,
+    skipRequested: false,
+    sessionStartTime: 0
+};
 
-.champ-trail-particle{
-    position:fixed;
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    background:radial-gradient(circle,
-        #F5E6D3 0%,
-        #D4B77A 40%,
-        transparent 100%);
-    pointer-events:none;
-    z-index:9999998;
-    transform:translate(-50%,-50%);
-    box-shadow:
-        0 0 14px #D4B77A,
-        0 0 28px rgba(212,183,122,.6),
-        0 0 42px rgba(212,183,122,.3);
-    will-change:transform, opacity, filter;
-}
+/* =========================================================
+   Audio Engine — Web Audio API
+========================================================= */
 
-/* ═══════════════════════════════════════════════════════
-   13) EFFECTS — Shockwave
-   ═══════════════════════════════════════════════════════ */
+let champAudioCtx = null;
 
-.champ-shockwave{
-    position:fixed;
-    width:120px;
-    height:120px;
-    border-radius:50%;
-    border:4px solid #D4B77A;
-    background:radial-gradient(circle,
-        rgba(212,183,122,.5) 0%,
-        rgba(212,183,122,.15) 40%,
-        transparent 70%);
-    pointer-events:none;
-    z-index:9999998;
-    transform:translate(-50%,-50%);
-    box-shadow:
-        0 0 60px #D4B77A,
-        0 0 100px rgba(212,183,122,.5),
-        inset 0 0 50px rgba(212,183,122,.6);
-    will-change:transform, opacity;
-}
-
-/* ═══════════════════════════════════════════════════════
-   14) EFFECTS — Burst Particle
-   ═══════════════════════════════════════════════════════ */
-
-.champ-burst-particle{
-    position:fixed;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:radial-gradient(circle,
-        #F5E6D3 0%,
-        #D4B77A 50%,
-        transparent 100%);
-    pointer-events:none;
-    z-index:9999999;
-    transform:translate(-50%,-50%);
-    box-shadow:
-        0 0 15px #D4B77A,
-        0 0 30px rgba(212,183,122,.6);
-    will-change:transform, opacity;
-}
-
-/* ═══════════════════════════════════════════════════════
-   15) EFFECTS — Confetti
-   ═══════════════════════════════════════════════════════ */
-
-.champ-confetti{
-    position:fixed;
-    pointer-events:none;
-    z-index:9999999;
-    will-change:transform, opacity;
-    box-shadow:0 0 8px rgba(212,183,122,.4);
-}
-
-/* ═══════════════════════════════════════════════════════
-   16) EFFECTS — Screen Flash
-   ═══════════════════════════════════════════════════════ */
-
-.champ-screen-flash{
-    position:fixed;
-    inset:0;
-    background:radial-gradient(circle at center,
-        #FFFFFF 0%,
-        rgba(212,183,122,.8) 30%,
-        transparent 70%);
-    pointer-events:none;
-    z-index:9999999;
-    opacity:0;
-}
-
-.champ-flash{
-    position:fixed;
-    inset:0;
-    background:radial-gradient(circle at center,
-        #FFFFFF 0%,
-        rgba(212,183,122,.6) 40%,
-        transparent 80%);
-    pointer-events:none;
-    z-index:9999999;
-    opacity:0;
-}
-
-/* ═══════════════════════════════════════════════════════
-   17) FLYER — العنصر الطائر
-   ═══════════════════════════════════════════════════════ */
-
-.champ-flyer{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    padding:14px 20px;
-    min-width:160px;
-    background:linear-gradient(135deg,
-        #8B1A2F 0%,
-        #4A0A15 100%);
-    border:3px solid #D4B77A;
-    border-radius:20px;
-    box-shadow:
-        0 0 60px rgba(212,183,122,.9),
-        0 0 120px rgba(212,183,122,.4),
-        0 20px 60px rgba(0,0,0,.8),
-        inset 0 0 30px rgba(212,183,122,.2);
-    will-change:transform, opacity, filter;
-    transform-origin:center center;
-}
-
-.champ-flyer img{
-    width:50px;
-    height:50px;
-    object-fit:contain;
-    filter:brightness(1.15) contrast(1.05);
-    flex-shrink:0;
-}
-
-.champ-flyer span{
-    font-size:12px;
-    font-weight:900;
-    color:#FAF6F0;
-    letter-spacing:1.2px;
-    text-transform:uppercase;
-    text-shadow:
-        0 0 12px rgba(212,183,122,.8),
-        0 2px 6px rgba(0,0,0,.9);
-    white-space:nowrap;
-    line-height:1.1;
-}
-
-/* ═══════════════════════════════════════════════════════
-   18) SKIP BUTTON
-   ═══════════════════════════════════════════════════════ */
-
-.champ-skip-btn{
-    position:fixed;
-    top:20px;
-    left:20px;
-    z-index:10000000;
-    display:inline-flex;
-    align-items:center;
-    gap:6px;
-    padding:10px 18px;
-    background:linear-gradient(135deg,
-        rgba(139,26,47,.9) 0%,
-        rgba(74,10,21,.9) 100%);
-    color:#D4B77A;
-    border:2px solid #D4B77A;
-    border-radius:50px;
-    font-size:13px;
-    font-weight:900;
-    letter-spacing:1px;
-    cursor:pointer;
-    font-family:'Cairo', 'Tajawal', sans-serif;
-    box-shadow:
-        0 4px 16px rgba(0,0,0,.5),
-        0 0 20px rgba(212,183,122,.3);
-    transition:all .3s ease;
-    opacity:0;
-}
-
-.champ-skip-btn:hover{
-    transform:scale(1.05);
-    box-shadow:
-        0 6px 24px rgba(0,0,0,.6),
-        0 0 30px rgba(212,183,122,.6);
-}
-
-.champ-skip-btn:active{
-    transform:scale(0.95);
-}
-
-.champ-skip-btn i{
-    font-size:16px;
-}
-
-/* ═══════════════════════════════════════════════════════
-   19) PROGRESS BAR
-   ═══════════════════════════════════════════════════════ */
-
-.champ-progress-bar{
-    position:fixed;
-    top:20px;
-    right:20px;
-    z-index:10000000;
-    display:flex;
-    gap:8px;
-    align-items:center;
-    padding:10px 16px;
-    background:rgba(20,20,20,.85);
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    border:1.5px solid rgba(212,183,122,.4);
-    border-radius:50px;
-    box-shadow:0 4px 16px rgba(0,0,0,.5);
-    opacity:0;
-    transition:opacity .4s ease;
-}
-
-.champ-progress-dot{
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    background:rgba(212,183,122,.2);
-    border:2px solid rgba(212,183,122,.4);
-    transition:all .3s ease;
-    position:relative;
-}
-
-.champ-progress-dot.active{
-    background:#D4B77A;
-    border-color:#F5E6D3;
-    transform:scale(1.4);
-    box-shadow:
-        0 0 12px rgba(212,183,122,.9),
-        0 0 24px rgba(212,183,122,.5);
-    animation:champProgressPulse 1s ease-in-out infinite;
-}
-
-.champ-progress-dot.done{
-    background:rgba(212,183,122,.7);
-    border-color:rgba(212,183,122,.9);
-}
-
-.champ-progress-dot.done::after{
-    content:'✓';
-    position:absolute;
-    inset:0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:9px;
-    color:#0A0A0A;
-    font-weight:900;
-}
-
-@keyframes champProgressPulse{
-    0%, 100%{transform:scale(1.4);}
-    50%{transform:scale(1.6);}
-}
-
-/* ═══════════════════════════════════════════════════════
-   20) MOBILE — 768px
-   ═══════════════════════════════════════════════════════ */
-
-@media(max-width:768px){
-
-    .champions-draw-screen{
-        padding:16px 12px 30px;
-    }
-
-    .champ-preloader-logo{
-        width:140px;
-        height:140px;
-    }
-
-    .champ-preloader-text{
-        font-size:16px;
-        letter-spacing:3px;
-    }
-
-    .champ-preloader-bar{
-        max-width:320px;
-    }
-
-    .champ-intro-line{
-        font-size:clamp(36px, 14vw, 80px);
-        letter-spacing:6px;
-    }
-
-    .champ-intro-subline{
-        font-size:clamp(20px, 5vw, 40px);
-        letter-spacing:4px;
-    }
-
-    .champ-intro-year{
-        font-size:clamp(28px, 7vw, 56px);
-    }
-
-    .champ-draw-title{
-        font-size:20px;
-        letter-spacing:2px;
-    }
-
-    .champ-trophy-stage{
-        height:160px;
-    }
-
-    .champ-trophy{
-        width:130px;
-        height:130px;
-    }
-
-    .champ-trophy i{
-        font-size:110px;
-    }
-
-    .champ-trophy-glow{
-        width:220px;
-        height:220px;
-    }
-
-    .champ-pots-stage{
-        gap:14px;
-        margin-bottom:22px;
-    }
-
-    .champ-pot-teams{
-        gap:8px;
-    }
-
-    .champ-team-card{
-        padding:10px 12px;
-        gap:8px;
-        min-height:54px;
-        border-radius:14px;
-    }
-
-    .champ-team-card img{
-        width:30px;
-        height:30px;
-    }
-
-    .champ-team-card-name{
-        font-size:11px;
-        letter-spacing:0.4px;
-    }
-
-    .champ-team-card-check i{
-        font-size:20px;
-    }
-
-    .champ-pot-label{
-        font-size:12px;
-        letter-spacing:3px;
-    }
-
-    .champ-groups-stage{
-        gap:8px;
-    }
-
-    .champ-group-target{
-        padding:10px 6px;
-        min-height:200px;
-        border-radius:16px;
-    }
-
-    .champ-group-target-label{
-        font-size:16px;
-        letter-spacing:3px;
-        padding-bottom:8px;
-        margin-bottom:8px;
-    }
-
-    .champ-group-team-item{
-        padding:5px 8px;
-        gap:6px;
-        border-radius:8px;
-    }
-
-    .champ-group-team-item img{
-        width:18px;
-        height:18px;
-    }
-
-    .champ-group-team-item span{
-        font-size:10px;
-    }
-
-    .champ-draw-actions{
-        gap:12px;
-        margin:22px auto 0;
-    }
-
-    .champ-btn-save,
-    .champ-btn-reset{
-        padding:12px 20px;
-        font-size:12px;
-        min-width:140px;
-    }
-
-    .champ-btn-save i,
-    .champ-btn-reset i{
-        font-size:16px;
-    }
-
-    .champ-skip-btn{
-        top:14px;
-        left:14px;
-        padding:8px 14px;
-        font-size:11px;
-    }
-
-    .champ-progress-bar{
-        top:14px;
-        right:14px;
-        padding:8px 12px;
-        gap:6px;
-    }
-
-    .champ-progress-dot{
-        width:11px;
-        height:11px;
-    }
-
-    .champ-flyer{
-        padding:12px 16px;
-        min-width:130px;
-    }
-
-    .champ-flyer img{
-        width:40px;
-        height:40px;
-    }
-
-    .champ-flyer span{
-        font-size:11px;
+function champInitAudio() {
+    try {
+        if (!champAudioCtx) {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            if (AudioCtx) {
+                champAudioCtx = new AudioCtx();
+            }
+        }
+        if (champAudioCtx && champAudioCtx.state === 'suspended') {
+            champAudioCtx.resume();
+        }
+    } catch (e) {
+        console.warn('[Champ Audio] Init failed:', e);
     }
 }
 
-/* ═══════════════════════════════════════════════════════
-   21) MOBILE — 480px
-   ═══════════════════════════════════════════════════════ */
+function champPlayWhoosh(duration) {
+    if (!champAudioCtx) return;
+    duration = duration || 0.4;
 
-@media(max-width:480px){
+    try {
+        const now = champAudioCtx.currentTime;
+        const osc = champAudioCtx.createOscillator();
+        const gain = champAudioCtx.createGain();
+        const filter = champAudioCtx.createBiquadFilter();
 
-    .champions-draw-screen{
-        padding:12px 8px 24px;
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(150, now);
+        osc.frequency.exponentialRampToValueAtTime(600, now + duration * 0.5);
+        osc.frequency.exponentialRampToValueAtTime(80, now + duration);
+
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(2000, now);
+        filter.frequency.exponentialRampToValueAtTime(400, now + duration);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.08, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(champAudioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + duration + 0.05);
+    } catch (e) {}
+}
+
+function champPlayChime() {
+    if (!champAudioCtx) return;
+
+    try {
+        const now = champAudioCtx.currentTime;
+        const notes = [880, 1108, 1318];
+
+        notes.forEach(function(freq, idx) {
+            const osc = champAudioCtx.createOscillator();
+            const gain = champAudioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0.0001, now + idx * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.06, now + idx * 0.08 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 0.8);
+
+            osc.connect(gain);
+            gain.connect(champAudioCtx.destination);
+
+            osc.start(now + idx * 0.08);
+            osc.stop(now + idx * 0.08 + 0.9);
+        });
+    } catch (e) {}
+}
+
+function champPlayImpact() {
+    if (!champAudioCtx) return;
+
+    try {
+        const now = champAudioCtx.currentTime;
+        const osc = champAudioCtx.createOscillator();
+        const gain = champAudioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(120, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.15, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+
+        osc.connect(gain);
+        gain.connect(champAudioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.45);
+    } catch (e) {}
+}
+
+function champPlayCheer() {
+    if (!champAudioCtx) return;
+
+    try {
+        const now = champAudioCtx.currentTime;
+        const notes = [523, 659, 784, 1047];
+
+        notes.forEach(function(freq, idx) {
+            const osc = champAudioCtx.createOscillator();
+            const gain = champAudioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0.0001, now + idx * 0.12);
+            gain.gain.exponentialRampToValueAtTime(0.08, now + idx * 0.12 + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 1.2);
+
+            osc.connect(gain);
+            gain.connect(champAudioCtx.destination);
+
+            osc.start(now + idx * 0.12);
+            osc.stop(now + idx * 0.12 + 1.3);
+        });
+    } catch (e) {}
+}
+
+function champPlayTick() {
+    if (!champAudioCtx) return;
+
+    try {
+        const now = champAudioCtx.currentTime;
+        const osc = champAudioCtx.createOscillator();
+        const gain = champAudioCtx.createGain();
+
+        osc.type = 'square';
+        osc.frequency.value = 2200;
+
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.03, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+
+        osc.connect(gain);
+        gain.connect(champAudioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.08);
+    } catch (e) {}
+}
+
+function champPlaySuccess() {
+    if (!champAudioCtx) return;
+
+    try {
+        const now = champAudioCtx.currentTime;
+        const notes = [523, 659, 784, 1047, 1319];
+
+        notes.forEach(function(freq, idx) {
+            const osc = champAudioCtx.createOscillator();
+            const gain = champAudioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.value = freq;
+
+            gain.gain.setValueAtTime(0.0001, now + idx * 0.1);
+            gain.gain.exponentialRampToValueAtTime(0.07, now + idx * 0.1 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.1 + 0.6);
+
+            osc.connect(gain);
+            gain.connect(champAudioCtx.destination);
+
+            osc.start(now + idx * 0.1);
+            osc.stop(now + idx * 0.1 + 0.7);
+        });
+    } catch (e) {}
+}
+
+/* =========================================================
+   Haptic Feedback
+========================================================= */
+
+function champVibrate(pattern) {
+    try {
+        if (navigator.vibrate) {
+            navigator.vibrate(pattern);
+        }
+    } catch (e) {}
+}
+
+/* =========================================================
+   Helpers
+========================================================= */
+
+function champWait(ms) {
+    return new Promise(function(r) { setTimeout(r, ms); });
+}
+
+function champShuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
     }
+    return a;
+}
 
-    .champ-preloader-logo{
-        width:110px;
-        height:110px;
+function champGetTeamName(code) {
+    if (typeof teamsMap !== 'undefined' && teamsMap[code]) {
+        return teamsMap[code].name || code;
     }
+    return code || 'Unknown';
+}
 
-    .champ-preloader-text{
-        font-size:13px;
-        letter-spacing:2px;
+function champGetTeamLogo(code) {
+    if (typeof teamsMap !== 'undefined' && teamsMap[code]) {
+        return teamsMap[code].logo || '';
     }
+    return '';
+}
 
-    .champ-preloader-status{
-        font-size:11px;
-        letter-spacing:1px;
-    }
+function champXIcon(name, variant) {
+    variant = variant || 'regular';
+    const vc = variant === 'fill' ? 'ph-fill' :
+               variant === 'bold' ? 'ph-bold' :
+               variant === 'duotone' ? 'ph-duotone' : 'ph';
+    return '<i class="' + vc + ' ph-' + name + '"></i>';
+}
 
-    .champ-preloader-bar{
-        width:70%;
-        height:5px;
-    }
-
-    .champ-intro-line{
-        font-size:clamp(30px, 12vw, 60px);
-        letter-spacing:4px;
-    }
-
-    .champ-intro-subline{
-        font-size:clamp(16px, 4vw, 28px);
-        letter-spacing:3px;
-    }
-
-    .champ-intro-year{
-        font-size:clamp(24px, 6vw, 40px);
-    }
-
-    .champ-draw-header{
-        padding:10px 0 14px;
-    }
-
-    .champ-draw-title{
-        font-size:16px;
-        letter-spacing:1.5px;
-    }
-
-    .champ-trophy-stage{
-        height:120px;
-        margin:6px 0 14px;
-    }
-
-    .champ-trophy{
-        width:100px;
-        height:100px;
-    }
-
-    .champ-trophy i{
-        font-size:85px;
-    }
-
-    .champ-trophy-glow{
-        width:170px;
-        height:170px;
-    }
-
-    .champ-pots-stage{
-        gap:10px;
-        margin-bottom:16px;
-    }
-
-    .champ-pot-teams{
-        grid-template-columns:repeat(2, 1fr);
-        gap:6px;
-    }
-
-    .champ-team-card{
-        padding:8px 10px;
-        gap:6px;
-        min-height:48px;
-        border-radius:12px;
-    }
-
-    .champ-team-card img{
-        width:26px;
-        height:26px;
-    }
-
-    .champ-team-card-name{
-        font-size:10px;
-        letter-spacing:0.3px;
-    }
-
-    .champ-team-card-check{
-        width:20px;
-        height:20px;
-        margin-top:-10px;
-    }
-
-    .champ-team-card-check i{
-        font-size:17px;
-    }
-
-    .champ-pot-label{
-        font-size:10px;
-        letter-spacing:2px;
-    }
-
-    .champ-groups-stage{
-        grid-template-columns:repeat(2, 1fr);
-        gap:6px;
-    }
-
-    .champ-group-target{
-        padding:8px 5px;
-        min-height:165px;
-        border-radius:12px;
-    }
-
-    .champ-group-target-label{
-        font-size:13px;
-        letter-spacing:2px;
-        padding-bottom:6px;
-        margin-bottom:6px;
-    }
-
-    .champ-group-team-item{
-        padding:4px 6px;
-        gap:4px;
-        border-radius:7px;
-    }
-
-    .champ-group-team-item img{
-        width:15px;
-        height:15px;
-    }
-
-    .champ-group-team-item span{
-        font-size:8px;
-    }
-
-    .champ-draw-actions{
-        flex-direction:column;
-        gap:8px;
-        margin:18px auto 0;
-        padding:0 8px;
-    }
-
-    .champ-btn-save,
-    .champ-btn-reset{
-        width:100%;
-        max-width:none;
-        padding:12px 18px;
-        font-size:12px;
-    }
-
-    .champ-skip-btn{
-        top:10px;
-        left:10px;
-        padding:7px 12px;
-        font-size:10px;
-    }
-
-    .champ-skip-btn span{
-        display:none;
-    }
-
-    .champ-progress-bar{
-        top:10px;
-        right:10px;
-        padding:6px 10px;
-        gap:5px;
-    }
-
-    .champ-progress-dot{
-        width:9px;
-        height:9px;
-    }
-
-    .champ-progress-dot.done::after{
-        font-size:7px;
-    }
-
-    .champ-flyer{
-        padding:10px 14px;
-        min-width:110px;
-        gap:4px;
-    }
-
-    .champ-flyer img{
-        width:34px;
-        height:34px;
-    }
-
-    .champ-flyer span{
-        font-size:10px;
-        letter-spacing:0.8px;
-    }
-
-    .champ-trail-particle{
-        width:10px;
-        height:10px;
-    }
-
-    .champ-shockwave{
-        width:80px;
-        height:80px;
-        border-width:3px;
-    }
-
-    .champ-burst-particle{
-        width:8px;
-        height:8px;
+function champIsAdmin() {
+    try {
+        return sessionStorage.getItem('champ_admin') === 'true';
+    } catch (e) {
+        return false;
     }
 }
 
-/* ═══════════════════════════════════════════════════════
-   22) iPad — Landscape (768-1024)
-   ═══════════════════════════════════════════════════════ */
+/* =========================================================
+   Skip Button
+========================================================= */
 
-@media(min-width:768px) and (max-width:1024px){
+function champShowSkipButton() {
+    const old = document.getElementById('champSkipBtn');
+    if (old) return;
 
-    .champ-team-card{
-        min-height:60px;
-        padding:12px 14px;
-    }
+    const btn = document.createElement('button');
+    btn.id = 'champSkipBtn';
+    btn.className = 'champ-skip-btn';
+    btn.innerHTML = champXIcon('fast-forward', 'bold') + ' <span>تخطي</span>';
+    btn.onclick = function() {
+        champDrawState.skipRequested = true;
+        btn.style.opacity = '0';
+        setTimeout(function() { btn.remove(); }, 300);
+    };
 
-    .champ-team-card img{
-        width:36px;
-        height:36px;
-    }
+    document.body.appendChild(btn);
 
-    .champ-team-card-name{
-        font-size:13px;
-    }
+    setTimeout(function() {
+        if (btn) btn.style.opacity = '1';
+    }, 100);
+}
 
-    .champ-group-target{
-        min-height:230px;
+function champHideSkipButton() {
+    const btn = document.getElementById('champSkipBtn');
+    if (btn) {
+        btn.style.opacity = '0';
+        setTimeout(function() { btn.remove(); }, 300);
     }
 }
 
-/* ═══════════════════════════════════════════════════════
-   23) REDUCED MOTION
-   ═══════════════════════════════════════════════════════ */
+/* =========================================================
+   Progress Bar
+========================================================= */
 
-@media (prefers-reduced-motion: reduce){
+function champShowProgressBar() {
+    const old = document.getElementById('champProgressBar');
+    if (old) old.remove();
 
-    .champ-preloader-ring,
-    .champ-preloader-ring::before,
-    .champ-preloader-text,
-    .champ-preloader-fill::after,
-    .champ-trophy-glow{
-        animation:none !important;
+    const bar = document.createElement('div');
+    bar.id = 'champProgressBar';
+    bar.className = 'champ-progress-bar';
+
+    for (let i = 1; i <= 5; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'champ-progress-dot';
+        dot.dataset.pot = i;
+        bar.appendChild(dot);
     }
 
-    .champ-progress-dot.active{
-        animation:none !important;
-    }
+    document.body.appendChild(bar);
 
-    .champ-skip-btn,
-    .champ-progress-bar{
-        transition:none !important;
+    setTimeout(function() {
+        bar.style.opacity = '1';
+    }, 100);
+}
+
+function champUpdateProgress(potNum) {
+    const dots = document.querySelectorAll('.champ-progress-dot');
+    dots.forEach(function(dot) {
+        const num = parseInt(dot.dataset.pot, 10);
+        if (num < potNum) {
+            dot.classList.add('done');
+            dot.classList.remove('active');
+        } else if (num === potNum) {
+            dot.classList.add('active');
+            dot.classList.remove('done');
+        } else {
+            dot.classList.remove('active', 'done');
+        }
+    });
+}
+
+function champHideProgressBar() {
+    const bar = document.getElementById('champProgressBar');
+    if (bar) {
+        bar.style.opacity = '0';
+        setTimeout(function() { bar.remove(); }, 400);
     }
 }
 
-/* ═══════════════════════════════════════════════════════
-   24) HIGH PERFORMANCE DEVICES
-   ═══════════════════════════════════════════════════════ */
+/* =========================================================
+   Main Entry
+========================================================= */
 
-@media (min-width:1024px) and (hover:hover){
-
-    .champ-team-card:hover:not(.selected){
-        border-color:#F5E6D3;
-        box-shadow:
-            0 0 30px rgba(212,183,122,.6),
-            inset 0 0 20px rgba(212,183,122,.15);
+function champPerformDraw() {
+    if (typeof gsap === 'undefined') {
+        if (typeof showToast === 'function') showToast('GSAP not loaded', false);
+        return;
     }
 
-    .champ-btn-save:hover:not(:disabled),
-    .champ-btn-reset:hover{
-        letter-spacing:1.5px;
+    if (!champIsAdmin()) {
+        if (typeof showToast === 'function') showToast('غير مصرح', false);
+        return;
+    }
+
+    if (champDrawState.playing) {
+        console.warn('[Champ] Already playing');
+        return;
+    }
+
+    champInitAudio();
+
+    champPerformDrawAsync();
+}
+
+async function champPerformDrawAsync() {
+    champDrawState.playing = true;
+    champDrawState.skipRequested = false;
+    champDrawState.sessionStartTime = Date.now();
+
+    try {
+        const pots = await buildPots();
+        if (!pots) {
+            champDrawState.playing = false;
+            if (typeof showToast === 'function') showToast('فشل بناء الـ Pots', false);
+            return;
+        }
+
+        const drawRows = champGenerateRandomDraw(pots);
+        champData.pendingDraw = drawRows;
+
+        champBuildDrawScreen(pots);
+
+        await champRunCinematicDraw(drawRows, pots);
+
+    } catch (err) {
+        console.error('[Champions] Draw error:', err);
+        if (typeof showToast === 'function') showToast('فشل: ' + err.message, false, 4000);
+    } finally {
+        champDrawState.playing = false;
     }
 }
 
-/* ═══════════════════════════════════════════════════════
-   25) منع حفظ الصور
-   ═══════════════════════════════════════════════════════ */
+/* =========================================================
+   Build Draw Screen
+========================================================= */
 
-.champ-team-card img,
-.champ-group-team-item img,
-.champ-flyer img,
-.champ-banner-original img{
-    -webkit-user-select:none;
-    -webkit-user-drag:none;
-    -webkit-touch-callout:none;
-    -moz-user-select:none;
-    -ms-user-select:none;
-    user-select:none;
-    pointer-events:none;
+function champBuildDrawScreen(pots) {
+    const old = document.getElementById('champDrawScreen');
+    if (old) old.remove();
+
+    const screen = document.createElement('div');
+    screen.className = 'champions-draw-screen';
+    screen.id = 'champDrawScreen';
+
+    let html = '';
+
+    /* Background Canvas */
+    html += '<canvas id="champBgCanvas" class="champ-bg-canvas"></canvas>';
+
+    /* Preloader */
+    html += '<div class="champ-preloader" id="champPreloader">';
+    html += '<div class="champ-preloader-logo" id="champPreloaderLogo">';
+    html += '<div class="champ-preloader-ring"></div>';
+    html += '<div class="champ-preloader-text">FINALISSIMA</div>';
+    html += '</div>';
+    html += '<div class="champ-preloader-bar"><div class="champ-preloader-fill" id="champPreloaderFill"></div></div>';
+    html += '<div class="champ-preloader-status" id="champPreloaderStatus">جاري التحضير...</div>';
+    html += '</div>';
+
+    /* Intro Overlay */
+    html += '<div class="champ-intro-overlay" id="champIntroOverlay" style="display:none;">';
+    html += '<div class="champ-intro-text" id="champIntroText"></div>';
+    html += '</div>';
+
+    /* Main Content */
+    html += '<div class="champ-main-content" id="champMainContent" style="opacity:0;">';
+
+    /* Title */
+    html += '<div class="champ-draw-header" id="champDrawHeader">';
+    html += '<div class="champ-draw-title" id="champDrawTitle">قرعة كأس أبطال الفيناليغ</div>';
+    html += '</div>';
+
+    /* Trophy */
+    html += '<div class="champ-trophy-stage" id="champTrophyStage">';
+    html += '<div class="champ-trophy-glow"></div>';
+    html += '<div class="champ-trophy" id="champTrophy">';
+    html += '<i class="ph-fill ph-trophy"></i>';
+    html += '</div>';
+    html += '</div>';
+
+    /* Pots */
+    html += '<div class="champ-pots-stage" id="champPotsStage">';
+    pots.forEach(function(potTeams, potIdx) {
+        const potNum = potIdx + 1;
+
+        html += '<div class="champ-pot-row" data-pot="' + potNum + '" id="champPotRow' + potNum + '">';
+        html += '<div class="champ-pot-label">POT ' + potNum + '</div>';
+        html += '<div class="champ-pot-teams">';
+
+        potTeams.forEach(function(teamCode) {
+            const teamName = champGetTeamName(teamCode);
+            const teamLogo = champGetTeamLogo(teamCode);
+
+            html += '<div class="champ-team-card" data-team="' + teamCode + '" data-pot="' + potNum + '" id="champCard-' + teamCode + '">';
+            html += '<span class="champ-team-card-check">';
+            html += '<i class="ph-fill ph-check-circle"></i>';
+            html += '</span>';
+            if (teamLogo) {
+                html += '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">';
+            }
+            html += '<span class="champ-team-card-name">' + teamName + '</span>';
+            html += '</div>';
+        });
+
+        html += '</div></div>';
+    });
+    html += '</div>';
+
+    /* Groups */
+    html += '<div class="champ-groups-stage" id="champGroupsStage">';
+    CHAMP_GROUPS.forEach(function(g) {
+        html += '<div class="champ-group-target" id="champGroupTarget' + g + '" data-group="' + g + '">';
+        html += '<div class="champ-group-target-label">' + g + '</div>';
+        html += '<div class="champ-group-target-teams" id="champGroupTeams' + g + '"></div>';
+        html += '</div>';
+    });
+    html += '</div>';
+
+    html += '</div>';
+
+    screen.innerHTML = html;
+    document.body.appendChild(screen);
 }
+
+/* =========================================================
+   Cinematic Sequence
+========================================================= */
+
+async function champRunCinematicDraw(drawRows, pots) {
+    await champStagePreloader();
+    if (champDrawState.skipRequested) return;
+
+    await champStageIntro();
+    if (champDrawState.skipRequested) return;
+
+    await champStageTrophy();
+    if (champDrawState.skipRequested) return;
+
+    await champStagePotsEntry();
+    if (champDrawState.skipRequested) return;
+
+    champShowProgressBar();
+    champShowSkipButton();
+
+    const potGroups = {};
+    drawRows.forEach(function(row) {
+        if (!potGroups[row.pot_number]) potGroups[row.pot_number] = [];
+        potGroups[row.pot_number].push(row);
+    });
+
+    for (let potNum = 1; potNum <= 5; potNum++) {
+        if (champDrawState.skipRequested) break;
+
+        const potRows = potGroups[potNum] || [];
+        if (potRows.length === 0) continue;
+
+        champDrawState.currentPot = potNum;
+        champUpdateProgress(potNum);
+
+        await champStagePotHighlight(potNum);
+
+        for (let i = 0; i < potRows.length; i++) {
+            if (champDrawState.skipRequested) break;
+            await champStagePickTeam(potRows[i], potNum);
+        }
+
+        await champWait(300);
+    }
+
+    champHideSkipButton();
+    await champStageFinale();
+    champHideProgressBar();
+}
+
+/* =========================================================
+   STAGE 0: Preloader
+========================================================= */
+
+async function champStagePreloader() {
+    const preloader = document.getElementById('champPreloader');
+    const fill = document.getElementById('champPreloaderFill');
+    const status = document.getElementById('champPreloaderStatus');
+
+    if (!preloader) return;
+
+    const steps = [
+        { pct: 25, text: 'جاري التحميل...' },
+        { pct: 50, text: 'تحضير الفرق...' },
+        { pct: 75, text: 'تجهيز القرعة...' },
+        { pct: 100, text: 'جاهز!' }
+    ];
+
+    for (let i = 0; i < steps.length; i++) {
+        if (champDrawState.skipRequested) break;
+
+        await new Promise(function(resolve) {
+            gsap.to(fill, {
+                width: steps[i].pct + '%',
+                duration: 0.5,
+                ease: 'power2.out',
+                onComplete: resolve
+            });
+            status.textContent = steps[i].text;
+        });
+
+        await champWait(200);
+    }
+
+    await champWait(400);
+
+    await new Promise(function(resolve) {
+        gsap.to(preloader, {
+            opacity: 0,
+            duration: 0.5,
+            onComplete: function() {
+                preloader.style.display = 'none';
+                resolve();
+            }
+        });
+    });
+
+    const main = document.getElementById('champMainContent');
+    if (main) {
+        gsap.to(main, { opacity: 1, duration: 0.4 });
+    }
+}
+
+/* =========================================================
+   STAGE 1: Intro Cinematic
+========================================================= */
+
+async function champStageIntro() {
+    const overlay = document.getElementById('champIntroOverlay');
+    const textEl = document.getElementById('champIntroText');
+
+    if (!overlay || !textEl) return;
+
+    overlay.style.display = 'flex';
+
+    textEl.innerHTML = '<div class="champ-intro-line">CHAMPIONS</div>';
+    const line1 = textEl.querySelector('.champ-intro-line');
+    gsap.set(line1, { opacity: 0, y: 120, scale: 0.5, filter: 'blur(30px)' });
+
+    champPlayWhoosh(1.0);
+
+    await new Promise(function(resolve) {
+        gsap.to(line1, {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 1.2,
+            ease: 'power4.out',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(700);
+
+    await new Promise(function(resolve) {
+        gsap.to(line1, {
+            scale: 1.5,
+            opacity: 0,
+            filter: 'blur(40px)',
+            duration: 0.35,
+            ease: 'power2.in',
+            onComplete: resolve
+        });
+    });
+
+    champPlayImpact();
+
+    textEl.innerHTML = '<div class="champ-intro-line champ-intro-cup">CUP</div>';
+    const line2 = textEl.querySelector('.champ-intro-line');
+    gsap.set(line2, { opacity: 0, scale: 2.5, filter: 'blur(60px)' });
+
+    await new Promise(function(resolve) {
+        gsap.to(line2, {
+            opacity: 1,
+            scale: 1,
+            filter: 'blur(0px)',
+            duration: 0.9,
+            ease: 'power3.out',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(900);
+
+    textEl.innerHTML = 
+        '<div class="champ-intro-subline">FINALISSIMA</div>' +
+        '<div class="champ-intro-year">2026</div>';
+    const subline = textEl.querySelector('.champ-intro-subline');
+    const year = textEl.querySelector('.champ-intro-year');
+
+    gsap.set([subline, year], { opacity: 0, y: 20 });
+    gsap.to(subline, { opacity: 1, y: 0, duration: 0.6, delay: 0.1 });
+    gsap.to(year, { opacity: 1, y: 0, duration: 0.6, delay: 0.3 });
+
+    champPlayChime();
+
+    await champWait(1400);
+
+    await new Promise(function(resolve) {
+        gsap.to(overlay, {
+            opacity: 0,
+            duration: 0.7,
+            onComplete: function() {
+                overlay.style.display = 'none';
+                resolve();
+            }
+        });
+    });
+}
+
+/* =========================================================
+   STAGE 2: Trophy Reveal
+========================================================= */
+
+async function champStageTrophy() {
+    const trophy = document.getElementById('champTrophy');
+    const stage = document.getElementById('champTrophyStage');
+
+    if (!trophy || !stage) return;
+
+    gsap.set(stage, { opacity: 0, scale: 0.5 });
+    gsap.set(trophy, { rotationY: 0, scale: 0.5, y: -100 });
+
+    await new Promise(function(resolve) {
+        gsap.to(stage, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+            onComplete: resolve
+        });
+    });
+
+    champPlayWhoosh(0.8);
+
+    await new Promise(function(resolve) {
+        gsap.timeline({ onComplete: resolve })
+            .to(trophy, {
+                y: 0,
+                scale: 1,
+                duration: 0.9,
+                ease: 'bounce.out'
+            })
+            .to(trophy, {
+                rotationY: 360,
+                duration: 1.2,
+                ease: 'power2.inOut'
+            }, '-=0.4');
+    });
+
+    champPlayChime();
+    champVibrate([30, 20, 30]);
+
+    await champWait(600);
+
+    gsap.to(stage, {
+        scale: 1.05,
+        duration: 0.6,
+        yoyo: true,
+        repeat: 2,
+        ease: 'power2.inOut'
+    });
+
+    await champWait(1000);
+
+    await new Promise(function(resolve) {
+        gsap.to(stage, {
+            opacity: 0,
+            scale: 0.8,
+            duration: 0.6,
+            onComplete: function() {
+                stage.style.display = 'none';
+                resolve();
+            }
+        });
+    });
+}
+
+/* =========================================================
+   STAGE 3: Pots Entry
+========================================================= */
+
+async function champStagePotsEntry() {
+    const potRows = document.querySelectorAll('.champ-pot-row');
+    const header = document.getElementById('champDrawHeader');
+    const potsStage = document.getElementById('champPotsStage');
+    const groupsStage = document.getElementById('champGroupsStage');
+
+    gsap.set(header, { opacity: 0, y: -30 });
+    await new Promise(function(resolve) {
+        gsap.to(header, {
+            opacity: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(200);
+
+    gsap.set(potsStage, { opacity: 0 });
+    gsap.to(potsStage, { opacity: 1, duration: 0.4 });
+
+    gsap.set(potRows, { opacity: 0, x: -80 });
+
+    for (let i = 0; i < potRows.length; i++) {
+        await new Promise(function(resolve) {
+            gsap.to(potRows[i], {
+                opacity: 1,
+                x: 0,
+                duration: 0.7,
+                ease: 'power3.out',
+                onComplete: resolve
+            });
+        });
+
+        champPlayWhoosh(0.3);
+        await champWait(120);
+    }
+
+    await champWait(400);
+
+    const cards = document.querySelectorAll('.champ-team-card');
+    gsap.set(cards, { opacity: 0, scale: 0.85 });
+
+    await new Promise(function(resolve) {
+        gsap.to(cards, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            stagger: 0.04,
+            ease: 'back.out(1.4)',
+            onComplete: resolve
+        });
+    });
+
+    champPlayChime();
+
+    await champWait(300);
+
+    gsap.set(groupsStage, { opacity: 0, y: 30 });
+    await new Promise(function(resolve) {
+        gsap.to(groupsStage, {
+            opacity: 1,
+            y: 0,
+            duration: 0.7,
+            ease: 'power3.out',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(600);
+}
+
+/* =========================================================
+   STAGE 4: Pot Highlight
+========================================================= */
+
+async function champStagePotHighlight(potNum) {
+    const potRow = document.getElementById('champPotRow' + potNum);
+    if (!potRow) return;
+
+    const label = potRow.querySelector('.champ-pot-label');
+
+    await new Promise(function(resolve) {
+        gsap.timeline({ onComplete: resolve })
+            .to(potRow, {
+                boxShadow: '0 0 40px rgba(212,183,122,.6), inset 0 0 30px rgba(212,183,122,.15)',
+                duration: 0.4,
+                ease: 'power2.out'
+            })
+            .to(label, {
+                scale: 1.15,
+                color: '#F5E6D3',
+                textShadow: '0 0 20px rgba(212,183,122,1)',
+                duration: 0.3
+            }, '-=0.3');
+    });
+
+    champPlayChime();
+    await champWait(400);
+}
+
+/* =========================================================
+   STAGE 5: Pick Team
+========================================================= */
+
+async function champStagePickTeam(row, potNum) {
+    const allPotCards = document.querySelectorAll(
+        '.champ-team-card[data-pot="' + potNum + '"]:not(.selected)'
+    );
+    if (allPotCards.length === 0) return;
+
+    /* PHASE 1: Roulette Spin */
+    const spotCount = allPotCards.length;
+    const totalCycles = 3;
+
+    for (let cycle = 0; cycle < totalCycles; cycle++) {
+        for (let i = 0; i < spotCount; i++) {
+            if (champDrawState.skipRequested) return;
+
+            gsap.to(allPotCards, {
+                borderColor: 'rgba(212,183,122,.5)',
+                boxShadow: '0 0 0 rgba(212,183,122,0)',
+                scale: 1,
+                duration: 0.08
+            });
+
+            gsap.to(allPotCards[i], {
+                borderColor: '#F5E6D3',
+                boxShadow: '0 0 30px rgba(212,183,122,1), 0 0 60px rgba(212,183,122,.6), inset 0 0 20px rgba(212,183,122,.2)',
+                scale: 1.04,
+                duration: 0.12
+            });
+
+            champPlayTick();
+
+            let waitTime = 120;
+
+            if (cycle === 0) {
+                waitTime = 220 - (i * 15);
+                if (waitTime < 80) waitTime = 80;
+            } else if (cycle === totalCycles - 1) {
+                waitTime = 80 + (i * 15);
+                if (waitTime > 220) waitTime = 220;
+            }
+
+            await champWait(waitTime);
+        }
+    }
+
+    /* Final Slow Spin */
+    for (let i = 0; i < spotCount; i++) {
+        if (champDrawState.skipRequested) return;
+
+        gsap.to(allPotCards, {
+            borderColor: 'rgba(212,183,122,.5)',
+            boxShadow: '0 0 0 rgba(212,183,122,0)',
+            scale: 1,
+            duration: 0.1
+        });
+
+        gsap.to(allPotCards[i], {
+            borderColor: '#F5E6D3',
+            boxShadow: '0 0 35px rgba(212,183,122,1), 0 0 70px rgba(212,183,122,.7), inset 0 0 25px rgba(212,183,122,.25)',
+            scale: 1.05,
+            duration: 0.15
+        });
+
+        champPlayTick();
+
+        await champWait(250);
+    }
+
+    /* PHASE 2: Selection Lock */
+    const targetCard = document.querySelector(
+        '.champ-team-card[data-team="' + row.team + '"]'
+    );
+    if (!targetCard) return;
+
+    gsap.to(allPotCards, {
+        borderColor: 'rgba(212,183,122,.3)',
+        boxShadow: '0 0 0 rgba(212,183,122,0)',
+        scale: 1,
+        duration: 0.2
+    });
+
+    await champWait(200);
+
+    gsap.to(targetCard, {
+        borderColor: '#F5E6D3',
+        boxShadow: '0 0 50px rgba(212,183,122,1), 0 0 100px rgba(212,183,122,.8), inset 0 0 30px rgba(212,183,122,.3)',
+        scale: 1.1,
+        duration: 0.4,
+        ease: 'power2.out'
+    });
+
+    champPlayChime();
+    champVibrate([20, 10, 20]);
+
+    await champWait(600);
+
+    champFlashScreen();
+
+    await champWait(300);
+
+    /* PHASE 3: Prepare Flight */
+    const teamName = champGetTeamName(row.team);
+    const teamLogo = champGetTeamLogo(row.team);
+
+    const cardRect = targetCard.getBoundingClientRect();
+    const groupTarget = document.getElementById('champGroupTarget' + row.group_name);
+    const groupTeamsEl = document.getElementById('champGroupTeams' + row.group_name);
+
+    if (!groupTarget || !groupTeamsEl) return;
+
+    const groupRect = groupTarget.getBoundingClientRect();
+
+    const startX = cardRect.left + cardRect.width / 2;
+    const startY = cardRect.top + cardRect.height / 2;
+    const endX = groupRect.left + groupRect.width / 2;
+    const endY = groupRect.top + groupRect.height / 2;
+
+    /* PHASE 4: Flyer */
+    const flyer = document.createElement('div');
+    flyer.className = 'champ-flyer';
+    flyer.id = 'champFlyer';
+    flyer.innerHTML =
+        (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
+        '<span>' + teamName + '</span>';
+
+    flyer.style.position = 'fixed';
+    flyer.style.left = '0';
+    flyer.style.top = '0';
+    flyer.style.zIndex = '9999999';
+    flyer.style.pointerEvents = 'none';
+    flyer.style.transform = 'translate(' + (startX - 80) + 'px, ' + (startY - 35) + 'px) scale(0.2)';
+    flyer.style.opacity = '0';
+
+    document.body.appendChild(flyer);
+
+    const cardImg = targetCard.querySelector('img');
+    const cardName = targetCard.querySelector('.champ-team-card-name');
+
+    if (cardImg) {
+        gsap.to(cardImg, { opacity: 0.3, scale: 0.8, duration: 0.4 });
+    }
+    if (cardName) {
+        gsap.to(cardName, { opacity: 0.3, duration: 0.4 });
+    }
+
+    await new Promise(function(resolve) {
+        gsap.to(flyer, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.6,
+            ease: 'back.out(1.7)',
+            onComplete: resolve
+        });
+    });
+
+    champPlayWhoosh(0.5);
+
+    await champWait(200);
+
+    /* PHASE 5: Flight */
+    await champAnimateFlight(flyer, startX, startY, endX, endY, cardRect);
+
+    /* PHASE 6: Impact */
+    flyer.remove();
+    champPlayImpact();
+    champVibrate([40, 20, 40]);
+
+    champScreenShake();
+
+    champSpawnShockwave(endX, endY, 0);
+    champSpawnShockwave(endX, endY, 100);
+    champSpawnShockwave(endX, endY, 200);
+
+    champSpawnBurst(endX, endY, 40);
+
+    gsap.timeline()
+        .to(groupTarget, {
+            scale: 1.18,
+            boxShadow: '0 0 80px rgba(212,183,122,1), inset 0 0 40px rgba(212,183,122,.5)',
+            borderColor: '#D4B77A',
+            duration: 0.3,
+            ease: 'power2.out'
+        })
+        .to(groupTarget, {
+            scale: 1,
+            duration: 0.7,
+            ease: 'elastic.out(1, 0.4)'
+        })
+        .to(groupTarget, {
+            boxShadow: '0 0 0 rgba(212,183,122,0)',
+            borderColor: 'rgba(212,183,122,0.4)',
+            duration: 0.5
+        }, '-=0.4');
+
+    /* PHASE 7: Add Team */
+    const teamHtml =
+        '<div class="champ-group-team-item">' +
+            (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
+            '<span>' + teamName + '</span>' +
+        '</div>';
+    groupTeamsEl.insertAdjacentHTML('beforeend', teamHtml);
+
+    const newTeam = groupTeamsEl.lastElementChild;
+    gsap.fromTo(newTeam,
+        { opacity: 0, scale: 0.4, y: -30 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(2)' }
+    );
+
+    /* PHASE 8: Mark Selected */
+    await new Promise(function(resolve) {
+        gsap.to(targetCard, {
+            background: 'rgba(20,10,12,.55)',
+            borderColor: 'rgba(212,183,122,.15)',
+            boxShadow: '0 0 0 rgba(212,183,122,0)',
+            opacity: 0.45,
+            scale: 1,
+            duration: 0.5,
+            onComplete: function() {
+                targetCard.classList.add('selected');
+                resolve();
+            }
+        });
+    });
+
+    if (cardImg) {
+        gsap.to(cardImg, { filter: 'grayscale(0.7) brightness(0.6)', duration: 0.5 });
+    }
+    if (cardName) {
+        gsap.to(cardName, { color: 'rgba(250,246,240,.3)', duration: 0.5 });
+    }
+
+    const checkEl = targetCard.querySelector('.champ-team-card-check');
+    if (checkEl) {
+        gsap.to(checkEl, {
+            opacity: 1,
+            scale: 1,
+            duration: 0.5,
+            ease: 'back.out(2)'
+        });
+
+        setTimeout(function() {
+            const checkI = checkEl.querySelector('i');
+            if (checkI) {
+                gsap.fromTo(checkI,
+                    { filter: 'drop-shadow(0 0 0 rgba(212,183,122,0))' },
+                    {
+                        filter: 'drop-shadow(0 0 20px rgba(212,183,122,1))',
+                        duration: 0.5,
+                        yoyo: true,
+                        repeat: 2
+                    }
+                );
+            }
+        }, 300);
+    }
+
+    await champWait(500);
+}
+
+/* =========================================================
+   Flight Animation
+========================================================= */
+
+async function champAnimateFlight(flyer, startX, startY, endX, endY, cardRect) {
+    return new Promise(function(resolve) {
+        const duration = 1.6;
+        const startTime = performance.now();
+        const midX = (startX + endX) / 2;
+        const midY = Math.min(startY, endY) - 220;
+
+        let lastTrailTime = 0;
+        let rotation = 0;
+
+        function animate(now) {
+            if (champDrawState.skipRequested) {
+                flyer.style.transform = 'translate(' + (endX - 80) + 'px, ' + (endY - 35) + 'px) scale(1)';
+                resolve();
+                return;
+            }
+
+            const elapsed = now - startTime;
+            const t = Math.min(elapsed / duration, 1);
+
+            const eased = t < 0.5
+                ? 4 * t * t * t
+                : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+            const mt = 1 - eased;
+            let x = mt*mt*mt*startX
+                  + 3*mt*mt*eased*midX
+                  + 3*mt*eased*eased*midX
+                  + eased*eased*eased*endX;
+
+            let y = mt*mt*mt*startY
+                  + 3*mt*mt*eased*midY
+                  + 3*mt*eased*eased*midY
+                  + eased*eased*eased*endY;
+
+            const spiralStrength = Math.sin(eased * Math.PI) * 30;
+            const spiralPhase = eased * Math.PI * 6;
+            x += Math.cos(spiralPhase) * spiralStrength * 0.4;
+            y += Math.sin(spiralPhase) * spiralStrength * 0.3;
+
+            const scale = 1 + Math.sin(eased * Math.PI) * 0.5;
+            rotation += 25;
+            const brightness = 1.3 + Math.sin(eased * Math.PI * 3) * 0.4;
+
+            flyer.style.transform =
+                'translate(' + (x - 80) + 'px, ' + (y - 35) + 'px) ' +
+                'rotate(' + rotation + 'deg) ' +
+                'scale(' + scale + ')';
+
+            flyer.style.filter = 'brightness(' + brightness + ') drop-shadow(0 0 20px rgba(212,183,122,.8))';
+
+            if (now - lastTrailTime > 18) {
+                lastTrailTime = now;
+                champSpawnTrail(x, y);
+            }
+
+            if (t < 1) {
+                requestAnimationFrame(animate);
+            } else {
+                resolve();
+            }
+        }
+
+        requestAnimationFrame(animate);
+    });
+}
+
+/* =========================================================
+   Screen Shake
+========================================================= */
+
+function champScreenShake() {
+    const screen = document.getElementById('champDrawScreen');
+    if (!screen) return;
+
+    const tl = gsap.timeline();
+
+    for (let i = 0; i < 5; i++) {
+        const x = (Math.random() - 0.5) * 12;
+        const y = (Math.random() - 0.5) * 12;
+        const rot = (Math.random() - 0.5) * 0.6;
+
+        tl.to(screen, {
+            x: x,
+            y: y,
+            rotation: rot,
+            duration: 0.04
+        });
+    }
+
+    tl.to(screen, {
+        x: 0,
+        y: 0,
+        rotation: 0,
+        duration: 0.15,
+        ease: 'power2.out'
+    });
+}
+
+function champFlashScreen() {
+    const flash = document.createElement('div');
+    flash.className = 'champ-screen-flash';
+    document.body.appendChild(flash);
+
+    gsap.fromTo(flash,
+        { opacity: 0.85 },
+        {
+            opacity: 0,
+            duration: 0.5,
+            ease: 'power2.out',
+            onComplete: function() {
+                flash.remove();
+            }
+        }
+    );
+}
+
+/* =========================================================
+   Spawn Effects
+========================================================= */
+
+function champSpawnTrail(x, y) {
+    const p = document.createElement('div');
+    p.className = 'champ-trail-particle';
+    p.style.left = x + 'px';
+    p.style.top = y + 'px';
+
+    const hue = Math.random() * 20 + 30;
+    p.style.filter = 'hue-rotate(' + hue + 'deg)';
+
+    document.body.appendChild(p);
+
+    gsap.fromTo(p,
+        { opacity: 1, scale: 1.3 },
+        {
+            opacity: 0,
+            scale: 0.1,
+            duration: 0.7,
+            ease: 'power2.out',
+            onComplete: function() { p.remove(); }
+        }
+    );
+}
+
+function champSpawnShockwave(x, y, delay) {
+    setTimeout(function() {
+        const w = document.createElement('div');
+        w.className = 'champ-shockwave';
+        w.style.left = x + 'px';
+        w.style.top = y + 'px';
+        document.body.appendChild(w);
+
+        gsap.fromTo(w,
+            { opacity: 0.9, scale: 0 },
+            {
+                opacity: 0,
+                scale: 5,
+                duration: 1.1,
+                ease: 'power2.out',
+                onComplete: function() { w.remove(); }
+            }
+        );
+    }, delay);
+}
+
+function champSpawnBurst(x, y, count) {
+    for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'champ-burst-particle';
+        p.style.left = x + 'px';
+        p.style.top = y + 'px';
+        document.body.appendChild(p);
+
+        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.4;
+        const distance = 80 + Math.random() * 180;
+        const duration = 0.9 + Math.random() * 0.6;
+
+        gsap.fromTo(p,
+            { opacity: 1, scale: 1, x: 0, y: 0 },
+            {
+                opacity: 0,
+                scale: 0.2,
+                x: Math.cos(angle) * distance,
+                y: Math.sin(angle) * distance,
+                duration: duration,
+                ease: 'power2.out',
+                onComplete: function() { p.remove(); }
+            }
+        );
+    }
+}
+
+/* =========================================================
+   STAGE 10: Finale
+========================================================= */
+
+async function champStageFinale() {
+    champSpawnConfetti(120);
+    champPlaySuccess();
+    champVibrate([100, 50, 100]);
+
+    const titleEl = document.getElementById('champDrawTitle');
+    if (titleEl) {
+        await new Promise(function(resolve) {
+            gsap.to(titleEl, {
+                opacity: 0,
+                y: -20,
+                duration: 0.4,
+                onComplete: resolve
+            });
+        });
+
+        titleEl.textContent = 'اكتملت القرعة ✨';
+
+        await new Promise(function(resolve) {
+            gsap.fromTo(titleEl,
+                { opacity: 0, y: 20, scale: 0.8 },
+                {
+                    opacity: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.7,
+                    ease: 'back.out(1.7)',
+                    onComplete: resolve
+                }
+            );
+        });
+    }
+
+    setTimeout(function() {
+        if (titleEl) {
+            gsap.fromTo(titleEl,
+                { textShadow: '0 0 20px rgba(212,183,122,.6)' },
+                {
+                    textShadow: '0 0 40px rgba(212,183,122,1), 0 0 80px rgba(212,183,122,.6)',
+                    duration: 0.6,
+                    yoyo: true,
+                    repeat: 3
+                }
+            );
+        }
+    }, 400);
+
+    await champWait(800);
+
+    champSpawnConfetti(80);
+    await champWait(600);
+
+    champSpawnConfetti(60);
+    await champWait(1000);
+
+    champShowDrawButtons();
+}
+
+/* =========================================================
+   Draw Buttons
+========================================================= */
+
+function champShowDrawButtons() {
+    if (!champIsAdmin()) return;
+
+    const old = document.getElementById('champDrawActions');
+    if (old) return;
+
+    const groupsStage = document.getElementById('champGroupsStage');
+    if (!groupsStage) return;
+
+    const actions = document.createElement('div');
+    actions.className = 'champ-draw-actions';
+    actions.id = 'champDrawActions';
+
+    actions.innerHTML =
+        '<button class="champ-btn-save" id="champBtnSave" onclick="champSaveAndClose()">' +
+            champXIcon('floppy-disk', 'fill') + ' <span>حفظ القرعة</span>' +
+        '</button>' +
+        '<button class="champ-btn-reset" id="champBtnReset" onclick="champResetFromDraw()">' +
+            champXIcon('arrows-clockwise', 'bold') + ' <span>إعادة القرعة</span>' +
+        '</button>';
+
+    groupsStage.parentElement.appendChild(actions);
+
+    gsap.fromTo(actions,
+        { opacity: 0, y: 40, scale: 0.9 },
+        {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.7,
+            ease: 'back.out(1.5)',
+            delay: 0.2
+        }
+    );
+}
+
+/* =========================================================
+   Save & Close
+========================================================= */
+
+wasync function champSaveAndClose() {
+    if (!champIsAdmin()) return;
+
+    const saveBtn = document.getElementById('champBtnSave');
+    if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = champXIcon('hourglass', 'bold') + ' <span>جاري الحفظ...</span>';
+    }
+
+    const drawRows = champData.pendingDraw || [];
+
+    if (drawRows.length === 0) {
+        if (typeof showToast === 'function') showToast('لا توجد قرعة للحفظ', false);
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = champXIcon('floppy-disk', 'fill') + ' <span>حفظ القرعة</span>';
+        }
+        return;
+    }
+
+    try {
+        await champSaveDraw(drawRows);
+        champData.pendingDraw = null;
+
+        const startGw = (typeof currentRound !== 'undefined' ? currentRound : 1) + 1;
+
+        await saveChampionsMeta({
+            started: true,
+            start_g: startGw,
+            current_stage: 'groups',
+            current_round: 1
+        });
+
+        if (typeof showToast === 'function') {
+            showToast('تم حفظ القرعة — بدأ دور المجموعات ✅', true, 3000);
+        }
+
+        champPlaySuccess();
+
+        const screen = document.getElementById('champDrawScreen');
+        if (screen) {
+            gsap.to(screen, {
+                opacity: 0,
+                duration: 0.5,
+                onComplete: function() {
+                    screen.remove();
+                    champLoaded = false;
+                    loadChampions();
+                }
+            });
+        }
+
+    } catch (err) {
+        console.error('[Champ] Save error:', err);
+        if (typeof showToast === 'function') showToast('فشل الحفظ', false);
+
+        if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = champXIcon('floppy-disk', 'fill') + ' <span>حفظ القرعة</span>';
+        }
+    }
+}
+
+function champResetFromDraw() {
+    if (!champIsAdmin()) return;
+
+    if (!confirm('هل أنت متأكد؟ سيتم حذف القرعة الحالية والبدء من جديد.')) return;
+
+    const screen = document.getElementById('champDrawScreen');
+    if (screen) {
+        gsap.to(screen, {
+            opacity: 0,
+            duration: 0.4,
+            onComplete: function() {
+                screen.remove();
+                champData.pendingDraw = null;
+                champHideSkipButton();
+                champHideProgressBar();
+
+                setTimeout(function() {
+                    champPerformDraw();
+                }, 300);
+            }
+        });
+    }
+}
+
+window.champSaveAndClose = champSaveAndClose;
+window.champResetFromDraw = champResetFromDraw;
+
+/* =========================================================
+   Confetti
+========================================================= */
+
+function champSpawnConfetti(count) {
+    const colors = [
+        '#D4B77A',
+        '#F5E6D3',
+        '#8B1A2F',
+        '#4A0A15',
+        '#FAF6F0',
+        '#E5D4A5'
+    ];
+
+    for (let i = 0; i < count; i++) {
+        const c = document.createElement('div');
+        c.className = 'champ-confetti';
+
+        c.style.left = Math.random() * 100 + '%';
+        c.style.top = '-20px';
+        c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+
+        const size = 6 + Math.random() * 10;
+        c.style.width = size + 'px';
+        c.style.height = size + 'px';
+
+        if (Math.random() > 0.6) {
+            c.style.borderRadius = '50%';
+        } else if (Math.random() > 0.5) {
+            c.style.borderRadius = '2px';
+            c.style.width = (size * 0.5) + 'px';
+            c.style.height = (size * 1.5) + 'px';
+        } else {
+            c.style.borderRadius = '50% 0 50% 0';
+        }
+
+        c.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
+
+        document.body.appendChild(c);
+
+        const duration = 3 + Math.random() * 2.5;
+        const xDrift = (Math.random() - 0.5) * 300;
+        const rotationEnd = Math.random() * 1440 - 720;
+
+        gsap.to(c, {
+            y: window.innerHeight + 60,
+            x: xDrift,
+            rotation: rotationEnd,
+            opacity: 0.3,
+            duration: duration,
+            delay: Math.random() * 1.5,
+            ease: 'power1.in',
+            onComplete: function() {
+                c.remove();
+            }
+        });
+
+        if (Math.random() > 0.7) {
+            gsap.fromTo(c,
+                { scale: 0 },
+                {
+                    scale: 1,
+                    duration: 0.3,
+                    ease: 'back.out(2)'
+                }
+            );
+        }
+    }
+}
+
+/* =========================================================
+   Cleanup
+========================================================= */
+
+function champCleanup() {
+    const elementsToRemove = [
+        'champSkipBtn',
+        'champProgressBar',
+        'champFlyer'
+    ];
+
+    elementsToRemove.forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    });
+
+    document.querySelectorAll('.champ-trail-particle, .champ-shockwave, .champ-burst-particle, .champ-confetti, .champ-screen-flash, .champ-flash').forEach(function(el) {
+        el.remove();
+    });
+
+    champDrawState.~playing = false;
+    champDrawState.skipRequested = false;
+    champDrawState.currentPot = 0;
+}
+
+window.champCleanup = champCleanup;
+
+/* =========================================================
+   Safety Timeout
+========================================================= */
+
+function champStartSafetyTimeout() {
+    setTimeout(function() {
+        if (champDrawState.playing) {
+            console.warn('[Champ] Safety timeout');
+            champCleanup();
+            if (typeof showToast === 'function') {
+                showToast('انتهى الوقت المسموح', false, 3000);
+            }
+        }
+    }, 8 * 60 * 1000);
+}
+
+/* =========================================================
+   Main Entry Override
+========================================================= */
+
+const champPerformDrawOld = champPerformDraw;
+
+window.champPerformDraw = function() {
+    champStartSafetyTimeout();
+    champPerformDrawOld();
+};
+
+/* =========================================================
+   Window Exports
+========================================================= */
+
+window.champIsAdmin = champIsAdmin;
+window.champInitAudio = champInitAudio;
+window.champPlayWhoosh = champPlayWhoosh;
+window.champPlayChime = champPlayChime;
+window.champPlayImpact = champPlayImpact;
+window.champPlayCheer = champPlayCheer;
+window.champPlaySuccess = champPlaySuccess;
+window.champSpawnConfetti = champSpawnConfetti;
+
+/* =========================================================
+   Init Log
+========================================================= */
+
+console.log('%c[Champions Draw] v=5 WORLD-CLASS ✨',
+    'background: linear-gradient(135deg, #D4B77A, #8B1A2F); color: #fff; padding: 4px 12px; border-radius: 4px; font-weight: bold;');
+console.log('[Champ] Components: Audio ✓ | Particles ✓ | Preloader ✓ | Cinematic ✓');
