@@ -1,6 +1,6 @@
 /* =========================================================
-   champions-draw.css — FINALISSIMA LEAGUE CHAT (v=4)
-   ✨ Pots أفقي + مجموعات عمودية
+   champions-draw.css — FINALISSIMA LEAGUE CHAT (v=5)
+   🎬 WORLD-CLASS CINEMATIC DRAW
 ========================================================= */
 
 /* ═══════════════════════════════════════════════════════
@@ -11,10 +11,11 @@
     position:fixed;
     inset:0;
     z-index:999999;
-    background:radial-gradient(ellipse at center,
-        rgba(139,26,47,0.20) 0%,
-        rgba(74,10,21,0.10) 40%,
-        #0A0A0A 80%);
+    background:
+        radial-gradient(ellipse at center,
+            rgba(139,26,47,0.18) 0%,
+            rgba(74,10,21,0.10) 40%,
+            #0A0A0A 75%);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -24,6 +25,8 @@
     overflow-x:hidden;
     animation:champDrawFadeIn .6s ease;
     direction:rtl;
+    font-family:'Cairo', 'Tajawal', sans-serif;
+    will-change:transform;
 }
 
 @keyframes champDrawFadeIn{
@@ -31,7 +34,236 @@
     to{opacity:1;}
 }
 
-/* ═══ TITLE ═══ */
+/* ═══════════════════════════════════════════════════════
+   2) BACKGROUND CANVAS
+   ═══════════════════════════════════════════════════════ */
+
+.champ-bg-canvas{
+    position:fixed;
+    inset:0;
+    z-index:1;
+    pointer-events:none;
+    opacity:0.7;
+}
+
+/* ═══════════════════════════════════════════════════════
+   3) PRELOADER
+   ═══════════════════════════════════════════════════════ */
+
+.champ-preloader{
+    position:fixed;
+    inset:0;
+    z-index:9999999;
+    background:#0A0A0A;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:40px;
+    padding:30px;
+}
+
+.champ-preloader-logo{
+    position:relative;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    width:180px;
+    height:180px;
+}
+
+.champ-preloader-ring{
+    position:absolute;
+    inset:0;
+    border:3px solid transparent;
+    border-top-color:#D4B77A;
+    border-right-color:rgba(212,183,122,.5);
+    border-radius:50%;
+    animation:champPreloaderSpin 1.5s linear infinite;
+    box-shadow:
+        0 0 40px rgba(212,183,122,.5),
+        inset 0 0 30px rgba(212,183,122,.2);
+}
+
+.champ-preloader-ring::before{
+    content:'';
+    position:absolute;
+    inset:12px;
+    border:2px solid transparent;
+    border-bottom-color:rgba(139,26,47,.8);
+    border-left-color:rgba(139,26,47,.4);
+    border-radius:50%;
+    animation:champPreloaderSpin 2s linear infinite reverse;
+}
+
+@keyframes champPreloaderSpin{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+
+.champ-preloader-text{
+    font-size:20px;
+    font-weight:900;
+    color:#D4B77A;
+    letter-spacing:4px;
+    text-transform:uppercase;
+    text-shadow:
+        0 0 20px rgba(212,183,122,.7),
+        0 0 40px rgba(212,183,122,.3);
+    animation:champPreloaderPulse 1.5s ease-in-out infinite;
+    z-index:2;
+}
+
+@keyframes champPreloaderPulse{
+    0%, 100%{opacity:0.7;transform:scale(1);}
+    50%{opacity:1;transform:scale(1.05);}
+}
+
+.champ-preloader-bar{
+    width:80%;
+    max-width:400px;
+    height:6px;
+    background:rgba(212,183,122,.15);
+    border-radius:10px;
+    overflow:hidden;
+    position:relative;
+    border:1px solid rgba(212,183,122,.3);
+}
+
+.champ-preloader-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,
+        #8B1A2F 0%,
+        #D4B77A 50%,
+        #F5E6D3 100%);
+    border-radius:10px;
+    box-shadow:
+        0 0 20px rgba(212,183,122,.8),
+        0 0 40px rgba(212,183,122,.4);
+    transition:width .5s ease;
+    position:relative;
+}
+
+.champ-preloader-fill::after{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,255,255,.4) 50%,
+        transparent 100%);
+    animation:champPreloaderShimmer 1.5s ease-in-out infinite;
+}
+
+@keyframes champPreloaderShimmer{
+    0%{transform:translateX(-100%);}
+    100%{transform:translateX(100%);}
+}
+
+.champ-preloader-status{
+    font-size:13px;
+    font-weight:800;
+    color:#D4B77A;
+    letter-spacing:2px;
+    opacity:0.8;
+    text-align:center;
+}
+
+/* ═══════════════════════════════════════════════════════
+   4) INTRO OVERLAY
+   ═══════════════════════════════════════════════════════ */
+
+.champ-intro-overlay{
+    position:fixed;
+    inset:0;
+    z-index:9999998;
+    background:radial-gradient(ellipse at center,
+        rgba(0,0,0,0.85) 0%,
+        #000 100%);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    pointer-events:none;
+}
+
+.champ-intro-text{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+    text-align:center;
+    padding:20px;
+}
+
+.champ-intro-line{
+    font-size:clamp(48px, 11vw, 120px);
+    font-weight:900;
+    letter-spacing:12px;
+    color:#D4B77A;
+    text-transform:uppercase;
+    font-family:'Cairo', 'Tajawal', sans-serif;
+    line-height:1;
+    text-shadow:
+        0 0 30px #D4B77A,
+        0 0 80px rgba(212,183,122,.6),
+        0 0 140px rgba(212,183,122,.3),
+        0 4px 30px rgba(0,0,0,.9);
+    will-change:transform, opacity, filter;
+}
+
+.champ-intro-cup{
+    color:#8B1A2F;
+    text-shadow:
+        0 0 30px #8B1A2F,
+        0 0 80px rgba(139,26,47,.8),
+        0 0 140px rgba(212,183,122,.5),
+        0 4px 30px rgba(0,0,0,.9);
+}
+
+.champ-intro-subline{
+    font-size:clamp(28px, 6vw, 56px);
+    font-weight:900;
+    letter-spacing:8px;
+    color:#D4B77A;
+    text-transform:uppercase;
+    text-shadow:
+        0 0 20px rgba(212,183,122,.8),
+        0 2px 10px rgba(0,0,0,.9);
+}
+
+.champ-intro-year{
+    font-size:clamp(36px, 8vw, 80px);
+    font-weight:900;
+    letter-spacing:6px;
+    color:#8B1A2F;
+    font-family:'Inter', sans-serif;
+    text-shadow:
+        0 0 30px rgba(139,26,47,.9),
+        0 0 60px rgba(212,183,122,.6),
+        0 4px 20px rgba(0,0,0,.9);
+}
+
+/* ═══════════════════════════════════════════════════════
+   5) MAIN CONTENT
+   ═══════════════════════════════════════════════════════ */
+
+.champ-main-content{
+    position:relative;
+    z-index:10;
+    width:100%;
+    max-width:1200px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    will-change:opacity;
+}
+
+/* ═══════════════════════════════════════════════════════
+   6) TITLE
+   ═══════════════════════════════════════════════════════ */
 
 .champ-draw-header{
     width:100%;
@@ -39,51 +271,120 @@
     padding:14px 0 22px;
     flex-shrink:0;
     position:relative;
-    z-index:10;
+    z-index:11;
 }
 
 .champ-draw-title{
-    font-size:clamp(22px, 4vw, 36px);
+    font-size:clamp(22px, 4vw, 38px);
     font-weight:900;
     color:#D4B77A;
-    letter-spacing:2px;
+    letter-spacing:3px;
     text-align:center;
     line-height:1.3;
     text-shadow:
         0 0 20px rgba(212,183,122,.6),
-        0 2px 8px rgba(0,0,0,.9);
+        0 0 40px rgba(212,183,122,.3),
+        0 2px 10px rgba(0,0,0,.9);
     font-family:'Cairo', 'Tajawal', sans-serif;
     direction:rtl;
 }
 
-/* ═══ POTS STAGE ═══ */
+/* ═══════════════════════════════════════════════════════
+   7) TROPHY STAGE
+   ═══════════════════════════════════════════════════════ */
+
+.champ-trophy-stage{
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:100%;
+    height:220px;
+    margin:10px 0 20px;
+    flex-shrink:0;
+}
+
+.champ-trophy-glow{
+    position:absolute;
+    width:300px;
+    height:300px;
+    border-radius:50%;
+    background:radial-gradient(circle,
+        rgba(212,183,122,.35) 0%,
+        rgba(212,183,122,.15) 30%,
+        transparent 70%);
+    filter:blur(20px);
+    animation:champTrophyGlowPulse 2s ease-in-out infinite;
+    pointer-events:none;
+}
+
+@keyframes champTrophyGlowPulse{
+    0%, 100%{transform:scale(1);opacity:0.7;}
+    50%{transform:scale(1.15);opacity:1;}
+}
+
+.champ-trophy{
+    position:relative;
+    z-index:2;
+    width:180px;
+    height:180px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    filter:
+        drop-shadow(0 0 30px rgba(212,183,122,.9))
+        drop-shadow(0 0 60px rgba(212,183,122,.5))
+        drop-shadow(0 10px 30px rgba(0,0,0,.8));
+    will-change:transform, filter;
+}
+
+.champ-trophy i{
+    font-size:160px;
+    background:linear-gradient(135deg,
+        #F5E6D3 0%,
+        #D4B77A 30%,
+        #8B7340 60%,
+        #D4B77A 90%);
+    -webkit-background-clip:text;
+    background-clip:text;
+    -webkit-text-fill-color:transparent;
+    color:transparent;
+}
+
+/* ═══════════════════════════════════════════════════════
+   8) POTS STAGE
+   ═══════════════════════════════════════════════════════ */
 
 .champ-pots-stage{
     width:100%;
-    max-width:1200px;
     display:flex;
     flex-direction:column;
-    gap:20px;
+    gap:18px;
     margin-bottom:30px;
     position:relative;
-    z-index:10;
+    z-index:11;
 }
 
 .champ-pot-row{
     display:flex;
     flex-direction:column;
     gap:8px;
+    padding:6px;
+    border-radius:18px;
+    transition:box-shadow .4s ease;
+    will-change:box-shadow;
 }
 
 .champ-pot-label{
-    font-size:13px;
+    font-size:14px;
     font-weight:900;
     color:#D4B77A;
-    letter-spacing:3px;
+    letter-spacing:4px;
     text-transform:uppercase;
     text-align:right;
-    padding:0 4px;
-    text-shadow:0 0 10px rgba(212,183,122,.5);
+    padding:0 8px 4px;
+    text-shadow:0 0 12px rgba(212,183,122,.5);
+    transition:color .3s ease, transform .3s ease, text-shadow .3s ease;
 }
 
 .champ-pot-teams{
@@ -93,22 +394,24 @@
     width:100%;
 }
 
-/* ═══ TEAM CARD ═══ */
+/* ═══════════════════════════════════════════════════════
+   9) TEAM CARD
+   ═══════════════════════════════════════════════════════ */
 
 .champ-team-card{
     display:flex;
     align-items:center;
-    gap:12px;
-    padding:12px 16px;
+    gap:10px;
+    padding:12px 14px;
     background:linear-gradient(135deg,
-        rgba(139,26,47,.30) 0%,
-        rgba(139,26,47,.15) 100%);
+        rgba(139,26,47,.32) 0%,
+        rgba(139,26,47,.18) 100%);
     border:1.5px solid #D4B77A;
     border-radius:16px;
     transition:all .3s ease;
     position:relative;
     overflow:hidden;
-    min-height:60px;
+    min-height:64px;
     will-change:transform, box-shadow, background, border-color, opacity;
 }
 
@@ -117,19 +420,20 @@
     position:absolute;
     inset:0;
     background:linear-gradient(135deg,
-        rgba(212,183,122,.06) 0%,
-        transparent 100%);
+        rgba(212,183,122,.08) 0%,
+        transparent 60%);
     pointer-events:none;
 }
 
 .champ-team-card img{
-    width:36px;
-    height:36px;
+    width:40px;
+    height:40px;
     object-fit:contain;
     flex-shrink:0;
-    filter:drop-shadow(0 2px 4px rgba(0,0,0,.5));
+    filter:brightness(1.1) drop-shadow(0 2px 4px rgba(0,0,0,.5));
     position:relative;
     z-index:2;
+    transition:filter .4s ease, opacity .4s ease, transform .4s ease;
 }
 
 .champ-team-card-name{
@@ -137,7 +441,7 @@
     font-size:14px;
     font-weight:900;
     color:#FAF6F0;
-    letter-spacing:0.8px;
+    letter-spacing:0.6px;
     text-transform:uppercase;
     text-align:right;
     overflow:hidden;
@@ -146,6 +450,7 @@
     text-shadow:0 2px 4px rgba(0,0,0,.7);
     position:relative;
     z-index:2;
+    transition:color .4s ease, opacity .4s ease;
 }
 
 .champ-team-card-check{
@@ -157,61 +462,57 @@
     flex-shrink:0;
     opacity:0;
     transform:scale(0);
-    transition:all .35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    position:relative;
-    z-index:2;
+    transition:all .4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position:absolute;
+    top:50%;
+    left:8px;
+    transform-origin:center;
+    margin-top:-12px;
+    z-index:3;
 }
 
 .champ-team-card-check i{
-    font-size:24px;
+    font-size:26px;
     color:#D4B77A;
-    filter:drop-shadow(0 0 8px rgba(212,183,122,.8));
+    filter:
+        drop-shadow(0 0 6px rgba(212,183,122,.9))
+        drop-shadow(0 0 12px rgba(212,183,122,.5));
 }
 
-/* ⭐ Spotlight */
-.champ-team-card.spotlight{
-    border-color:#F5E6D3;
-    box-shadow:
-        0 0 30px rgba(212,183,122,1),
-        0 0 60px rgba(212,183,122,.6),
-        inset 0 0 20px rgba(212,183,122,.2);
-    background:linear-gradient(135deg,
-        rgba(139,26,47,.55) 0%,
-        rgba(139,26,47,.30) 100%);
-    transform:scale(1.03);
-}
-
-/* ⭐ Selected (بعد الاختيار) */
 .champ-team-card.selected{
-    background:rgba(20,10,12,.6);
-    border-color:rgba(212,183,122,.2);
-    opacity:0.55;
+    background:rgba(20,10,12,.55);
+    border-color:rgba(212,183,122,.15);
+    opacity:0.45;
+    transform:scale(0.98);
 }
 
 .champ-team-card.selected img{
-    filter:grayscale(0.4) brightness(0.7);
+    filter:grayscale(0.7) brightness(0.55);
+    opacity:0.5;
 }
 
 .champ-team-card.selected .champ-team-card-name{
-    color:rgba(250,246,240,.4);
+    color:rgba(250,246,240,.3);
 }
 
 .champ-team-card.selected .champ-team-card-check{
     opacity:1;
     transform:scale(1);
+    margin-top:-12px;
 }
 
-/* ═══ GROUPS STAGE ═══ */
+/* ═══════════════════════════════════════════════════════
+   10) GROUPS STAGE
+   ═══════════════════════════════════════════════════════ */
 
 .champ-groups-stage{
     width:100%;
-    max-width:1200px;
     display:grid;
     grid-template-columns:repeat(4, 1fr);
     gap:14px;
     margin:0 auto;
     position:relative;
-    z-index:10;
+    z-index:11;
 }
 
 .champ-group-target{
@@ -221,7 +522,7 @@
     border:2px solid rgba(212,183,122,.4);
     border-radius:20px;
     padding:14px 10px;
-    min-height:240px;
+    min-height:250px;
     display:flex;
     flex-direction:column;
     transition:all .3s ease;
@@ -230,8 +531,18 @@
     overflow:hidden;
 }
 
+.champ-group-target::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:radial-gradient(ellipse at top,
+        rgba(212,183,122,.06) 0%,
+        transparent 60%);
+    pointer-events:none;
+}
+
 .champ-group-target-label{
-    font-size:20px;
+    font-size:22px;
     font-weight:900;
     color:#D4B77A;
     letter-spacing:4px;
@@ -239,7 +550,9 @@
     padding-bottom:10px;
     margin-bottom:10px;
     border-bottom:2px solid rgba(212,183,122,.3);
-    text-shadow:0 0 12px rgba(212,183,122,.5);
+    text-shadow:0 0 15px rgba(212,183,122,.6);
+    position:relative;
+    z-index:2;
 }
 
 .champ-group-target-teams{
@@ -247,19 +560,22 @@
     flex-direction:column;
     gap:6px;
     flex:1;
+    position:relative;
+    z-index:2;
 }
 
 .champ-group-team-item{
     display:flex;
     align-items:center;
     gap:8px;
-    padding:6px 10px;
+    padding:7px 10px;
     background:linear-gradient(135deg,
         rgba(212,183,122,.15) 0%,
         rgba(139,26,47,.15) 100%);
     border:1px solid rgba(212,183,122,.3);
     border-radius:10px;
     will-change:transform, opacity;
+    box-shadow:0 2px 6px rgba(0,0,0,.25);
 }
 
 .champ-group-team-item img{
@@ -267,6 +583,7 @@
     height:22px;
     object-fit:contain;
     flex-shrink:0;
+    filter:brightness(1.1);
 }
 
 .champ-group-team-item span{
@@ -274,7 +591,7 @@
     font-size:11px;
     font-weight:800;
     color:#FAF6F0;
-    letter-spacing:0.5px;
+    letter-spacing:0.4px;
     text-transform:uppercase;
     text-align:right;
     overflow:hidden;
@@ -283,7 +600,9 @@
     text-shadow:0 1px 3px rgba(0,0,0,.5);
 }
 
-/* ═══ DRAW ACTIONS ═══ */
+/* ═══════════════════════════════════════════════════════
+   11) DRAW ACTIONS
+   ═══════════════════════════════════════════════════════ */
 
 .champ-draw-actions{
     display:flex;
@@ -292,11 +611,12 @@
     align-items:center;
     width:100%;
     max-width:600px;
-    margin:24px auto 0;
+    margin:30px auto 0;
     flex-wrap:wrap;
     direction:rtl;
     position:relative;
     z-index:100;
+    padding:0 16px;
 }
 
 .champ-btn-save,
@@ -307,9 +627,9 @@
     align-items:center;
     justify-content:center;
     gap:8px;
-    padding:14px 24px;
+    padding:14px 26px;
     border-radius:50px;
-    font-size:13px;
+    font-size:14px;
     font-weight:900;
     letter-spacing:1px;
     cursor:pointer;
@@ -317,18 +637,44 @@
     transition:all .3s ease;
     border:2px solid transparent;
     min-width:160px;
+    position:relative;
+    overflow:hidden;
+}
+
+.champ-btn-save::before,
+.champ-btn-reset::before{
+    content:'';
+    position:absolute;
+    top:0;
+    left:-100%;
+    width:100%;
+    height:100%;
+    background:linear-gradient(90deg,
+        transparent 0%,
+        rgba(255,255,255,.25) 50%,
+        transparent 100%);
+    transition:left .6s ease;
+}
+
+.champ-btn-save:hover:not(:disabled)::before,
+.champ-btn-reset:hover::before{
+    left:100%;
 }
 
 .champ-btn-save{
     background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
     color:#1A1A1A;
     border-color:#FAF6F0;
-    box-shadow:0 6px 20px rgba(212,183,122,.5);
+    box-shadow:
+        0 6px 20px rgba(212,183,122,.5),
+        inset 0 1px 0 rgba(255,255,255,.3);
 }
 
 .champ-btn-save:hover:not(:disabled){
     transform:translateY(-2px);
-    box-shadow:0 10px 28px rgba(212,183,122,.7);
+    box-shadow:
+        0 10px 28px rgba(212,183,122,.7),
+        inset 0 1px 0 rgba(255,255,255,.4);
 }
 
 .champ-btn-save:disabled{
@@ -340,12 +686,21 @@
     background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color:#FAF6F0;
     border-color:#D4B77A;
-    box-shadow:0 6px 20px rgba(139,26,47,.5);
+    box-shadow:
+        0 6px 20px rgba(139,26,47,.5),
+        inset 0 1px 0 rgba(255,255,255,.15);
 }
 
 .champ-btn-reset:hover{
     transform:translateY(-2px);
-    box-shadow:0 10px 28px rgba(139,26,47,.7);
+    box-shadow:
+        0 10px 28px rgba(139,26,47,.7),
+        inset 0 1px 0 rgba(255,255,255,.2);
+}
+
+.champ-btn-save:active:not(:disabled),
+.champ-btn-reset:active{
+    transform:translateY(0) scale(.97);
 }
 
 .champ-btn-save i,
@@ -353,82 +708,338 @@
     font-size:18px;
 }
 
-/* ═══ EFFECTS ═══ */
+/* ═══════════════════════════════════════════════════════
+   12) TRAIL PARTICLE
+   ═══════════════════════════════════════════════════════ */
 
 .champ-trail-particle{
     position:fixed;
-    width:12px;
-    height:12px;
+    width:14px;
+    height:14px;
     border-radius:50%;
     background:radial-gradient(circle,
-        #E5D4A5 0%,
+        #F5E6D3 0%,
         #D4B77A 40%,
         transparent 100%);
     pointer-events:none;
     z-index:9999998;
     transform:translate(-50%,-50%);
     box-shadow:
-        0 0 12px #D4B77A,
-        0 0 24px rgba(212,183,122,.5);
+        0 0 14px #D4B77A,
+        0 0 28px rgba(212,183,122,.6),
+        0 0 42px rgba(212,183,122,.3);
+    will-change:transform, opacity, filter;
 }
+
+/* ═══════════════════════════════════════════════════════
+   13) SHOCKWAVE
+   ═══════════════════════════════════════════════════════ */
 
 .champ-shockwave{
     position:fixed;
-    width:100px;
-    height:100px;
+    width:120px;
+    height:120px;
     border-radius:50%;
     border:4px solid #D4B77A;
     background:radial-gradient(circle,
-        rgba(212,183,122,.4) 0%,
+        rgba(212,183,122,.5) 0%,
+        rgba(212,183,122,.15) 40%,
         transparent 70%);
     pointer-events:none;
     z-index:9999998;
     transform:translate(-50%,-50%);
     box-shadow:
-        0 0 50px #D4B77A,
-        inset 0 0 40px rgba(212,183,122,.5);
+        0 0 60px #D4B77A,
+        0 0 100px rgba(212,183,122,.5),
+        inset 0 0 50px rgba(212,183,122,.6);
+    will-change:transform, opacity;
 }
 
-.champ-flash{
+/* ═══════════════════════════════════════════════════════
+   14) BURST PARTICLE
+   ═══════════════════════════════════════════════════════ */
+
+.champ-burst-particle{
+    position:fixed;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:radial-gradient(circle,
+        #F5E6D3 0%,
+        #D4B77A 50%,
+        transparent 100%);
+    pointer-events:none;
+    z-index:9999999;
+    transform:translate(-50%,-50%);
+    box-shadow:
+        0 0 15px #D4B77A,
+        0 0 30px rgba(212,183,122,.6);
+    will-change:transform, opacity;
+}
+
+/* ═══════════════════════════════════════════════════════
+   15) CONFETTI
+   ═══════════════════════════════════════════════════════ */
+
+.champ-confetti{
+    position:fixed;
+    pointer-events:none;
+    z-index:9999999;
+    will-change:transform, opacity;
+    box-shadow:0 0 8px rgba(212,183,122,.4);
+}
+
+/* ═══════════════════════════════════════════════════════
+   16) SCREEN FLASH
+   ═══════════════════════════════════════════════════════ */
+
+.champ-screen-flash{
     position:fixed;
     inset:0;
-    background:#fff;
+    background:radial-gradient(circle at center,
+        #FFFFFF 0%,
+        rgba(212,183,122,.8) 30%,
+        transparent 70%);
     pointer-events:none;
     z-index:9999999;
     opacity:0;
 }
 
-.champ-confetti{
+.champ-flash{
     position:fixed;
-    border-radius:2px;
+    inset:0;
+    background:radial-gradient(circle at center,
+        #FFFFFF 0%,
+        rgba(212,183,122,.6) 40%,
+        transparent 80%);
     pointer-events:none;
     z-index:9999999;
-    will-change:transform;
+    opacity:0;
 }
 
-/* ═══ REDUCED MOTION ═══ */
-
-@media (prefers-reduced-motion: reduce){
-    .champ-team-card.spotlight{
-        animation:none !important;
-    }
-}
-
-/* ═══ منع حفظ الصور ═══ */
-
-.champ-team-card img,
-.champ-group-team-item img{
-    -webkit-user-select:none;
-    -webkit-user-drag:none;
-    -webkit-touch-callout:none;
-    user-select:none;
-    pointer-events:none;
-}
 /* ═══════════════════════════════════════════════════════
-   MOBILE
+   17) FLYER
+   ═══════════════════════════════════════════════════════ */
+
+.champ-flyer{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    padding:14px 20px;
+    min-width:160px;
+    background:linear-gradient(135deg,
+        #8B1A2F 0%,
+        #4A0A15 100%);
+    border:3px solid #D4B77A;
+    border-radius:20px;
+    box-shadow:
+        0 0 60px rgba(212,183,122,.9),
+        0 0 120px rgba(212,183,122,.4),
+        0 20px 60px rgba(0,0,0,.8),
+        inset 0 0 30px rgba(212,183,122,.2);
+    will-change:transform, opacity, filter;
+    transform-origin:center center;
+}
+
+.champ-flyer img{
+    width:50px;
+    height:50px;
+    object-fit:contain;
+    filter:brightness(1.15) contrast(1.05);
+    flex-shrink:0;
+}
+
+.champ-flyer span{
+    font-size:12px;
+    font-weight:900;
+    color:#FAF6F0;
+    letter-spacing:1.2px;
+    text-transform:uppercase;
+    text-shadow:
+        0 0 12px rgba(212,183,122,.8),
+        0 2px 6px rgba(0,0,0,.9);
+    white-space:nowrap;
+    line-height:1.1;
+}
+
+/* ═══════════════════════════════════════════════════════
+   18) SKIP BUTTON
+   ═══════════════════════════════════════════════════════ */
+
+.champ-skip-btn{
+    position:fixed;
+    top:20px;
+    left:20px;
+    z-index:10000000;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:10px 18px;
+    background:linear-gradient(135deg,
+        rgba(139,26,47,.9) 0%,
+        rgba(74,10,21,.9) 100%);
+    color:#D4B77A;
+    border:2px solid #D4B77A;
+    border-radius:50px;
+    font-size:13px;
+    font-weight:900;
+    letter-spacing:1px;
+    cursor:pointer;
+    font-family:'Cairo', 'Tajawal', sans-serif;
+    box-shadow:
+        0 4px 16px rgba(0,0,0,.5),
+        0 0 20px rgba(212,183,122,.3);
+    transition:all .3s ease;
+    opacity:0;
+}
+
+.champ-skip-btn:hover{
+    transform:scale(1.05);
+    box-shadow:
+        0 6px 24px rgba(0,0,0,.6),
+        0 0 30px rgba(212,183,122,.6);
+}
+
+.champ-skip-btn:active{
+    transform:scale(0.95);
+}
+
+.champ-skip-btn i{
+    font-size:16px;
+}
+
+/* ═══════════════════════════════════════════════════════
+   19) PROGRESS BAR
+   ═══════════════════════════════════════════════════════ */
+
+.champ-progress-bar{
+    position:fixed;
+    top:20px;
+    right:20px;
+    z-index:10000000;
+    display:flex;
+    gap:8px;
+    align-items:center;
+    padding:10px 16px;
+    background:rgba(20,20,20,.85);
+    backdrop-filter:blur(10px);
+    -webkit-backdrop-filter:blur(10px);
+    border:1.5px solid rgba(212,183,122,.4);
+    border-radius:50px;
+    box-shadow:0 4px 16px rgba(0,0,0,.5);
+    opacity:0;
+    transition:opacity .4s ease;
+}
+
+.champ-progress-dot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    background:rgba(212,183,122,.2);
+    border:2px solid rgba(212,183,122,.4);
+    transition:all .3s ease;
+    position:relative;
+}
+
+.champ-progress-dot.active{
+    background:#D4B77A;
+    border-color:#F5E6D3;
+    transform:scale(1.4);
+    box-shadow:
+        0 0 12px rgba(212,183,122,.9),
+        0 0 24px rgba(212,183,122,.5);
+    animation:champProgressPulse 1s ease-in-out infinite;
+}
+
+.champ-progress-dot.done{
+    background:rgba(212,183,122,.7);
+    border-color:rgba(212,183,122,.9);
+}
+
+.champ-progress-dot.done::after{
+    content:'✓';
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:9px;
+    color:#0A0A0A;
+    font-weight:900;
+}
+
+@keyframes champProgressPulse{
+    0%, 100%{transform:scale(1.4);}
+    50%{transform:scale(1.6);}
+}
+
+/* ═══════════════════════════════════════════════════════
+   20) MOBILE — 768px
    ═══════════════════════════════════════════════════════ */
 
 @media(max-width:768px){
+
+    .champions-draw-screen{
+        padding:16px 12px 30px;
+    }
+
+    .champ-preloader-logo{
+        width:140px;
+        height:140px;
+    }
+
+    .champ-preloader-text{
+        font-size:16px;
+        letter-spacing:3px;
+    }
+
+    .champ-preloader-bar{
+        max-width:320px;
+    }
+
+    .champ-intro-line{
+        font-size:clamp(36px, 14vw, 80px);
+        letter-spacing:6px;
+    }
+
+    .champ-intro-subline{
+        font-size:clamp(20px, 5vw, 40px);
+        letter-spacing:4px;
+    }
+
+    .champ-intro-year{
+        font-size:clamp(28px, 7vw, 56px);
+    }
+
+    .champ-draw-title{
+        font-size:20px;
+        letter-spacing:2px;
+    }
+
+    .champ-trophy-stage{
+        height:160px;
+    }
+
+    .champ-trophy{
+        width:130px;
+        height:130px;
+    }
+
+    .champ-trophy i{
+        font-size:110px;
+    }
+
+    .champ-trophy-glow{
+        width:220px;
+        height:220px;
+    }
+
+    .champ-pots-stage{
+        gap:14px;
+        margin-bottom:22px;
+    }
 
     .champ-pot-teams{
         gap:8px;
@@ -437,18 +1048,18 @@
     .champ-team-card{
         padding:10px 12px;
         gap:8px;
-        min-height:52px;
+        min-height:54px;
         border-radius:14px;
     }
 
     .champ-team-card img{
-        width:28px;
-        height:28px;
+        width:30px;
+        height:30px;
     }
 
     .champ-team-card-name{
         font-size:11px;
-        letter-spacing:0.5px;
+        letter-spacing:0.4px;
     }
 
     .champ-team-card-check i{
@@ -456,16 +1067,16 @@
     }
 
     .champ-pot-label{
-        font-size:11px;
-        letter-spacing:2px;
+        font-size:12px;
+        letter-spacing:3px;
     }
 
     .champ-groups-stage{
-        gap:10px;
+        gap:8px;
     }
 
     .champ-group-target{
-        padding:12px 8px;
+        padding:10px 6px;
         min-height:200px;
         border-radius:16px;
     }
@@ -473,11 +1084,14 @@
     .champ-group-target-label{
         font-size:16px;
         letter-spacing:3px;
+        padding-bottom:8px;
+        margin-bottom:8px;
     }
 
     .champ-group-team-item{
         padding:5px 8px;
         gap:6px;
+        border-radius:8px;
     }
 
     .champ-group-team-item img{
@@ -489,31 +1103,132 @@
         font-size:10px;
     }
 
-    .champ-draw-title{
-        font-size:20px;
+    .champ-draw-actions{
+        gap:12px;
+        margin:22px auto 0;
     }
 
     .champ-btn-save,
     .champ-btn-reset{
-        padding:12px 18px;
+        padding:12px 20px;
         font-size:12px;
         min-width:140px;
     }
+
+    .champ-btn-save i,
+    .champ-btn-reset i{
+        font-size:16px;
+    }
+
+    .champ-skip-btn{
+        top:14px;
+        left:14px;
+        padding:8px 14px;
+        font-size:11px;
+    }
+
+    .champ-progress-bar{
+        top:14px;
+        right:14px;
+        padding:8px 12px;
+        gap:6px;
+    }
+
+    .champ-progress-dot{
+        width:11px;
+        height:11px;
+    }
+
+    .champ-flyer{
+        padding:12px 16px;
+        min-width:130px;
+    }
+
+    .champ-flyer img{
+        width:40px;
+        height:40px;
+    }
+
+    .champ-flyer span{
+        font-size:11px;
+    }
 }
+
+/* ═══════════════════════════════════════════════════════
+   21) MOBILE — 480px
+   ═══════════════════════════════════════════════════════ */
 
 @media(max-width:480px){
 
     .champions-draw-screen{
-        padding:14px 8px 30px;
+        padding:12px 8px 24px;
+    }
+
+    .champ-preloader-logo{
+        width:110px;
+        height:110px;
+    }
+
+    .champ-preloader-text{
+        font-size:13px;
+        letter-spacing:2px;
+    }
+
+    .champ-preloader-status{
+        font-size:11px;
+        letter-spacing:1px;
+    }
+
+    .champ-preloader-bar{
+        width:70%;
+        height:5px;
+    }
+
+    .champ-intro-line{
+        font-size:clamp(30px, 12vw, 60px);
+        letter-spacing:4px;
+    }
+
+    .champ-intro-subline{
+        font-size:clamp(16px, 4vw, 28px);
+        letter-spacing:3px;
+    }
+
+    .champ-intro-year{
+        font-size:clamp(24px, 6vw, 40px);
     }
 
     .champ-draw-header{
-        padding:10px 0 16px;
+        padding:10px 0 14px;
     }
 
     .champ-draw-title{
-        font-size:17px;
+        font-size:16px;
         letter-spacing:1.5px;
+    }
+
+    .champ-trophy-stage{
+        height:120px;
+        margin:6px 0 14px;
+    }
+
+    .champ-trophy{
+        width:100px;
+        height:100px;
+    }
+
+    .champ-trophy i{
+        font-size:85px;
+    }
+
+    .champ-trophy-glow{
+        width:170px;
+        height:170px;
+    }
+
+    .champ-pots-stage{
+        gap:10px;
+        margin-bottom:16px;
     }
 
     .champ-pot-teams{
@@ -524,80 +1239,73 @@
     .champ-team-card{
         padding:8px 10px;
         gap:6px;
-        min-height:46px;
+        min-height:48px;
         border-radius:12px;
     }
 
     .champ-team-card img{
-        width:24px;
-        height:24px;
+        width:26px;
+        height:26px;
     }
 
     .champ-team-card-name{
         font-size:10px;
+        letter-spacing:0.3px;
     }
 
     .champ-team-card-check{
         width:20px;
         height:20px;
+        margin-top:-10px;
     }
 
     .champ-team-card-check i{
-        font-size:18px;
+        font-size:17px;
     }
 
     .champ-pot-label{
         font-size:10px;
-        letter-spacing:1.5px;
-    }
-
-    .champ-pots-stage{
-        gap:14px;
-        margin-bottom:20px;
-    }
-
-    .champ-pot-row{
-        gap:6px;
+        letter-spacing:2px;
     }
 
     .champ-groups-stage{
         grid-template-columns:repeat(2, 1fr);
-        gap:8px;
+        gap:6px;
     }
 
     .champ-group-target{
-        padding:10px 6px;
-        min-height:170px;
-        border-radius:14px;
+        padding:8px 5px;
+        min-height:165px;
+        border-radius:12px;
     }
 
     .champ-group-target-label{
-        font-size:14px;
+        font-size:13px;
         letter-spacing:2px;
-        padding-bottom:8px;
-        margin-bottom:8px;
+        padding-bottom:6px;
+        margin-bottom:6px;
     }
 
     .champ-group-team-item{
         padding:4px 6px;
         gap:4px;
-        border-radius:8px;
+        border-radius:7px;
     }
 
     .champ-group-team-item img{
-        width:16px;
-        height:16px;
+        width:15px;
+        height:15px;
     }
 
     .champ-group-team-item span{
         font-size:8px;
-        letter-spacing:0;
     }
 
     .champ-draw-actions{
         flex-direction:column;
         gap:8px;
         margin:18px auto 0;
+        padding:0 8px;
     }
 
     .champ-btn-save,
@@ -605,16 +1313,150 @@
         width:100%;
         max-width:none;
         padding:12px 18px;
+        font-size:12px;
+    }
+
+    .champ-skip-btn{
+        top:10px;
+        left:10px;
+        padding:7px 12px;
+        font-size:10px;
+    }
+
+    .champ-skip-btn span{
+        display:none;
+    }
+
+    .champ-progress-bar{
+        top:10px;
+        right:10px;
+        padding:6px 10px;
+        gap:5px;
+    }
+
+    .champ-progress-dot{
+        width:9px;
+        height:9px;
+    }
+
+    .champ-progress-dot.done::after{
+        font-size:7px;
+    }
+
+    .champ-flyer{
+        padding:10px 14px;
+        min-width:110px;
+        gap:4px;
+    }
+
+    .champ-flyer img{
+        width:34px;
+        height:34px;
+    }
+
+    .champ-flyer span{
+        font-size:10px;
+        letter-spacing:0.8px;
+    }
+
+    .champ-trail-particle{
+        width:10px;
+        height:10px;
+    }
+
+    .champ-shockwave{
+        width:80px;
+        height:80px;
+        border-width:3px;
+    }
+
+    .champ-burst-particle{
+        width:8px;
+        height:8px;
     }
 }
 
-/* ═══ منع حفظ الصور ═══ */
+/* ═══════════════════════════════════════════════════════
+   22) iPad Landscape
+   ═══════════════════════════════════════════════════════ */
+
+@media(min-width:768px) and (max-width:1024px){
+
+    .champ-team-card{
+        min-height:60px;
+        padding:12px 14px;
+    }
+
+    .champ-team-card img{
+        width:36px;
+        height:36px;
+    }
+
+    .champ-team-card-name{
+        font-size:13px;
+    }
+
+    .champ-group-target{
+        min-height:230px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   23) REDUCED MOTION
+   ═══════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce){
+
+    .champ-preloader-ring,
+    .champ-preloader-ring::before,
+    .champ-preloader-text,
+    .champ-preloader-fill::after,
+    .champ-trophy-glow{
+        animation:none !important;
+    }
+
+    .champ-progress-dot.active{
+        animation:none !important;
+    }
+
+    .champ-skip-btn,
+    .champ-progress-bar{
+        transition:none !important;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   24) HOVER (Desktop)
+   ═══════════════════════════════════════════════════════ */
+
+@media (min-width:1024px) and (hover:hover){
+
+    .champ-team-card:hover:not(.selected){
+        border-color:#F5E6D3;
+        box-shadow:
+            0 0 30px rgba(212,183,122,.6),
+            inset 0 0 20px rgba(212,183,122,.15);
+    }
+
+    .champ-btn-save:hover:not(:disabled),
+    .champ-btn-reset:hover{
+        letter-spacing:1.5px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════════
+   25) منع حفظ الصور
+   ═══════════════════════════════════════════════════════ */
 
 .champ-team-card img,
-.champ-group-team-item img{
+.champ-group-team-item img,
+.champ-flyer img,
+.champ-banner-original img{
     -webkit-user-select:none;
     -webkit-user-drag:none;
     -webkit-touch-callout:none;
+    -moz-user-select:none;
+    -ms-user-select:none;
     user-select:none;
     pointer-events:none;
 }
