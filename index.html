@@ -23,7 +23,7 @@ document.addEventListener('touchend', function(e) {
 <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-<!-- ⭐ GSAP — للأنيميشن السينمائي -->
+<!-- GSAP — للأنيميشن السينمائي -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 
 <!-- Phosphor Icons -->
@@ -76,7 +76,6 @@ body{
     touch-action:manipulation;
 }
 
-/* ========== ERROR BOX ========== */
 #errorBox{
     display:none;
     position:fixed;
@@ -102,7 +101,6 @@ body{
     font-weight:900;font-size:16px;cursor:pointer;
 }
 
-/* ========== TOAST ========== */
 #toast{
     position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
     padding:12px 28px;border-radius:30px;
@@ -120,7 +118,6 @@ body{
 }
 @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
 
-/* ========== DOWNLOAD BUTTON ========== */
 .download-wrapper{position:relative;display:inline-block;}
 
 .download-btn{
@@ -142,7 +139,6 @@ body{
     stroke-linecap:round;stroke-linejoin:round;fill:none;
 }
 
-/* ========== SETTINGS BUTTON ========== */
 .settings-btn-inline{
     display:flex;align-items:center;justify-content:center;
     width:44px;height:38px;
@@ -155,7 +151,6 @@ body{
 .settings-btn-inline:hover{transform:scale(1.06) rotate(20deg);}
 .settings-btn-inline:active{transform:scale(0.94) rotate(0deg);}
 
-/* ========== DOWNLOAD MENU ========== */
 .download-menu{
     position:absolute;top:calc(100% + 8px);right:0;min-width:160px;
     border-radius:14px;padding:6px;z-index:9999;
@@ -172,7 +167,6 @@ body{
 .download-menu-item .q-label{flex:1;text-align:left;}
 .download-menu-item .q-scale{font-weight:900;font-size:11px;flex-shrink:0;}
 
-/* ========== HIDDEN EDIT BTN ========== */
 #hiddenEditBtn,#hiddenEditBtn2{
     display:block;width:100%;padding:8px 10px;margin:8px 0 0 0;
     background:transparent;border:none;color:rgba(31,31,31,0.15);
@@ -182,7 +176,6 @@ body{
     -webkit-tap-highlight-color:transparent;touch-action:manipulation;outline:none;
 }
 
-/* ========== ROUND SELECTOR ========== */
 .round-selector-row{
     display:flex;justify-content:center;align-items:center;gap:8px;
     margin:10px 0 2px;padding:0 8px;
@@ -194,7 +187,6 @@ body{
     background-repeat:no-repeat;background-position:right 12px center;
 }
 
-/* ========== HEADER / NAV ========== */
 .header{padding:8px 0;text-align:center;}
 .round-nav-container{display:flex;align-items:center;justify-content:center;gap:16px;flex-wrap:wrap;}
 .round-indicator{
@@ -212,7 +204,6 @@ body{
 
 .main-container{width:100%;max-width:768px;margin:0 auto;padding:0 6px;}
 
-/* ========== EDIT PANEL ========== */
 .edit-panel{
     display:flex;gap:10px;margin-bottom:12px;padding:12px;
     border-radius:16px;
@@ -224,10 +215,6 @@ body{
     display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:.5px;
     font-family:inherit;
 }
-
-/* =========================================================
-   FIXTURES TAB
-========================================================= */
 
 #captureFixtures{
     padding:0;background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
@@ -292,10 +279,6 @@ body{
     text-shadow:0 1px 3px rgba(0,0,0,.5);position:relative;z-index:2;
 }
 
-/* =========================================================
-   STANDINGS TAB
-========================================================= */
-
 #captureStandings{
     background:#fff;border-radius:16px;overflow:hidden;
     border:3px solid #fff;width:100%;position:relative;
@@ -359,10 +342,6 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 
 .tab-content{display:none}
 .tab-content.active{display:block}
-
-/* =========================================================
-   SETTINGS MODAL
-========================================================= */
 
 .settings-modal{
     display:none;
@@ -467,10 +446,6 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
 .maint-all-btn:active,
 .maint-open-btn:active{transform:scale(.97);}
 
-/* =========================================================
-   MAINTENANCE SCREEN
-========================================================= */
-
 #sectionMaintenance{
     display:none;
     position:fixed;inset:0;
@@ -503,14 +478,9 @@ tr.pos-20{background:linear-gradient(90deg, rgba(139, 26, 47, 0.40) 0%, rgba(139
     text-align:center;font-weight:bold;
 }
 
-/* Mobile */
 @media (max-width:400px){
     .text-carousel{min-height:120px;}
 }
-
-/* =========================================================
-   منع حفظ الصور
-========================================================= */
 
 img,
 .tc-shirt img,
@@ -542,7 +512,8 @@ img,
 <link rel="stylesheet" href="fpl-database.css?v=2">
 <link rel="stylesheet" href="manager-squad.css?v=2">
 <link rel="stylesheet" href="manager-hub.css?v=2">
-<link rel="stylesheet" href="champions.css?v=7">
+<link rel="stylesheet" href="champions.css?v=9">
+<link rel="stylesheet" href="champions-draw.css?v=1">
 <link rel="stylesheet" href="theme.css?v=15">
 
 </head>
@@ -834,7 +805,6 @@ img,
 
     </div>
 
-    <!-- ⭐ Champions Cup — قسم مستقل -->
     <div id="championsTab" class="tab-content">
         <div class="champions-wrapper">
             <div id="championsContent"></div>
@@ -1002,7 +972,8 @@ img,
 <script src="admin-matchweeks.js?v=4"></script>
 <script src="head-to-head.js?v=4"></script>
 <script src="countdown.js?v=2"></script>
-<script src="champions.js?v=10"></script>
+<script src="champions.js?v=11"></script>
+<script src="champions-draw.js?v=1"></script>
 
 </body>
 </html>
