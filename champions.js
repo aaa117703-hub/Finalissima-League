@@ -1,15 +1,16 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=10)
-   ========================================================= */
+   champions.js — FINALISSIMA LEAGUE CHAT (v=11)
+   المنطق الكامل + 3 Tabs (بدون أنيميشن)
+========================================================= */
 
 const CHAMP_PIN = '024680';
 const CHAMP_GROUPS = ['A', 'B', 'C', 'D'];
 const CHAMP_POT_SIZE = 4;
-const CHAMP_GROUP_SIZE = 5;
 
 let champData = { meta: null, draw: [], matches: [], pendingDraw: null };
 let champLoaded = false;
 let champDrawAnimating = false;
+let champCurrentView = 'matches'; // ⭐ 'matches' أو 'standings'
 
 /* =========================================================
    Helpers
@@ -23,6 +24,7 @@ function xIcon(name, variant) {
                          'ph';
     return '<i class="' + variantClass + ' ph-' + name + '"></i>';
 }
+window.xIcon = xIcon;
 
 function champGoToTab() {
     if (typeof switchTab === 'function') switchTab('champions');
@@ -35,6 +37,7 @@ function champGetTeamName(code) {
     }
     return code || 'Unknown';
 }
+window.champGetTeamName = champGetTeamName;
 
 function champGetTeamLogo(code) {
     if (typeof teamsMap !== 'undefined' && teamsMap[code]) {
@@ -42,10 +45,12 @@ function champGetTeamLogo(code) {
     }
     return '';
 }
+window.champGetTeamLogo = champGetTeamLogo;
 
 function champWait(ms) {
     return new Promise(function(r) { setTimeout(r, ms); });
 }
+window.champWait = champWait;
 
 function champShuffle(arr) {
     const a = arr.slice();
@@ -55,6 +60,7 @@ function champShuffle(arr) {
     }
     return a;
 }
+window.champShuffle = champShuffle;
 
 /* =========================================================
    Supabase
@@ -105,6 +111,7 @@ async function saveChampionsMeta(updates) {
         return true;
     } catch (e) { return false; }
 }
+window.saveChampionsMeta = saveChampionsMeta;
 
 async function saveChampionsDraw(rows) {
     if (!window.sbClient) return false;
@@ -113,8 +120,12 @@ async function saveChampionsDraw(rows) {
         const { error } = await window.sbClient.from('champions_draw').insert(rows);
         if (error) throw error;
         return true;
-    } catch (e) { return false; }
+    } catch (e) { 
+        console.error('[Champions] saveDraw error:', e);
+        return false; 
+    }
 }
+window.saveChampionsDraw = saveChampionsDraw;
 
 async function saveChampionsMatches(rows) {
     if (!window.sbClient) return false;
@@ -125,6 +136,7 @@ async function saveChampionsMatches(rows) {
         return true;
     } catch (e) { return false; }
 }
+window.saveChampionsMatches = saveChampionsMatches;
 
 async function updateChampionsMatch(id, updates) {
     if (!window.sbClient) return false;
@@ -212,6 +224,7 @@ async function buildPots() {
 
     return pots;
 }
+window.buildPots = buildPots;
 
 function champGenerateRandomDraw(pots) {
     const groups = { A: [], B: [], C: [], D: [] };
@@ -238,6 +251,7 @@ function champGenerateRandomDraw(pots) {
 
     return drawRows;
 }
+window.champGenerateRandomDraw = champGenerateRandomDraw;
 
 /* =========================================================
    Round Robin
@@ -293,7 +307,7 @@ function buildRoundRobin(groups) {
 
     return matches;
 }
-
+window.buildRoundRobin = buildRoundRobin;
 /* =========================================================
    Sync Results
 ========================================================= */
@@ -544,6 +558,46 @@ async function buildKnockoutStage(startGw) {
     await saveChampionsMeta({ current_stage: 'qf', current_round: 1 });
     return true;
 }
+
+/* =========================================================
+   ⭐ 3 TABS (Matches / Standings)
+========================================================= */
+
+function champSwitchView(view) {
+    champCurrentView = view;
+
+    document.querySelectorAll('.champ-view-btn').forEach(function(btn) {
+        btn.classList.toggle('active', btn.dataset.view === view);
+    });
+    document.querySelectorAll('.champ-view-panel').forEach(function(panel) {
+        panel.style.display = (panel.dataset.panel === view) ? 'block' : 'none';
+    });
+}
+window.champSwitchView = champSwitchView;
+
+/* ⭐ زر الإعدادات */
+function champShowSettingsMenu() {
+    const pin = prompt('أدخل رمز الإعدادات:');
+    if (pin === null) return;
+    if (pin !== CHAMP_PIN) { 
+        if (typeof showToast === 'function') showToast('رمز خطأ', false, 2500);
+        return; 
+    }
+
+    const choice = prompt(
+        'إعدادات البطولة:\n' +
+        '1 - إعادة القرعة\n' +
+        '2 - تحديث النتائج\n' +
+        '3 - بدء الإقصائيات\n' +
+        '0 - إلغاء'
+    );
+
+    if (choice === '1') champRequestReset();
+    else if (choice === '2') champSyncNow();
+    else if (choice === '3') champStartKnockout();
+}
+window.champShowSettingsMenu = champShowSettingsMenu;
+
 /* =========================================================
    Render Main
 ========================================================= */
@@ -588,15 +642,38 @@ function renderChampionsMain() {
         html += '</div></div>';
     }
 
-    if (draw.length > 0) {
-        html += renderGroupsSection(draw, matches, meta);
-        if (meta.started) {
-            if (meta.current_stage === 'groups') {
-                html += renderGroupsMatches(matches, meta);
-            } else {
-                html += renderKnockoutBracket(matches, meta);
-            }
+    if (draw.length > 0 && meta.started) {
+        /* ⭐ 3 Tabs */
+        html += '<div class="champ-view-tabs">';
+        html += '<button class="champ-view-btn ' + (champCurrentView === 'matches' ? 'active' : '') + '" data-view="matches" onclick="champSwitchView(\'matches\')">';
+        html += xIcon('soccer-ball', 'bold') + ' <span>المواجهات</span>';
+        html += '</button>';
+        html += '<button class="champ-view-btn ' + (champCurrentView === 'standings' ? 'active' : '') + '" data-view="standings" onclick="champSwitchView(\'standings\')">';
+        html += xIcon('chart-bar', 'bold') + ' <span>الترتيب</span>';
+        html += '</button>';
+        html += '<button class="champ-view-btn champ-view-settings" onclick="champShowSettingsMenu()" title="إعدادات البطولة">';
+        html += xIcon('gear-six', 'fill');
+        html += '</button>';
+        html += '</div>';
+
+        /* Panel 1: Matches */
+        if (meta.current_stage === 'groups') {
+            html += '<div class="champ-view-panel" data-panel="matches" style="display:' + (champCurrentView === 'matches' ? 'block' : 'none') + ';">';
+            html += renderGroupsMatches(matches, meta);
+            html += '</div>';
+        } else {
+            html += '<div class="champ-view-panel" data-panel="matches" style="display:' + (champCurrentView === 'matches' ? 'block' : 'none') + ';">';
+            html += renderKnockoutBracket(matches, meta);
+            html += '</div>';
         }
+
+        /* Panel 2: Standings */
+        html += '<div class="champ-view-panel" data-panel="standings" style="display:' + (champCurrentView === 'standings' ? 'block' : 'none') + ';">';
+        html += renderGroupsSection(draw, matches, meta);
+        html += '</div>';
+
+    } else if (draw.length > 0 && !meta.started) {
+        html += renderGroupsSection(draw, matches, meta);
     } else {
         html += '<div class="champions-empty">';
         html += xIcon('trophy', 'duotone');
@@ -607,6 +684,10 @@ function renderChampionsMain() {
     container.innerHTML = html;
     attachChampHiddenBtns();
 }
+
+/* =========================================================
+   Render Groups Section
+========================================================= */
 
 function renderGroupsSection(draw, matches, meta) {
     let html = '<div class="champions-groups-section">';
@@ -654,11 +735,13 @@ function renderGroupsSection(draw, matches, meta) {
     return html;
 }
 
+/* =========================================================
+   Render Matches (بدون GW)
+========================================================= */
+
 function renderGroupsMatches(matches, meta) {
     const groupMatches = matches.filter(function(m) { return m.stage === 'groups'; });
     if (groupMatches.length === 0) return '';
-
-    const startGw = meta.start_gw || 6;
 
     let html = '<div class="champions-round-section">';
     html += '<div class="champions-section-title">' + xIcon('soccer-ball', 'bold') + ' <span>Group Matches</span></div>';
@@ -667,14 +750,17 @@ function renderGroupsMatches(matches, meta) {
         const roundMatches = groupMatches.filter(function(m) { return m.round_num === r; });
         if (roundMatches.length === 0) continue;
 
-        const gw = startGw + (r - 1);
-        html += '<div class="champ-round-label">Round ' + r + ' <span class="champ-gw">GW' + gw + '</span></div>';
+        html += '<div class="champ-round-label">Round ' + r + '</div>';
         roundMatches.forEach(function(m) { html += renderMatchRow(m); });
     }
 
     html += '</div>';
     return html;
 }
+
+/* =========================================================
+   Render Knockout
+========================================================= */
 
 function renderKnockoutBracket(matches, meta) {
     const qfMatches = matches.filter(function(m) { return m.stage === 'qf'; });
@@ -771,615 +857,6 @@ function renderMatchRow(m) {
         '</div>' +
     '</div>';
 }
-
-/* =========================================================
-   🎬 CINEMATIC DRAW
-========================================================= */
-
-async function champPerformDraw() {
-    if (champDrawAnimating) return;
-    champDrawAnimating = true;
-
-    if (typeof gsap === 'undefined') {
-        champDrawAnimating = false;
-        if (typeof showToast === 'function') showToast('GSAP not loaded', false);
-        return;
-    }
-
-    const pots = await buildPots();
-    if (!pots) {
-        champDrawAnimating = false;
-        if (typeof showToast === 'function') showToast('Failed to build pots', false);
-        return;
-    }
-
-    const drawRows = champGenerateRandomDraw(pots);
-    champData.pendingDraw = drawRows;
-
-    champBuildDrawScreen();
-
-    await champRunCinematicDraw(drawRows, pots);
-
-    champDrawAnimating = false;
-}
-
-function champBuildDrawScreen() {
-    const old = document.getElementById('champDrawScreen');
-    if (old) old.remove();
-
-    const screen = document.createElement('div');
-    screen.className = 'champions-draw-screen';
-    screen.id = 'champDrawScreen';
-
-    let html = '';
-
-    /* Title */
-    html += '<div class="champ-draw-header" id="champDrawHeader">';
-    html += '<div class="champ-draw-title" id="champDrawTitle">قرعة كأس أبطال الفيناليغ</div>';
-    html += '</div>';
-
-    /* Banner + Cards Stage */
-    html += '<div class="champ-banner-stage" id="champBannerStage">';
-
-    /* Original Banner */
-    html += '<div class="champ-banner-original" id="champBannerOriginal">';
-    html += '<img src="./banner-fina.png" alt="Champions Cup">';
-    html += '</div>';
-
-    /* Cards (4 pieces from banner) */
-    html += '<div class="champ-cards-stage" id="champCardsStage" style="display:none;">';
-    for (let i = 0; i < 4; i++) {
-        const bgPos = (i * 33.33) + '% 0%';
-
-        html += '<div class="champ-card" id="champCard' + i + '" data-index="' + i + '">';
-        html += '<div class="champ-card-inner">';
-
-        html += '<div class="champ-card-front" ';
-        html += 'style="background-image:url(./banner-fina.png);';
-        html += 'background-size:400% 100%;';
-        html += 'background-position:' + bgPos + ';';
-        html += 'background-repeat:no-repeat;"></div>';
-
-        html += '<div class="champ-card-back">';
-        html += '<div class="champ-card-back-team" id="champCardTeam' + i + '"></div>';
-        html += '</div>';
-
-        html += '</div></div>';
-    }
-    html += '</div>';
-
-    /* Groups */
-    html += '<div class="champ-groups-stage" id="champGroupsStage">';
-    CHAMP_GROUPS.forEach(function(g) {
-        html += '<div class="champ-group-target" id="champGroupTarget' + g + '" data-group="' + g + '">';
-        html += '<div class="champ-group-target-label">' + g + '</div>';
-        html += '<div class="champ-group-target-teams" id="champGroupTeams' + g + '"></div>';
-        html += '</div>';
-    });
-    html += '</div>';
-
-    html += '</div>';
-
-    screen.innerHTML = html;
-    document.body.appendChild(screen);
-}
-
-/* =========================================================
-   🎬 Cinematic Draw Sequence
-========================================================= */
-
-async function champRunCinematicDraw(drawRows, pots) {
-    const banner = document.getElementById('champBannerOriginal');
-    const cardsStage = document.getElementById('champCardsStage');
-    const cardInners = document.querySelectorAll('.champ-card-inner');
-    const cards = document.querySelectorAll('.champ-card');
-    const header = document.getElementById('champDrawHeader');
-
-    gsap.set(header, { opacity: 0, y: -30 });
-    gsap.set(banner, { opacity: 0, scale: 0.85 });
-
-    await new Promise(function(resolve) {
-        gsap.timeline({ onComplete: resolve })
-            .to(header, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' })
-            .to(banner, { opacity: 1, scale: 1, duration: 1.4, ease: 'power3.out' }, '-=0.8');
-    });
-
-    await champWait(1200);
-
-    await new Promise(function(resolve) {
-        gsap.to(banner, {
-            opacity: 0,
-            duration: 0.4,
-            onComplete: function() {
-                banner.style.display = 'none';
-                cardsStage.style.display = 'flex';
-                resolve();
-            }
-        });
-    });
-
-    gsap.set(cards, { opacity: 0, scale: 0.9 });
-
-    await new Promise(function(resolve) {
-        gsap.to(cards, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.9,
-            stagger: 0.12,
-            ease: 'back.out(1.4)',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(800);
-
-    await new Promise(function(resolve) {
-        gsap.to(cardInners, {
-            rotationY: 180,
-            duration: 1.2,
-            stagger: 0.15,
-            ease: 'power2.inOut',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(600);
-
-    const potGroups = {};
-    drawRows.forEach(function(row) {
-        if (!potGroups[row.pot_number]) potGroups[row.pot_number] = [];
-        potGroups[row.pot_number].push(row);
-    });
-
-    for (let potNum = 1; potNum <= 5; potNum++) {
-        const potRows = potGroups[potNum] || [];
-        if (potRows.length === 0) continue;
-
-        potRows.sort(function(a, b) { return a.slot_index - b.slot_index; });
-
-        await champShowPotTeams(potNum, potRows);
-
-        for (let i = 0; i < potRows.length; i++) {
-            await champDistributeTeam(potRows[i], i);
-        }
-
-        if (potNum < 5) {
-            await champResetCardsForNextPot();
-        }
-
-        await champWait(400);
-    }
-
-    await champFinale();
-}
-
-async function champShowPotTeams(potNum, potRows) {
-    const titleEl = document.getElementById('champDrawTitle');
-    if (titleEl) {
-        titleEl.textContent = 'POT ' + potNum;
-        gsap.fromTo(titleEl,
-            { opacity: 0.5, scale: 0.9 },
-            { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }
-        );
-    }
-
-    const cardInners = document.querySelectorAll('.champ-card-inner');
-    const cards = document.querySelectorAll('.champ-card');
-
-    gsap.set(cardInners, { rotationY: 180 });
-
-    for (let i = 0; i < 4; i++) {
-        const card = cards[i];
-        const teamSlot = document.getElementById('champCardTeam' + i);
-        if (!card || !teamSlot) continue;
-
-        const row = potRows[i];
-        if (!row) continue;
-
-        const teamName = champGetTeamName(row.team);
-        const teamLogo = champGetTeamLogo(row.team);
-
-        teamSlot.innerHTML =
-            (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
-            '<span>' + teamName + '</span>';
-
-        card.dataset.team = row.team;
-        card.dataset.group = row.group_name;
-    }
-
-    await champWait(900);
-}
-
-async function champDistributeTeam(row, slotIndex) {
-    const card = document.getElementById('champCard' + slotIndex);
-    const groupTarget = document.getElementById('champGroupTarget' + row.group_name);
-    const groupTeamsEl = document.getElementById('champGroupTeams' + row.group_name);
-
-    if (!card || !groupTarget || !groupTeamsEl) return;
-
-    const allCards = document.querySelectorAll('.champ-card');
-
-    for (let cycle = 0; cycle < 3; cycle++) {
-        for (let c = 0; c < 4; c++) {
-            gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.1 });
-            gsap.to(allCards[c], {
-                boxShadow: '0 0 45px rgba(212,183,122,0.9)',
-                scale: 1.06,
-                duration: 0.13
-            });
-            await champWait(110);
-        }
-    }
-
-    gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.2 });
-    gsap.to(card, {
-        boxShadow: '0 0 70px rgba(212,183,122,1)',
-        scale: 1.18,
-        duration: 0.35,
-        ease: 'power2.out'
-    });
-
-    await champWait(550);
-
-    const teamName = champGetTeamName(row.team);
-    const teamLogo = champGetTeamLogo(row.team);
-
-    const cardRect = card.getBoundingClientRect();
-    const groupRect = groupTarget.getBoundingClientRect();
-
-    const startX = cardRect.left + cardRect.width / 2;
-    const startY = cardRect.top + cardRect.height / 2;
-    const endX = groupRect.left + groupRect.width / 2;
-    const endY = groupRect.top + groupRect.height / 2;
-
-    const led = document.createElement('div');
-    led.className = 'champ-led';
-    led.innerHTML =
-        (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
-        '<span>' + teamName + '</span>';
-    led.style.position = 'fixed';
-    led.style.left = '0';
-    led.style.top = '0';
-    led.style.zIndex = '9999999';
-    led.style.pointerEvents = 'none';
-    led.style.transform = 'translate(' + (startX - 60) + 'px, ' + (startY - 30) + 'px) scale(0.3)';
-    led.style.opacity = '0';
-    document.body.appendChild(led);
-
-    const cardTeam = card.querySelector('.champ-card-back-team');
-    if (cardTeam) {
-        gsap.to(cardTeam, {
-            opacity: 0,
-            scale: 0.5,
-            duration: 0.4
-        });
-    }
-
-    await new Promise(function(resolve) {
-        gsap.to(led, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.5,
-            ease: 'back.out(1.5)',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(300);
-
-    await new Promise(function(resolve) {
-        const duration = 1.6;
-        const startTime = performance.now();
-        const midX = (startX + endX) / 2;
-        const midY = Math.min(startY, endY) - 180;
-
-        let lastTrailTime = 0;
-
-        function animate(now) {
-            const elapsed = now - startTime;
-            const t = Math.min(elapsed / duration, 1);
-
-            const eased = t < 0.5
-                ? 4 * t * t * t
-                : 1 - Math.pow(-2 * t + 2, 3) / 2;
-
-            const mt = 1 - eased;
-            const x = mt*mt*mt*startX + 3*mt*mt*eased*midX + 3*mt*eased*eased*midX + eased*eased*eased*endX;
-            const y = mt*mt*mt*startY + 3*mt*mt*eased*midY + 3*mt*eased*eased*midY + eased*eased*eased*endY;
-
-            const sc = 1 + Math.sin(eased * Math.PI) * 0.4;
-            const rot = eased * 720;
-
-            led.style.transform =
-                'translate(' + (x - 60) + 'px, ' + (y - 30) + 'px) ' +
-                'rotate(' + rot + 'deg) scale(' + sc + ')';
-
-            if (now - lastTrailTime > 25) {
-                lastTrailTime = now;
-                champSpawnTrail(x, y);
-            }
-
-            if (t < 1) {
-                requestAnimationFrame(animate);
-            } else {
-                resolve();
-            }
-        }
-        requestAnimationFrame(animate);
-    });
-
-    led.remove();
-    champSpawnShockwave(endX, endY);
-
-    gsap.timeline()
-        .to(groupTarget, {
-            scale: 1.18,
-            boxShadow: '0 0 70px rgba(212,183,122,1), inset 0 0 40px rgba(212,183,122,0.4)',
-            borderColor: '#D4B77A',
-            duration: 0.3,
-            ease: 'power2.out'
-        })
-        .to(groupTarget, {
-            scale: 1,
-            duration: 0.6,
-            ease: 'elastic.out(1, 0.5)'
-        })
-        .to(groupTarget, {
-            boxShadow: '0 0 0 rgba(212,183,122,0)',
-            borderColor: 'rgba(212,183,122,0.5)',
-            duration: 0.5
-        }, '-=0.4');
-
-    const teamHtml =
-        '<div class="champ-group-team-item">' +
-            (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
-            '<span>' + teamName + '</span>' +
-        '</div>';
-    groupTeamsEl.insertAdjacentHTML('beforeend', teamHtml);
-
-    const newTeam = groupTeamsEl.lastElementChild;
-    gsap.fromTo(newTeam,
-        { opacity: 0, scale: 0.5, y: -20 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(1.7)' }
-    );
-
-    gsap.to(card, {
-        boxShadow: 'none',
-        scale: 1,
-        duration: 0.4
-    });
-
-    if (cardTeam) {
-        gsap.to(cardTeam, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.3
-        });
-    }
-
-    await champWait(400);
-}
-
-async function champResetCardsForNextPot() {
-    const cardInners = document.querySelectorAll('.champ-card-inner');
-    const teamSlots = document.querySelectorAll('.champ-card-back-team');
-
-    teamSlots.forEach(function(el) { el.innerHTML = ''; });
-
-    await new Promise(function(resolve) {
-        gsap.to(cardInners, {
-            rotationY: 0,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'power2.inOut',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(400);
-
-    await new Promise(function(resolve) {
-        gsap.to(cardInners, {
-            rotationY: 180,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'power2.inOut',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(300);
-}
-
-async function champFinale() {
-    champSpawnConfetti(80);
-
-    const titleEl = document.getElementById('champDrawTitle');
-    if (titleEl) {
-        gsap.to(titleEl, {
-            opacity: 0,
-            y: -20,
-            duration: 0.4,
-            onComplete: function() {
-                titleEl.textContent = 'اكتملت القرعة';
-                gsap.to(titleEl, { opacity: 1, y: 0, duration: 0.6 });
-            }
-        });
-    }
-
-    await champWait(1200);
-
-    champShowDrawButtons();
-}
-
-/* =========================================================
-   Draw Buttons — Save + Reset
-========================================================= */
-
-function champShowDrawButtons() {
-    const old = document.getElementById('champDrawActions');
-    if (old) return;
-
-    const groupsStage = document.getElementById('champGroupsStage');
-    if (!groupsStage) return;
-
-    const actions = document.createElement('div');
-    actions.className = 'champ-draw-actions';
-    actions.id = 'champDrawActions';
-
-    actions.innerHTML =
-        '<button class="champ-btn-save" id="champBtnSave" onclick="champSaveAndClose()">' +
-            xIcon('floppy-disk', 'fill') + ' <span>حفظ القرعة</span>' +
-        '</button>' +
-        '<button class="champ-btn-reset" id="champBtnReset" onclick="champResetFromDraw()">' +
-            xIcon('arrows-clockwise', 'bold') + ' <span>إعادة القرعة</span>' +
-        '</button>';
-
-    groupsStage.parentElement.appendChild(actions);
-
-    gsap.fromTo(actions,
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', delay: 0.3 }
-    );
-}
-
-/* ⭐ v=10: حفظ + تفعيل البطولة تلقائياً */
-async function champSaveAndClose() {
-    const saveBtn = document.getElementById('champBtnSave');
-    if (saveBtn) {
-        saveBtn.disabled = true;
-        saveBtn.innerHTML = xIcon('hourglass', 'bold') + ' <span>جاري الحفظ...</span>';
-    }
-
-    const drawRows = champData.pendingDraw || [];
-
-    if (drawRows.length > 0) {
-        await champSaveDraw(drawRows);
-        champData.pendingDraw = null;
-
-        /* ⭐ نفعّل البطولة تلقائياً */
-        const startGw = (typeof currentRound !== 'undefined' ? currentRound : 1) + 1;
-
-        await saveChampionsMeta({
-            started: true,
-            start_gw: startGw,
-            current_stage: 'groups',
-            current_round: 1
-        });
-
-        if (typeof showToast === 'function') {
-            showToast('تم حفظ القرعة — بدأ دور المجموعات', true, 3000);
-        }
-    }
-
-    const screen = document.getElementById('champDrawScreen');
-    if (screen) {
-        gsap.to(screen, {
-            opacity: 0,
-            duration: 0.4,
-            onComplete: function() {
-                screen.remove();
-                champLoaded = false;
-                loadChampions();
-            }
-        });
-    }
-}
-
-function champResetFromDraw() {
-    if (!confirm('هل أنت متأكد؟ سيتم حذف القرعة الحالية والبدء من جديد.')) return;
-
-    const screen = document.getElementById('champDrawScreen');
-    if (screen) {
-        gsap.to(screen, {
-            opacity: 0,
-            duration: 0.4,
-            onComplete: function() {
-                screen.remove();
-                champData.pendingDraw = null;
-
-                setTimeout(function() {
-                    champPerformDraw();
-                }, 300);
-            }
-        });
-    }
-}
-
-window.champSaveAndClose = champSaveAndClose;
-window.champResetFromDraw = champResetFromDraw;
-
-/* =========================================================
-   Effects
-========================================================= */
-
-function champSpawnTrail(x, y) {
-    const p = document.createElement('div');
-    p.className = 'champ-trail-particle';
-    p.style.left = x + 'px';
-    p.style.top = y + 'px';
-    document.body.appendChild(p);
-
-    gsap.fromTo(p,
-        { opacity: 0.9, scale: 1 },
-        { opacity: 0, scale: 0.2, duration: 0.6, onComplete: function() { p.remove(); } }
-    );
-}
-
-function champSpawnShockwave(x, y) {
-    const w = document.createElement('div');
-    w.className = 'champ-shockwave';
-    w.style.left = x + 'px';
-    w.style.top = y + 'px';
-    document.body.appendChild(w);
-
-    gsap.fromTo(w,
-        { opacity: 0.8, scale: 0 },
-        { opacity: 0, scale: 4, duration: 0.9, onComplete: function() { w.remove(); } }
-    );
-}
-
-function champSpawnConfetti(count) {
-    const colors = ['#D4B77A', '#8B1A2F', '#FAF6F0', '#2A2A2A'];
-    for (let i = 0; i < count; i++) {
-        const c = document.createElement('div');
-        c.className = 'champ-confetti';
-        c.style.left = Math.random() * 100 + '%';
-        c.style.top = '-20px';
-        c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        c.style.width = (6 + Math.random() * 8) + 'px';
-        c.style.height = (6 + Math.random() * 8) + 'px';
-        document.body.appendChild(c);
-
-        gsap.to(c, {
-            y: window.innerHeight + 40,
-            x: (Math.random() - 0.5) * 200,
-            rotation: Math.random() * 720 - 360,
-            opacity: 0,
-            duration: 3 + Math.random() * 2,
-            delay: Math.random() * 1.5,
-            ease: 'power1.in',
-            onComplete: function() { c.remove(); }
-        });
-    }
-}
-
-/* =========================================================
-   Save Draw
-========================================================= */
-
-async function champSaveDraw(drawRows) {
-    await saveChampionsDraw(drawRows);
-    champData.draw = drawRows;
-
-    const groups = { A: [], B: [], C: [], D: [] };
-    drawRows.forEach(function(r) { groups[r.group_name].push(r); });
-
-    const matches = buildRoundRobin(groups);
-    await saveChampionsMatches(matches);
-    champData.matches = matches;
-}
-
 /* =========================================================
    Start Tournament
 ========================================================= */
@@ -1407,9 +884,10 @@ async function champStartTournament() {
         if (typeof showToast === 'function') showToast('Failed to start', false);
     }
 }
+window.champStartTournament = champStartTournament;
 
 /* =========================================================
-   Admin Menu
+   Admin Menu (الزر المخفي)
 ========================================================= */
 
 function attachChampHiddenBtns() {
@@ -1461,7 +939,7 @@ function champShowAdminMenu() {
 }
 
 async function champSyncNow() {
-    if (typeof showToast === 'function') showToast('Syncing...', false);
+    if (typeof showToast === 'function') showToast('جاري التحديث...', false);
 
     const meta = champData.meta || {};
     let updated = 0;
@@ -1470,14 +948,15 @@ async function champSyncNow() {
     else updated = await syncKnockoutResults();
 
     if (updated > 0) {
-        if (typeof showToast === 'function') showToast('Updated ' + updated + ' matches', true, 2500);
+        if (typeof showToast === 'function') showToast('تم تحديث ' + updated + ' مباراة', true, 2500);
     } else {
-        if (typeof showToast === 'function') showToast('No new results', false, 2500);
+        if (typeof showToast === 'function') showToast('لا نتائج جديدة', false, 2500);
     }
 
     champLoaded = false;
     loadChampions();
 }
+window.champSyncNow = champSyncNow;
 
 async function champStartKnockout() {
     const meta = champData.meta || {};
@@ -1493,27 +972,46 @@ async function champStartKnockout() {
     const ok = await buildKnockoutStage(startGw);
 
     if (ok) {
-        if (typeof showToast === 'function') showToast('Knockout started from GW' + startGw, true, 3000);
+        if (typeof showToast === 'function') showToast('بدأ الإقصائيات من GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
     } else {
         alert('Failed to build knockout');
     }
 }
+window.champStartKnockout = champStartKnockout;
 
 function champRequestReset() {
-    if (!confirm('Reset draw and all matches?')) return;
+    if (!confirm('هل أنت متأكد؟ سيتم حذف القرعة والمباريات والبدء من جديد.')) return;
     resetChampions().then(function(ok) {
         if (ok) {
-            if (typeof showToast === 'function') showToast('Draw reset', true, 2500);
+            if (typeof showToast === 'function') showToast('تم حذف القرعة', true, 2500);
             champData = { meta: null, draw: [], matches: [], pendingDraw: null };
             champLoaded = false;
             loadChampions();
         } else {
-            if (typeof showToast === 'function') showToast('Failed', false);
+            if (typeof showToast === 'function') showToast('فشل', false);
         }
     });
 }
+window.champRequestReset = champRequestReset;
+
+/* =========================================================
+   ⭐ Save Draw (يستخدم من champions-draw.js)
+========================================================= */
+
+async function champSaveDraw(drawRows) {
+    await saveChampionsDraw(drawRows);
+    champData.draw = drawRows;
+
+    const groups = { A: [], B: [], C: [], D: [] };
+    drawRows.forEach(function(r) { groups[r.group_name].push(r); });
+
+    const matches = buildRoundRobin(groups);
+    await saveChampionsMatches(matches);
+    champData.matches = matches;
+}
+window.champSaveDraw = champSaveDraw;
 
 /* =========================================================
    Load
@@ -1550,15 +1048,25 @@ async function loadChampions() {
         container.innerHTML = '<div class="champions-empty">' + xIcon('warning-circle', 'duotone') + '<div>Load failed</div></div>';
     }
 }
-
 window.loadChampions = loadChampions;
-window.champPerformDraw = champPerformDraw;
-window.champStartTournament = champStartTournament;
-window.champRequestReset = champRequestReset;
+
+window.champLoaded = champLoaded;
+
+/* =========================================================
+   Window Export
+========================================================= */
+
+window.champGoToTab = champGoToTab;
+window.champSwitchView = champSwitchView;
+window.champShowSettingsMenu = champShowSettingsMenu;
+window.champShowAdminMenu = champShowAdminMenu;
 window.champSyncNow = champSyncNow;
 window.champStartKnockout = champStartKnockout;
-window.champShowAdminMenu = champShowAdminMenu;
-window.champGoToTab = champGoToTab;
+window.champRequestReset = champRequestReset;
+window.champStartTournament = champStartTournament;
+window.champSaveDraw = champSaveDraw;
+window.loadChampions = loadChampions;
+
 window.championsReload = function() {
     champLoaded = false;
     loadChampions();
