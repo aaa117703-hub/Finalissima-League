@@ -1,6 +1,6 @@
 /* =========================================================
-   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=3)
-   ✨ نظيف + مؤثرات بسيطة
+   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=4)
+   ✨ Pots أفقي + مجموعات عمودية
 ========================================================= */
 
 /* =========================================================
@@ -35,7 +35,7 @@ async function champPerformDrawAsync() {
         const drawRows = champGenerateRandomDraw(pots);
         champData.pendingDraw = drawRows;
 
-        champBuildDrawScreen();
+        champBuildDrawScreen(pots);
 
         await champRunCinematicDraw(drawRows, pots);
 
@@ -51,7 +51,7 @@ async function champPerformDrawAsync() {
    Build Draw Screen
 ========================================================= */
 
-function champBuildDrawScreen() {
+function champBuildDrawScreen(pots) {
     const old = document.getElementById('champDrawScreen');
     if (old) old.remove();
 
@@ -66,34 +66,35 @@ function champBuildDrawScreen() {
     html += '<div class="champ-draw-title" id="champDrawTitle">قرعة كأس أبطال الفيناليغ</div>';
     html += '</div>';
 
-    /* Banner + Cards + Groups */
-    html += '<div class="champ-banner-stage" id="champBannerStage">';
+    /* Pots */
+    html += '<div class="champ-pots-stage" id="champPotsStage">';
 
-    html += '<div class="champ-banner-original" id="champBannerOriginal">';
-    html += '<img src="./banner-fina.png" alt="Champions Cup">';
-    html += '</div>';
+    pots.forEach(function(potTeams, potIdx) {
+        const potNum = potIdx + 1;
 
-    html += '<div class="champ-cards-stage" id="champCardsStage" style="display:none;">';
-    for (let i = 0; i < 4; i++) {
-        const bgPos = (i * 33.33) + '% 0%';
+        html += '<div class="champ-pot-row" data-pot="' + potNum + '">';
+        html += '<div class="champ-pot-label">POT ' + potNum + '</div>';
+        html += '<div class="champ-pot-teams">';
 
-        html += '<div class="champ-card" id="champCard' + i + '" data-index="' + i + '">';
-        html += '<div class="champ-card-inner">';
+        potTeams.forEach(function(teamCode) {
+            const teamName = champGetTeamName(teamCode);
+            const teamLogo = champGetTeamLogo(teamCode);
 
-        html += '<div class="champ-card-front" ';
-        html += 'style="background-image:url(./banner-fina.png);';
-        html += 'background-size:400% 100%;';
-        html += 'background-position:' + bgPos + ';';
-        html += 'background-repeat:no-repeat;"></div>';
-
-        html += '<div class="champ-card-back">';
-        html += '<div class="champ-card-back-team" id="champCardTeam' + i + '"></div>';
-        html += '</div>';
+            html += '<div class="champ-team-card" data-team="' + teamCode + '" data-pot="' + potNum + '">';
+            if (teamLogo) {
+                html += '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">';
+            }
+            html += '<span class="champ-team-card-name">' + teamName + '</span>';
+            html += '<span class="champ-team-card-check"><i class="ph-fill ph-check-circle"></i></span>';
+            html += '</div>';
+        });
 
         html += '</div></div>';
-    }
+    });
+
     html += '</div>';
 
+    /* Groups */
     html += '<div class="champ-groups-stage" id="champGroupsStage">';
     CHAMP_GROUPS.forEach(function(g) {
         html += '<div class="champ-group-target" id="champGroupTarget' + g + '" data-group="' + g + '">';
@@ -101,8 +102,6 @@ function champBuildDrawScreen() {
         html += '<div class="champ-group-target-teams" id="champGroupTeams' + g + '"></div>';
         html += '</div>';
     });
-    html += '</div>';
-
     html += '</div>';
 
     screen.innerHTML = html;
@@ -114,66 +113,35 @@ function champBuildDrawScreen() {
 ========================================================= */
 
 async function champRunCinematicDraw(drawRows, pots) {
-    const banner = document.getElementById('champBannerOriginal');
-    const cardsStage = document.getElementById('champCardsStage');
-    const cardInners = document.querySelectorAll('.champ-card-inner');
-    const cards = document.querySelectorAll('.champ-card');
     const header = document.getElementById('champDrawHeader');
+    const potRows = document.querySelectorAll('.champ-pot-row');
+    const teamCards = document.querySelectorAll('.champ-team-card');
 
-    /* ⭐ المشهد 1: العنوان + البنر */
-    gsap.set(header, { opacity: 0, y: -30 });
-    gsap.set(banner, { opacity: 0, scale: 0.85 });
+    /* ⭐ المشهد 1: ظهور العنوان + البطاقات */
+    gsap.set(header, { opacity: 0, y: -20 });
+    gsap.set(potRows, { opacity: 0, y: 30 });
+    gsap.set(teamCards, { opacity: 0, scale: 0.85 });
 
     await new Promise(function(resolve) {
         gsap.timeline({ onComplete: resolve })
-            .to(header, { opacity: 1, y: 0, duration: 1.0, ease: 'power3.out' })
-            .to(banner, { opacity: 1, scale: 1, duration: 1.2, ease: 'power3.out' }, '-=0.6');
+            .to(header, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' })
+            .to(potRows, {
+                opacity: 1, y: 0,
+                duration: 0.7,
+                stagger: 0.15,
+                ease: 'power3.out'
+            }, '-=0.4')
+            .to(teamCards, {
+                opacity: 1, scale: 1,
+                duration: 0.5,
+                stagger: 0.03,
+                ease: 'back.out(1.4)'
+            }, '-=0.3');
     });
 
-    await champWait(1000);
+    await champWait(800);
 
-    /* ⭐ المشهد 2: الانقسام — اخفاء البنر */
-    await new Promise(function(resolve) {
-        gsap.to(banner, {
-            opacity: 0,
-            duration: 0.4,
-            onComplete: function() {
-                banner.style.display = 'none';
-                cardsStage.style.display = 'flex';
-                resolve();
-            }
-        });
-    });
-
-    gsap.set(cards, { opacity: 0, scale: 0.9 });
-
-    await new Promise(function(resolve) {
-        gsap.to(cards, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.9,
-            stagger: 0.12,
-            ease: 'back.out(1.4)',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(700);
-
-    /* ⭐ المشهد 3: القلب */
-    await new Promise(function(resolve) {
-        gsap.to(cardInners, {
-            rotationY: 180,
-            duration: 1.2,
-            stagger: 0.15,
-            ease: 'power2.inOut',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(700);
-
-    /* ⭐ المشهد 4: كل Pot */
+    /* ⭐ المشهد 2: كل Pot */
     const potGroups = {};
     drawRows.forEach(function(row) {
         if (!potGroups[row.pot_number]) potGroups[row.pot_number] = [];
@@ -184,121 +152,104 @@ async function champRunCinematicDraw(drawRows, pots) {
         const potRows = potGroups[potNum] || [];
         if (potRows.length === 0) continue;
 
-        potRows.sort(function(a, b) { return a.slot_index - b.slot_index; });
-
-        await champShowPotTeams(potNum, potRows);
-
+        /* ⭐ توزيع منتخبات هذا Pot */
         for (let i = 0; i < potRows.length; i++) {
-            await champDistributeTeam(potRows[i], i);
-        }
-
-        if (potNum < 5) {
-            await champResetCardsForNextPot();
+            await champPickTeam(potRows[i], potNum);
         }
 
         await champWait(400);
     }
 
-    /* ⭐ المشهد 5: النهاية */
+    /* ⭐ المشهد 3: النهاية */
     await champFinale();
 }
 
 /* =========================================================
-   Show Pot Teams
+   Pick Team — spotlight + اختيار
 ========================================================= */
 
-async function champShowPotTeams(potNum, potRows) {
-    const titleEl = document.getElementById('champDrawTitle');
-    if (titleEl) {
-        titleEl.textContent = 'POT ' + potNum;
-        gsap.fromTo(titleEl,
-            { opacity: 0.5, scale: 0.9 },
-            { opacity: 1, scale: 1, duration: 0.6, ease: 'power2.out' }
-        );
-    }
+async function champPickTeam(row, potNum) {
+    /* ⭐ كل بطاقات Pot الحالي */
+    const allPotCards = document.querySelectorAll('.champ-team-card[data-pot="' + potNum + '"]:not(.selected)');
+    if (allPotCards.length === 0) return;
 
-    const cardInners = document.querySelectorAll('.champ-card-inner');
-    const cards = document.querySelectorAll('.champ-card');
+    /* ⭐ 1. Spotlight — بطيء → سريع → بطيء */
+    const totalCycles = 2;
+    const spotCount = allPotCards.length;
 
-    gsap.set(cardInners, { rotationY: 180 });
-
-    for (let i = 0; i < 4; i++) {
-        const card = cards[i];
-        const teamSlot = document.getElementById('champCardTeam' + i);
-        if (!card || !teamSlot) continue;
-
-        const row = potRows[i];
-        if (!row) continue;
-
-        const teamName = champGetTeamName(row.team);
-        const teamLogo = champGetTeamLogo(row.team);
-
-        teamSlot.innerHTML =
-            (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
-            '<span>' + teamName + '</span>';
-
-        card.dataset.team = row.team;
-        card.dataset.group = row.group_name;
-    }
-
-    await champWait(900);
-}
-
-/* =========================================================
-   Distribute One Team
-========================================================= */
-
-async function champDistributeTeam(row, slotIndex) {
-    const card = document.getElementById('champCard' + slotIndex);
-    const groupTarget = document.getElementById('champGroupTarget' + row.group_name);
-    const groupTeamsEl = document.getElementById('champGroupTeams' + row.group_name);
-
-    if (!card || !groupTarget || !groupTeamsEl) return;
-
-    const allCards = document.querySelectorAll('.champ-card');
-
-    /* ⭐ Spotlight — دورتين */
-    for (let cycle = 0; cycle < 2; cycle++) {
-        for (let c = 0; c < 4; c++) {
-            gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.1 });
-            gsap.to(allCards[c], {
-                boxShadow: '0 0 40px rgba(212,183,122,0.9)',
-                scale: 1.06,
-                duration: 0.13
+    for (let cycle = 0; cycle < totalCycles; cycle++) {
+        for (let i = 0; i < spotCount; i++) {
+            /* إطفاء كل */
+            gsap.to(allPotCards, {
+                borderColor: '#D4B77A',
+                boxShadow: '0 0 0 rgba(212,183,122,0)',
+                scale: 1,
+                duration: 0.1
             });
-            await champWait(120);
+
+            /* إضاءة الحالي */
+            gsap.to(allPotCards[i], {
+                borderColor: '#F5E6D3',
+                boxShadow: '0 0 30px rgba(212,183,122,1), 0 0 60px rgba(212,183,122,.6), inset 0 0 20px rgba(212,183,122,.2)',
+                scale: 1.03,
+                duration: 0.15
+            });
+
+            /* ⭐ سرعة متغيرة: بطيء في البداية، سريع في النص، بطيء في النهاية */
+            let waitTime = 120;
+            if (cycle === 0 && i === 0) waitTime = 250;
+            else if (cycle === totalCycles - 1 && i === spotCount - 1) waitTime = 250;
+
+            await champWait(waitTime);
         }
     }
 
-    /* ⭐ توقف */
-    gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.2 });
-    gsap.to(card, {
-        boxShadow: '0 0 60px rgba(212,183,122,1)',
-        scale: 1.15,
+    /* ⭐ 2. البحث عن البطاقة المستهدفة */
+    const targetCard = document.querySelector('.champ-team-card[data-team="' + row.team + '"]');
+    if (!targetCard) return;
+
+    /* ⭐ إطفاء الجميع */
+    gsap.to(allPotCards, {
+        borderColor: '#D4B77A',
+        boxShadow: '0 0 0 rgba(212,183,122,0)',
+        scale: 1,
+        duration: 0.2
+    });
+
+    /* ⭐ إضاءة المستهدف */
+    gsap.to(targetCard, {
+        borderColor: '#F5E6D3',
+        boxShadow: '0 0 40px rgba(212,183,122,1), 0 0 80px rgba(212,183,122,.7), inset 0 0 25px rgba(212,183,122,.3)',
+        scale: 1.08,
         duration: 0.35,
         ease: 'power2.out'
     });
 
-    await champWait(550);
+    await champWait(500);
 
-    /* ⭐ Flash */
+    /* ⭐ 3. Flash */
     champFlash();
 
-    await champWait(250);
+    await champWait(200);
 
-    /* ⭐ بيانات */
+    /* ⭐ 4. الحصول على الإحداثيات */
+    const cardRect = targetCard.getBoundingClientRect();
+    const groupTarget = document.getElementById('champGroupTarget' + row.group_name);
+    const groupTeamsEl = document.getElementById('champGroupTeams' + row.group_name);
+
+    if (!groupTarget || !groupTeamsEl) return;
+
+    const groupRect = groupTarget.getBoundingClientRect();
+
     const teamName = champGetTeamName(row.team);
     const teamLogo = champGetTeamLogo(row.team);
-
-    const cardRect = card.getBoundingClientRect();
-    const groupRect = groupTarget.getBoundingClientRect();
 
     const startX = cardRect.left + cardRect.width / 2;
     const startY = cardRect.top + cardRect.height / 2;
     const endX = groupRect.left + groupRect.width / 2;
     const endY = groupRect.top + groupRect.height / 2;
 
-    /* ⭐ LED */
+    /* ⭐ 5. LED */
     const led = document.createElement('div');
     led.className = 'champ-led';
     led.innerHTML =
@@ -311,16 +262,27 @@ async function champDistributeTeam(row, slotIndex) {
     led.style.pointerEvents = 'none';
     led.style.transform = 'translate(' + (startX - 65) + 'px, ' + (startY - 35) + 'px) scale(0.3)';
     led.style.opacity = '0';
+    led.style.display = 'flex';
+    led.style.flexDirection = 'column';
+    led.style.alignItems = 'center';
+    led.style.gap = '6px';
+    led.style.padding = '12px 18px';
+    led.style.background = 'linear-gradient(135deg, #8B1A2F 0%, #4A0A15 100%)';
+    led.style.border = '3px solid #D4B77A';
+    led.style.borderRadius = '18px';
+    led.style.boxShadow = '0 0 50px rgba(212,183,122,.9), 0 15px 40px rgba(0,0,0,.8)';
     document.body.appendChild(led);
 
-    const cardTeam = card.querySelector('.champ-card-back-team');
-    if (cardTeam) {
-        gsap.to(cardTeam, {
-            opacity: 0,
-            scale: 0.5,
-            duration: 0.4
-        });
-    }
+    led.querySelector('img').style.width = '40px';
+    led.querySelector('img').style.height = '40px';
+    led.querySelector('img').style.objectFit = 'contain';
+
+    led.querySelector('span').style.fontSize = '12px';
+    led.querySelector('span').style.fontWeight = '900';
+    led.querySelector('span').style.color = '#FAF6F0';
+    led.querySelector('span').style.textTransform = 'uppercase';
+    led.querySelector('span').style.textShadow = '0 2px 6px rgba(0,0,0,.8)';
+    led.querySelector('span').style.whiteSpace = 'nowrap';
 
     await new Promise(function(resolve) {
         gsap.to(led, {
@@ -332,14 +294,14 @@ async function champDistributeTeam(row, slotIndex) {
         });
     });
 
-    await champWait(300);
+    await champWait(250);
 
-    /* ⭐ الطيران — قوس Bezier */
+    /* ⭐ 6. الطيران — قوس Bezier */
     await new Promise(function(resolve) {
-        const duration = 1.5;
+        const duration = 1.4;
         const startTime = performance.now();
         const midX = (startX + endX) / 2;
-        const midY = Math.min(startY, endY) - 180;
+        const midY = Math.min(startY, endY) - 200;
 
         let lastTrailTime = 0;
 
@@ -376,13 +338,14 @@ async function champDistributeTeam(row, slotIndex) {
         requestAnimationFrame(animate);
     });
 
-    /* ⭐ الوصول */
+    /* ⭐ 7. الوصول */
     led.remove();
     champSpawnShockwave(endX, endY);
 
+    /* نبض المجموعة */
     gsap.timeline()
         .to(groupTarget, {
-            scale: 1.15,
+            scale: 1.12,
             boxShadow: '0 0 60px rgba(212,183,122,1), inset 0 0 30px rgba(212,183,122,0.4)',
             borderColor: '#D4B77A',
             duration: 0.3,
@@ -399,7 +362,7 @@ async function champDistributeTeam(row, slotIndex) {
             duration: 0.5
         }, '-=0.4');
 
-    /* ⭐ إضافة الفريق */
+    /* ⭐ 8. إضافة الفريق */
     const teamHtml =
         '<div class="champ-group-team-item">' +
             (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
@@ -410,59 +373,41 @@ async function champDistributeTeam(row, slotIndex) {
     const newTeam = groupTeamsEl.lastElementChild;
     gsap.fromTo(newTeam,
         { opacity: 0, scale: 0.5, y: -20 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(1.7)' }
+        { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: 'back.out(1.7)' }
     );
 
-    gsap.to(card, {
-        boxShadow: 'none',
+    /* ⭐ 9. البطاقة تدخل حالة "مختارة" */
+    gsap.to(targetCard, {
+        background: 'rgba(20,10,12,.6)',
+        borderColor: 'rgba(212,183,122,.2)',
+        boxShadow: '0 0 0 rgba(212,183,122,0)',
+        opacity: 0.55,
         scale: 1,
-        duration: 0.4
+        duration: 0.5,
+        onComplete: function() {
+            targetCard.classList.add('selected');
+        }
     });
 
-    if (cardTeam) {
-        gsap.to(cardTeam, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.3
+    /* إطفاء شعار + اسم البطاقة */
+    const cardImg = targetCard.querySelector('img');
+    const cardName = targetCard.querySelector('.champ-team-card-name');
+
+    if (cardImg) {
+        gsap.to(cardImg, {
+            filter: 'grayscale(0.4) brightness(0.7)',
+            duration: 0.5
         });
     }
 
-    await champWait(450);
-}
-
-/* =========================================================
-   Reset Cards
-========================================================= */
-
-async function champResetCardsForNextPot() {
-    const cardInners = document.querySelectorAll('.champ-card-inner');
-    const teamSlots = document.querySelectorAll('.champ-card-back-team');
-
-    teamSlots.forEach(function(el) { el.innerHTML = ''; });
-
-    await new Promise(function(resolve) {
-        gsap.to(cardInners, {
-            rotationY: 0,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'power2.inOut',
-            onComplete: resolve
+    if (cardName) {
+        gsap.to(cardName, {
+            color: 'rgba(250,246,240,.4)',
+            duration: 0.5
         });
-    });
+    }
 
-    await champWait(400);
-
-    await new Promise(function(resolve) {
-        gsap.to(cardInners, {
-            rotationY: 180,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'power2.inOut',
-            onComplete: resolve
-        });
-    });
-
-    await champWait(300);
+    await champWait(500);
 }
 
 /* =========================================================
@@ -625,7 +570,7 @@ function champFlash() {
     document.body.appendChild(f);
 
     gsap.fromTo(f,
-        { opacity: 0.7 },
+        { opacity: 0.6 },
         { opacity: 0, duration: 0.4, onComplete: function() { f.remove(); } }
     );
 }
@@ -662,7 +607,5 @@ function champSpawnConfetti(count) {
 window.champPerformDraw = champPerformDraw;
 window.champSaveAndClose = champSaveAndClose;
 window.champResetFromDraw = champResetFromDraw;
-window.champBuildDrawScreen = champBuildDrawScreen;
-window.champRunCinematicDraw = champRunCinematicDraw;
 
-console.log('[Champions Draw] v=3 نظيف loaded ✅');
+console.log('[Champions Draw] v=4 ✨ loaded');
