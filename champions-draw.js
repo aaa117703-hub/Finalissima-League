@@ -1,11 +1,10 @@
 /* =========================================================
-   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=1)
-   الأنيميشن السينمائي كامل (مستقل)
-   يحتاج: champions.js (يبقى قبل هذا الملف)
+   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=2)
+   الأسطوري: 8 مشاهد + Waves + Roulette + Effects
 ========================================================= */
 
 /* =========================================================
-   Helpers (تستخدم window.X — عشان ما تصير تعارضات)
+   Helpers
 ========================================================= */
 
 function champPerformDraw() {
@@ -14,9 +13,8 @@ function champPerformDraw() {
         return;
     }
 
-    /* ⭐ reset flag — عشان ما يعلق */
     if (champDrawAnimating) {
-        console.warn('[Champions] Resetting animating flag');
+        console.warn('[Champions] Resetting flag');
         champDrawAnimating = false;
     }
 
@@ -38,14 +36,33 @@ async function champPerformDrawAsync() {
         champData.pendingDraw = drawRows;
 
         champBuildDrawScreen();
+        champSpawnFloatingParticles(25);
 
         await champRunCinematicDraw(drawRows, pots);
 
     } catch (err) {
         console.error('[Champions] Draw error:', err);
-        if (typeof showToast === 'function') showToast('فشل الأنيميشن: ' + err.message, false, 4000);
+        if (typeof showToast === 'function') showToast('فشل: ' + err.message, false, 4000);
     } finally {
         champDrawAnimating = false;
+    }
+}
+
+function champSpawnFloatingParticles(count) {
+    const container = document.getElementById('champParticlesBg');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'champ-particle-bg';
+        p.style.left = Math.random() * 100 + '%';
+        p.style.bottom = '-10px';
+        p.style.animationDuration = (15 + Math.random() * 20) + 's';
+        p.style.animationDelay = (Math.random() * 15) + 's';
+        p.style.opacity = 0.3 + Math.random() * 0.7;
+        container.appendChild(p);
     }
 }
 
@@ -63,6 +80,23 @@ function champBuildDrawScreen() {
 
     let html = '';
 
+    /* ⭐ الخلفية */
+    html += '<div class="champ-bg-waves">';
+    html += '<div class="champ-wave wave-1"></div>';
+    html += '<div class="champ-wave wave-2"></div>';
+    html += '<div class="champ-wave wave-3"></div>';
+    html += '<div class="champ-wave wave-4"></div>';
+    html += '</div>';
+
+    html += '<div class="champ-bg-pattern"></div>';
+    html += '<div class="champ-bg-glow"></div>';
+    html += '<div class="champ-particles-bg" id="champParticlesBg"></div>';
+
+    /* Intro */
+    html += '<div class="champ-intro" id="champIntro" style="display:none;">';
+    html += '<div class="champ-intro-text" id="champIntroText"></div>';
+    html += '</div>';
+
     /* Title */
     html += '<div class="champ-draw-header" id="champDrawHeader">';
     html += '<div class="champ-draw-title" id="champDrawTitle">قرعة كأس أبطال الفيناليغ</div>';
@@ -71,7 +105,6 @@ function champBuildDrawScreen() {
     /* Banner + Cards */
     html += '<div class="champ-banner-stage" id="champBannerStage">';
 
-    /* Original Banner */
     html += '<div class="champ-banner-original" id="champBannerOriginal">';
     html += '<img src="./banner-fina.png" alt="Champions Cup">';
     html += '</div>';
@@ -124,24 +157,92 @@ async function champRunCinematicDraw(drawRows, pots) {
     const cardInners = document.querySelectorAll('.champ-card-inner');
     const cards = document.querySelectorAll('.champ-card');
     const header = document.getElementById('champDrawHeader');
+    const intro = document.getElementById('champIntro');
+    const introText = document.getElementById('champIntroText');
 
-    /* ⭐ المشهد 1: العنوان + البنر */
-    gsap.set(header, { opacity: 0, y: -30 });
-    gsap.set(banner, { opacity: 0, scale: 0.85 });
+    /* ═══ المشهد 1: Intro ═══ */
+
+    gsap.set(header, { opacity: 0 });
+    gsap.set(banner, { opacity: 0, scale: 0.7 });
+    gsap.set(intro, { display: 'flex', opacity: 1 });
+
+    introText.innerHTML = '<div class="champ-intro-line">CHAMPIONS</div>';
+    const line1 = introText.querySelector('.champ-intro-line');
+    gsap.set(line1, { opacity: 0, y: 100, scale: 0.6, filter: 'blur(30px)' });
+
+    await new Promise(function(resolve) {
+        gsap.to(line1, {
+            opacity: 1, y: 0, scale: 1, filter: 'blur(0px)',
+            duration: 1.5, ease: 'power4.out',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(600);
+
+    gsap.to(line1, {
+        scale: 1.6, opacity: 0, filter: 'blur(40px)',
+        duration: 0.4, ease: 'power2.in'
+    });
+
+    await champWait(200);
+
+    introText.innerHTML = '<div class="champ-intro-line champ-intro-cup">CUP</div>';
+    const line2 = introText.querySelector('.champ-intro-line');
+    gsap.set(line2, { opacity: 0, scale: 2.5, filter: 'blur(50px)' });
+
+    await new Promise(function(resolve) {
+        gsap.to(line2, {
+            opacity: 1, scale: 1, filter: 'blur(0px)',
+            duration: 0.9, ease: 'power3.out',
+            onComplete: resolve
+        });
+    });
+
+    await champWait(700);
+
+    await new Promise(function(resolve) {
+        gsap.to(intro, {
+            opacity: 0,
+            duration: 0.6,
+            onComplete: function() {
+                intro.style.display = 'none';
+                resolve();
+            }
+        });
+    });
+
+    /* ═══ المشهد 2: Banner Entry ═══ */
+
+    gsap.set(header, { opacity: 1 });
+    gsap.set(banner, { opacity: 0, scale: 0.7, y: -50 });
 
     await new Promise(function(resolve) {
         gsap.timeline({ onComplete: resolve })
-            .to(header, { opacity: 1, y: 0, duration: 1.2, ease: 'power3.out' })
-            .to(banner, { opacity: 1, scale: 1, duration: 1.4, ease: 'power3.out' }, '-=0.8');
+            .to(banner, {
+                opacity: 1, scale: 1, y: 0,
+                duration: 1.4, ease: 'elastic.out(1, 0.6)'
+            })
+            .to(banner, {
+                boxShadow: '0 20px 80px rgba(212,183,122,.8), 0 0 100px rgba(139,26,47,.6), inset 0 0 40px rgba(212,183,122,.3)',
+                duration: 0.6
+            }, '-=0.4')
+            .to(banner, {
+                boxShadow: '0 20px 80px rgba(212,183,122,.5), 0 0 60px rgba(139,26,47,.4), inset 0 0 40px rgba(212,183,122,.2)',
+                duration: 0.8
+            });
     });
 
-    await champWait(1200);
+    await champWait(800);
 
-    /* ⭐ المشهد 2: الانقسام */
+    /* ═══ المشهد 3: Split ═══ */
+
     await new Promise(function(resolve) {
         gsap.to(banner, {
             opacity: 0,
-            duration: 0.4,
+            scale: 0.9,
+            filter: 'blur(20px)',
+            duration: 0.5,
             onComplete: function() {
                 banner.style.display = 'none';
                 cardsStage.style.display = 'flex';
@@ -150,35 +251,36 @@ async function champRunCinematicDraw(drawRows, pots) {
         });
     });
 
-    gsap.set(cards, { opacity: 0, scale: 0.9 });
+    gsap.set(cards, { opacity: 0, scale: 0.7, y: 60, rotationY: 0 });
 
     await new Promise(function(resolve) {
         gsap.to(cards, {
-            opacity: 1,
-            scale: 1,
+            opacity: 1, scale: 1, y: 0,
             duration: 0.9,
-            stagger: 0.12,
-            ease: 'back.out(1.4)',
+            stagger: 0.15,
+            ease: 'back.out(1.7)',
             onComplete: resolve
         });
     });
 
-    await champWait(800);
+    await champWait(700);
 
-    /* ⭐ المشهد 3: القلب */
+    /* ═══ المشهد 4: Flip ═══ */
+
     await new Promise(function(resolve) {
         gsap.to(cardInners, {
             rotationY: 180,
-            duration: 1.2,
+            duration: 1.3,
             stagger: 0.15,
             ease: 'power2.inOut',
             onComplete: resolve
         });
     });
 
-    await champWait(600);
+    await champWait(700);
 
-    /* ⭐ المشهد 4: كل Pot */
+    /* ═══ المشهد 5-7: كل Pot ═══ */
+
     const potGroups = {};
     drawRows.forEach(function(row) {
         if (!potGroups[row.pot_number]) potGroups[row.pot_number] = [];
@@ -201,10 +303,11 @@ async function champRunCinematicDraw(drawRows, pots) {
             await champResetCardsForNextPot();
         }
 
-        await champWait(400);
+        await champWait(500);
     }
 
-    /* ⭐ المشهد 5: النهاية */
+    /* ═══ المشهد 8: Finale ═══ */
+
     await champFinale();
 }
 
@@ -249,9 +352,8 @@ async function champShowPotTeams(potNum, potRows) {
     await champWait(900);
 }
 
-window.champPerformDraw = champPerformDraw;
 /* =========================================================
-   Distribute One Team — UEFA Trail
+   Distribute One Team
 ========================================================= */
 
 async function champDistributeTeam(row, slotIndex) {
@@ -263,29 +365,35 @@ async function champDistributeTeam(row, slotIndex) {
 
     const allCards = document.querySelectorAll('.champ-card');
 
-    /* ⭐ Spotlight — 3 دورات */
+    /* ⭐ Spotlight */
     for (let cycle = 0; cycle < 3; cycle++) {
         for (let c = 0; c < 4; c++) {
             gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.1 });
             gsap.to(allCards[c], {
-                boxShadow: '0 0 45px rgba(212,183,122,0.9)',
-                scale: 1.06,
+                boxShadow: '0 0 50px rgba(212,183,122,1), 0 0 100px rgba(139,26,47,.6)',
+                scale: 1.08,
                 duration: 0.13
             });
             await champWait(110);
         }
     }
 
-    /* ⭐ توقف على البطاقة */
     gsap.to(allCards, { boxShadow: 'none', scale: 1, duration: 0.2 });
     gsap.to(card, {
-        boxShadow: '0 0 70px rgba(212,183,122,1)',
-        scale: 1.18,
+        boxShadow: '0 0 80px rgba(212,183,122,1), 0 0 160px rgba(139,26,47,.7)',
+        scale: 1.2,
         duration: 0.35,
         ease: 'power2.out'
     });
 
-    await champWait(550);
+    await champWait(600);
+
+    /* ⭐ Crack + Flash + Burst */
+    champFlash();
+    champSpawnBurst(card, 30);
+    champSpawnRings(card, 2);
+
+    await champWait(250);
 
     /* ⭐ بيانات */
     const teamName = champGetTeamName(row.team);
@@ -310,16 +418,15 @@ async function champDistributeTeam(row, slotIndex) {
     led.style.top = '0';
     led.style.zIndex = '9999999';
     led.style.pointerEvents = 'none';
-    led.style.transform = 'translate(' + (startX - 60) + 'px, ' + (startY - 30) + 'px) scale(0.3)';
+    led.style.transform = 'translate(' + (startX - 65) + 'px, ' + (startY - 35) + 'px) scale(0.2)';
     led.style.opacity = '0';
     document.body.appendChild(led);
 
-    /* fade البطاقة */
     const cardTeam = card.querySelector('.champ-card-back-team');
     if (cardTeam) {
         gsap.to(cardTeam, {
             opacity: 0,
-            scale: 0.5,
+            scale: 0.3,
             duration: 0.4
         });
     }
@@ -327,22 +434,20 @@ async function champDistributeTeam(row, slotIndex) {
     /* ظهور LED */
     await new Promise(function(resolve) {
         gsap.to(led, {
-            opacity: 1,
-            scale: 1,
-            duration: 0.5,
-            ease: 'back.out(1.5)',
+            opacity: 1, scale: 1,
+            duration: 0.6, ease: 'back.out(2)',
             onComplete: resolve
         });
     });
 
-    await champWait(300);
+    await champWait(350);
 
-    /* ⭐ الطيران */
+    /* ⭐ الطيران الحلزوني */
     await new Promise(function(resolve) {
-        const duration = 1.6;
+        const duration = 1.8;
         const startTime = performance.now();
         const midX = (startX + endX) / 2;
-        const midY = Math.min(startY, endY) - 180;
+        const midY = Math.min(startY, endY) - 200;
 
         let lastTrailTime = 0;
 
@@ -355,17 +460,23 @@ async function champDistributeTeam(row, slotIndex) {
                 : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
             const mt = 1 - eased;
-            const x = mt*mt*mt*startX + 3*mt*mt*eased*midX + 3*mt*eased*eased*midX + eased*eased*eased*endX;
-            const y = mt*mt*mt*startY + 3*mt*mt*eased*midY + 3*mt*eased*eased*midY + eased*eased*eased*endY;
+            let x = mt*mt*mt*startX + 3*mt*mt*eased*midX + 3*mt*eased*eased*midX + eased*eased*eased*endX;
+            let y = mt*mt*mt*startY + 3*mt*mt*eased*midY + 3*mt*eased*eased*midY + eased*eased*eased*endY;
 
-            const sc = 1 + Math.sin(eased * Math.PI) * 0.4;
-            const rot = eased * 720;
+            /* ⭐ حلزوني */
+            const spiral = Math.sin(eased * Math.PI * 6) * 25 * (1 - eased);
+            x += spiral;
+            y += spiral * 0.5;
+
+            const sc = 1 + Math.sin(eased * Math.PI) * 0.5;
+            const rot = eased * 1080;
 
             led.style.transform =
-                'translate(' + (x - 60) + 'px, ' + (y - 30) + 'px) ' +
+                'translate(' + (x - 65) + 'px, ' + (y - 35) + 'px) ' +
                 'rotate(' + rot + 'deg) scale(' + sc + ')';
+            led.style.filter = 'brightness(' + (1.5 + Math.sin(eased * Math.PI * 3) * 0.5) + ')';
 
-            if (now - lastTrailTime > 25) {
+            if (now - lastTrailTime > 20) {
                 lastTrailTime = now;
                 champSpawnTrail(x, y);
             }
@@ -382,19 +493,23 @@ async function champDistributeTeam(row, slotIndex) {
     /* ⭐ الوصول */
     led.remove();
     champSpawnShockwave(endX, endY);
+    champSpawnShockwave(endX, endY, 'shockwave-2');
+    setTimeout(function() { champSpawnShockwave(endX, endY); }, 100);
+    champSpawnLightning(endX, endY);
 
+    /* نبض */
     gsap.timeline()
         .to(groupTarget, {
-            scale: 1.18,
-            boxShadow: '0 0 70px rgba(212,183,122,1), inset 0 0 40px rgba(212,183,122,0.4)',
+            scale: 1.2,
+            boxShadow: '0 0 80px rgba(212,183,122,1), inset 0 0 50px rgba(212,183,122,0.5)',
             borderColor: '#D4B77A',
             duration: 0.3,
             ease: 'power2.out'
         })
         .to(groupTarget, {
             scale: 1,
-            duration: 0.6,
-            ease: 'elastic.out(1, 0.5)'
+            duration: 0.7,
+            ease: 'elastic.out(1, 0.4)'
         })
         .to(groupTarget, {
             boxShadow: '0 0 0 rgba(212,183,122,0)',
@@ -402,7 +517,7 @@ async function champDistributeTeam(row, slotIndex) {
             duration: 0.5
         }, '-=0.4');
 
-    /* ⭐ إضافة الفريق */
+    /* إضافة الفريق */
     const teamHtml =
         '<div class="champ-group-team-item">' +
             (teamLogo ? '<img src="./' + teamLogo + '" onerror="this.style.display=\'none\'">' : '') +
@@ -412,30 +527,27 @@ async function champDistributeTeam(row, slotIndex) {
 
     const newTeam = groupTeamsEl.lastElementChild;
     gsap.fromTo(newTeam,
-        { opacity: 0, scale: 0.5, y: -20 },
-        { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(1.7)' }
+        { opacity: 0, scale: 0.3, y: -30 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: 'back.out(2)' }
     );
 
-    /* ⭐ Reset card */
     gsap.to(card, {
-        boxShadow: 'none',
-        scale: 1,
+        boxShadow: 'none', scale: 1,
         duration: 0.4
     });
 
     if (cardTeam) {
         gsap.to(cardTeam, {
-            opacity: 1,
-            scale: 1,
+            opacity: 1, scale: 1,
             duration: 0.3
         });
     }
 
-    await champWait(400);
+    await champWait(500);
 }
 
 /* =========================================================
-   Reset Cards for Next Pot
+   Reset Cards
 ========================================================= */
 
 async function champResetCardsForNextPot() {
@@ -446,11 +558,8 @@ async function champResetCardsForNextPot() {
 
     await new Promise(function(resolve) {
         gsap.to(cardInners, {
-            rotationY: 0,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'power2.inOut',
-            onComplete: resolve
+            rotationY: 0, duration: 0.8, stagger: 0.1,
+            ease: 'power2.inOut', onComplete: resolve
         });
     });
 
@@ -458,11 +567,8 @@ async function champResetCardsForNextPot() {
 
     await new Promise(function(resolve) {
         gsap.to(cardInners, {
-            rotationY: 180,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'power2.inOut',
-            onComplete: resolve
+            rotationY: 180, duration: 0.8, stagger: 0.1,
+            ease: 'power2.inOut', onComplete: resolve
         });
     });
 
@@ -474,28 +580,27 @@ async function champResetCardsForNextPot() {
 ========================================================= */
 
 async function champFinale() {
-    champSpawnConfetti(80);
+    champSpawnConfetti(150);
+    champSpawnConfetti(100);
 
     const titleEl = document.getElementById('champDrawTitle');
     if (titleEl) {
         gsap.to(titleEl, {
-            opacity: 0,
-            y: -20,
+            opacity: 0, y: -20,
             duration: 0.4,
             onComplete: function() {
                 titleEl.textContent = 'اكتملت القرعة';
-                gsap.to(titleEl, { opacity: 1, y: 0, duration: 0.6 });
+                gsap.to(titleEl, { opacity: 1, y: 0, duration: 0.8 });
             }
         });
     }
 
-    await champWait(1200);
-
+    await champWait(1500);
     champShowDrawButtons();
 }
 
 /* =========================================================
-   Draw Buttons — Save + Reset
+   Draw Buttons
 ========================================================= */
 
 function champShowDrawButtons() {
@@ -542,7 +647,6 @@ async function champSaveAndClose() {
         await champSaveDraw(drawRows);
         champData.pendingDraw = null;
 
-        /* ⭐ نفعّل البطولة تلقائياً */
         const startGw = (typeof currentRound !== 'undefined' ? currentRound : 1) + 1;
 
         await saveChampionsMeta({
@@ -560,8 +664,7 @@ async function champSaveAndClose() {
     const screen = document.getElementById('champDrawScreen');
     if (screen) {
         gsap.to(screen, {
-            opacity: 0,
-            duration: 0.4,
+            opacity: 0, duration: 0.5,
             onComplete: function() {
                 screen.remove();
                 champLoaded = false;
@@ -577,15 +680,11 @@ function champResetFromDraw() {
     const screen = document.getElementById('champDrawScreen');
     if (screen) {
         gsap.to(screen, {
-            opacity: 0,
-            duration: 0.4,
+            opacity: 0, duration: 0.4,
             onComplete: function() {
                 screen.remove();
                 champData.pendingDraw = null;
-
-                setTimeout(function() {
-                    champPerformDraw();
-                }, 300);
+                setTimeout(function() { champPerformDraw(); }, 300);
             }
         });
     }
@@ -605,51 +704,137 @@ function champSpawnTrail(x, y) {
     p.style.top = y + 'px';
     document.body.appendChild(p);
 
+    const hue = Math.random() * 30 + 30;
+    p.style.filter = 'hue-rotate(' + hue + 'deg)';
+
     gsap.fromTo(p,
-        { opacity: 0.9, scale: 1 },
-        { opacity: 0, scale: 0.2, duration: 0.6, onComplete: function() { p.remove(); } }
+        { opacity: 1, scale: 1.2 },
+        { opacity: 0, scale: 0.2, duration: 0.7,
+          onComplete: function() { p.remove(); } }
     );
 }
 
-function champSpawnShockwave(x, y) {
+function champSpawnShockwave(x, y, extraClass) {
     const w = document.createElement('div');
-    w.className = 'champ-shockwave';
+    w.className = 'champ-shockwave' + (extraClass ? ' ' + extraClass : '');
     w.style.left = x + 'px';
     w.style.top = y + 'px';
     document.body.appendChild(w);
 
     gsap.fromTo(w,
-        { opacity: 0.8, scale: 0 },
-        { opacity: 0, scale: 4, duration: 0.9, onComplete: function() { w.remove(); } }
+        { opacity: 0.9, scale: 0 },
+        { opacity: 0, scale: 4.5, duration: 1,
+          onComplete: function() { w.remove(); } }
+    );
+}
+
+function champSpawnBurst(source, count) {
+    const rect = source.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.className = 'champ-burst';
+        p.style.left = cx + 'px';
+        p.style.top = cy + 'px';
+        document.body.appendChild(p);
+
+        const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+        const distance = 100 + Math.random() * 200;
+
+        gsap.fromTo(p,
+            { opacity: 1, scale: 1, x: 0, y: 0 },
+            {
+                opacity: 0, scale: 0.3,
+                x: Math.cos(angle) * distance,
+                y: Math.sin(angle) * distance,
+                duration: 1 + Math.random() * 0.5,
+                ease: 'power2.out',
+                onComplete: function() { p.remove(); }
+            }
+        );
+    }
+}
+
+function champSpawnRings(source, count) {
+    const rect = source.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    for (let i = 0; i < count; i++) {
+        setTimeout(function() {
+            const r = document.createElement('div');
+            r.className = 'champ-ring';
+            r.style.left = cx + 'px';
+            r.style.top = cy + 'px';
+            document.body.appendChild(r);
+
+            gsap.fromTo(r,
+                { opacity: 0.9, scale: 0.3 },
+                { opacity: 0, scale: 2.5, duration: 0.9,
+                  onComplete: function() { r.remove(); } }
+            );
+        }, i * 100);
+    }
+}
+
+function champSpawnLightning(x, y) {
+    const l = document.createElement('div');
+    l.className = 'champ-lightning';
+    l.style.left = x + 'px';
+    l.style.top = (y - 200) + 'px';
+    l.style.width = '3px';
+    l.style.height = '200px';
+    document.body.appendChild(l);
+
+    gsap.fromTo(l,
+        { opacity: 1, scaleY: 0 },
+        { opacity: 0, scaleY: 1, duration: 0.4,
+          onComplete: function() { l.remove(); } }
+    );
+}
+
+function champFlash() {
+    const f = document.createElement('div');
+    f.className = 'champ-flash';
+    document.body.appendChild(f);
+
+    gsap.fromTo(f,
+        { opacity: 0.8 },
+        { opacity: 0, duration: 0.5,
+          onComplete: function() { f.remove(); } }
     );
 }
 
 function champSpawnConfetti(count) {
-    const colors = ['#D4B77A', '#8B1A2F', '#FAF6F0', '#2A2A2A'];
+    const colors = ['#D4B77A', '#8B1A2F', '#FAF6F0', '#4A0A15', '#E5D4A5'];
     for (let i = 0; i < count; i++) {
         const c = document.createElement('div');
         c.className = 'champ-confetti';
         c.style.left = Math.random() * 100 + '%';
         c.style.top = '-20px';
         c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        c.style.width = (6 + Math.random() * 8) + 'px';
-        c.style.height = (6 + Math.random() * 8) + 'px';
+        c.style.width = (6 + Math.random() * 10) + 'px';
+        c.style.height = (6 + Math.random() * 10) + 'px';
+        c.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
         document.body.appendChild(c);
 
         gsap.to(c, {
-            y: window.innerHeight + 40,
-            x: (Math.random() - 0.5) * 200,
-            rotation: Math.random() * 720 - 360,
+            y: window.innerHeight + 60,
+            x: (Math.random() - 0.5) * 300,
+            rotation: Math.random() * 1080 - 540,
             opacity: 0,
-            duration: 3 + Math.random() * 2,
-            delay: Math.random() * 1.5,
+            duration: 4 + Math.random() * 3,
+            delay: Math.random() * 2,
             ease: 'power1.in',
             onComplete: function() { c.remove(); }
         });
     }
 }
+
 /* =========================================================
-   Window Exports — للاستخدام الخارجي
+   Window Exports
 ========================================================= */
 
 window.champPerformDraw = champPerformDraw;
@@ -658,4 +843,4 @@ window.champResetFromDraw = champResetFromDraw;
 window.champBuildDrawScreen = champBuildDrawScreen;
 window.champRunCinematicDraw = champRunCinematicDraw;
 
-console.log('[Champions Draw] v=1 loaded ✅');
+console.log('[Champions Draw] v=2 الأسطوري loaded ✅');
