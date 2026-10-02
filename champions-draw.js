@@ -66,14 +66,13 @@ function champBuildDrawScreen() {
     html += '<div class="champ-draw-title" id="champDrawTitle">قرعة كأس أبطال الفيناليغ</div>';
     html += '</div>';
 
-    /* Banner + Cards */
+    /* Banner + Cards + Groups */
     html += '<div class="champ-banner-stage" id="champBannerStage">';
 
     html += '<div class="champ-banner-original" id="champBannerOriginal">';
     html += '<img src="./banner-fina.png" alt="Champions Cup">';
     html += '</div>';
 
-    /* Cards */
     html += '<div class="champ-cards-stage" id="champCardsStage" style="display:none;">';
     for (let i = 0; i < 4; i++) {
         const bgPos = (i * 33.33) + '% 0%';
@@ -95,7 +94,6 @@ function champBuildDrawScreen() {
     }
     html += '</div>';
 
-    /* Groups */
     html += '<div class="champ-groups-stage" id="champGroupsStage">';
     CHAMP_GROUPS.forEach(function(g) {
         html += '<div class="champ-group-target" id="champGroupTarget' + g + '" data-group="' + g + '">';
@@ -112,7 +110,7 @@ function champBuildDrawScreen() {
 }
 
 /* =========================================================
-   Cinematic Sequence — بسيط
+   Cinematic Sequence
 ========================================================= */
 
 async function champRunCinematicDraw(drawRows, pots) {
@@ -122,7 +120,7 @@ async function champRunCinematicDraw(drawRows, pots) {
     const cards = document.querySelectorAll('.champ-card');
     const header = document.getElementById('champDrawHeader');
 
-    /* ⭐ المشهد 1: العنوان */
+    /* ⭐ المشهد 1: العنوان + البنر */
     gsap.set(header, { opacity: 0, y: -30 });
     gsap.set(banner, { opacity: 0, scale: 0.85 });
 
@@ -134,7 +132,7 @@ async function champRunCinematicDraw(drawRows, pots) {
 
     await champWait(1000);
 
-    /* ⭐ المشهد 2: الانقسام */
+    /* ⭐ المشهد 2: الانقسام — اخفاء البنر */
     await new Promise(function(resolve) {
         gsap.to(banner, {
             opacity: 0,
@@ -247,7 +245,7 @@ async function champShowPotTeams(potNum, potRows) {
 }
 
 /* =========================================================
-   Distribute One Team — بسيط
+   Distribute One Team
 ========================================================= */
 
 async function champDistributeTeam(row, slotIndex) {
@@ -336,7 +334,7 @@ async function champDistributeTeam(row, slotIndex) {
 
     await champWait(300);
 
-    /* ⭐ الطيران — بسيط (قوس Bezier) */
+    /* ⭐ الطيران — قوس Bezier */
     await new Promise(function(resolve) {
         const duration = 1.5;
         const startTime = performance.now();
@@ -354,16 +352,15 @@ async function champDistributeTeam(row, slotIndex) {
                 : 1 - Math.pow(-2 * t + 2, 3) / 2;
 
             const mt = 1 - eased;
-            const x = mt*mt*mt*startX + Child3*mt*mt*eased*midX + 3*mt*eased*eased*midX + eased*eased*eased*endX;
+            const x = mt*mt*mt*startX + 3*mt*mt*eased*midX + 3*mt*eased*eased*midX + eased*eased*eased*endX;
             const y = mt*mt*mt*startY + 3*mt*mt*eased*midY + 3*mt*eased*eased*midY + eased*eased*eased*endY;
 
             const sc = 1 + Math.sin(eased * Math.PI) * 0.4;
             const rot = eased * 720;
-;
 
             led.style.transform =
-                'translate(' +    (x - 65) + 'px, g ' + (y - 35) + 'px)s ' +
-                'rotate(' + rot + 'apdeg) scale(' + sc + ')';
+                'translate(' + (x - 65) + 'px, ' + (y - 35) + 'px) ' +
+                'rotate(' + rot + 'deg) scale(' + sc + ')';
 
             if (now - lastTrailTime > 30) {
                 lastTrailTime = now;
@@ -410,7 +407,8 @@ async function champDistributeTeam(row, slotIndex) {
         '</div>';
     groupTeamsEl.insertAdjacentHTML('beforeend', teamHtml);
 
-    const newTeam = groupTeamsEl.lastElement.fromTo(newTeam,
+    const newTeam = groupTeamsEl.lastElementChild;
+    gsap.fromTo(newTeam,
         { opacity: 0, scale: 0.5, y: -20 },
         { opacity: 1, scale: 1, y: 0, duration: 0.55, ease: 'back.out(1.7)' }
     );
@@ -592,7 +590,7 @@ window.champSaveAndClose = champSaveAndClose;
 window.champResetFromDraw = champResetFromDraw;
 
 /* =========================================================
-   Effects — بسيطة
+   Effects
 ========================================================= */
 
 function champSpawnTrail(x, y) {
@@ -664,5 +662,7 @@ function champSpawnConfetti(count) {
 window.champPerformDraw = champPerformDraw;
 window.champSaveAndClose = champSaveAndClose;
 window.champResetFromDraw = champResetFromDraw;
+window.champBuildDrawScreen = champBuildDrawScreen;
+window.champRunCinematicDraw = champRunCinematicDraw;
 
 console.log('[Champions Draw] v=3 نظيف loaded ✅');
