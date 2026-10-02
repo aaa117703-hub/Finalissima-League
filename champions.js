@@ -128,10 +128,17 @@ async function loadChampionsMatches() {
     } catch (e) { return []; }
 }
 
-async function saveCh }ampionsMeta(updates) {
-    catch if (!window.sbClient) return false;
- (    try {
-        const payload = Object.assign({e id: 1, updated_at:) new Date().toISOString() { }, updates);
+async function saveChampionsMeta(updates) {
+    if (!window.sbClient) return false;
+    try {
+        const payload = Object.assign({ id: 1, updated_at: new Date().toISOString() }, updates);
+        const { error } = await window.sbClient
+            .from('champions_meta').upsert(payload, { onConflict: 'id' });
+        if (error) throw error;
+        return true;
+    } catch (e) { return false; }
+}
+window.saveChampionsMeta = saveChampionsMeta;
         const { error } = await window.sbClient
             .from('champions_meta').upsert(payload, { onConflict: 'id' });
         if (error) throw error;
