@@ -1,17 +1,21 @@
 /* =========================================================
-   champions-draw.css — FINALISSIMA LEAGUE CHAT (v=2)
-   الأسطوري: موجات سائلة + زخرفة إسلامية + إطار دوّار
+   champions-draw.css — FINALISSIMA LEAGUE CHAT (v=3)
+   ✨ نظيف + ماسي + إطار هندسي
 ========================================================= */
 
 /* ═══════════════════════════════════════════════════════
-   1) DRAW SCREEN
+   1) DRAW SCREEN — خلفية نظيفة
    ═══════════════════════════════════════════════════════ */
 
 .champions-draw-screen{
     position:fixed;
     inset:0;
     z-index:999999;
-    background:#0A0A0A;
+    background:
+        radial-gradient(ellipse at center,
+            rgba(139,26,47,0.25) 0%,
+            rgba(74,10,21,0.15) 35%,
+            #0A0A0A 70%);
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -28,183 +32,6 @@
     to{opacity:1;}
 }
 
-/* ═══ LAYER 1: موجات ذهبية سائلة ═══ */
-
-.champ-bg-waves{
-    position:absolute;
-    inset:0;
-    z-index:0;
-    overflow:hidden;
-    pointer-events:none;
-}
-
-.champ-wave{
-    position:absolute;
-    left:-50%;
-    width:200%;
-    height:60%;
-    border-radius:50%;
-    filter:blur(40px);
-    will-change:transform;
-}
-
-.champ-wave.wave-1{
-    top:5%;
-    height:50%;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(212,183,122,.06) 25%,
-        rgba(212,183,122,.15) 50%,
-        rgba(212,183,122,.06) 75%,
-        transparent 100%);
-    animation:champWave1 18s ease-in-out infinite;
-}
-
-.champ-wave.wave-2{
-    top:25%;
-    height:55%;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(139,26,47,.10) 30%,
-        rgba(212,183,122,.18) 50%,
-        rgba(139,26,47,.10) 70%,
-        transparent 100%);
-    animation:champWave2 22s ease-in-out infinite;
-    animation-delay:-5s;
-}
-
-.champ-wave.wave-3{
-    top:45%;
-    height:60%;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(212,183,122,.08) 40%,
-        rgba(212,183,122,.22) 50%,
-        rgba(212,183,122,.08) 60%,
-        transparent 100%);
-    animation:champWave3 26s ease-in-out infinite;
-    animation-delay:-10s;
-}
-
-.champ-wave.wave-4{
-    top:65%;
-    height:50%;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(139,26,47,.07) 25%,
-        rgba(212,183,122,.13) 50%,
-        rgba(139,26,47,.07) 75%,
-        transparent 100%);
-    animation:champWave4 30s ease-in-out infinite;
-    animation-delay:-15s;
-}
-
-@keyframes champWave1{
-    0%, 100%{transform:translateX(-15%) rotate(-2deg) scaleY(1);}
-    50%{transform:translateX(15%) rotate(2deg) scaleY(1.15);}
-}
-
-@keyframes champWave2{
-    0%, 100%{transform:translateX(10%) rotate(1deg) scaleY(0.95);}
-    50%{transform:translateX(-15%) rotate(-3deg) scaleY(1.1);}
-}
-
-@keyframes champWave3{
-    0%, 100%{transform:translateX(-10%) rotate(2deg) scaleY(1.05);}
-    50%{transform:translateX(18%) rotate(-2deg) scaleY(0.9);}
-}
-
-@keyframes champWave4{
-    0%, 100%{transform:translateX(12%) rotate(-1deg) scaleY(1);}
-    50%{transform:translateX(-12%) rotate(3deg) scaleY(1.2);}
-}
-
-/* ═══ LAYER 2: زخرفة إسلامية ═══ */
-
-.champ-bg-pattern{
-    position:absolute;
-    inset:0;
-    z-index:1;
-    pointer-events:none;
-    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200'><defs><pattern id='p' x='0' y='0' width='100' height='100' patternUnits='userSpaceOnUse'><g fill='none' stroke='%23D4B77A' stroke-width='0.5' opacity='0.4'><path d='M50 5 L95 50 L50 95 L5 50 Z'/><path d='M50 20 L80 50 L50 80 L20 50 Z'/><circle cx='50' cy='50' r='12'/><circle cx='50' cy='50' r='4' fill='%23D4B77A' fill-opacity='0.5'/></g></pattern></defs><rect width='200' height='200' fill='url(%23p)'/></svg>");
-    background-size:200px 200px;
-    opacity:0.5;
-    animation:champPatternFloat 60s linear infinite;
-    mask-image:radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
-    -webkit-mask-image:radial-gradient(ellipse at center, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 60%, transparent 100%);
-}
-
-@keyframes champPatternFloat{
-    0%{background-position:0 0;}
-    100%{background-position:200px 200px;}
-}
-
-/* ═══ LAYER 3: توهج مركزي ═══ */
-
-.champ-bg-glow{
-    position:absolute;
-    inset:0;
-    z-index:2;
-    pointer-events:none;
-    background:radial-gradient(ellipse at center,
-        rgba(212,183,122,0.08) 0%,
-        rgba(139,26,47,0.05) 30%,
-        transparent 70%);
-    animation:champGlowPulse 6s ease-in-out infinite;
-}
-
-@keyframes champGlowPulse{
-    0%, 100%{opacity:0.6;transform:scale(1);}
-    50%{opacity:1;transform:scale(1.05);}
-}
-
-/* ═══ LAYER 4: جزيئات عائمة ═══ */
-
-.champ-particles-bg{
-    position:absolute;
-    inset:0;
-    z-index:3;
-    pointer-events:none;
-    overflow:hidden;
-}
-
-.champ-particle-bg{
-    position:absolute;
-    width:3px;
-    height:3px;
-    background:radial-gradient(circle, #D4B77A 0%, transparent 70%);
-    border-radius:50%;
-    box-shadow:0 0 8px rgba(212,183,122,0.8);
-    animation:champParticleFloat linear infinite;
-}
-
-@keyframes champParticleFloat{
-    0%{
-        transform:translateY(0) translateX(0) scale(0);
-        opacity:0;
-    }
-    10%{
-        opacity:1;
-        transform:translateY(-10vh) translateX(20px) scale(1);
-    }
-    90%{
-        opacity:1;
-        transform:translateY(-90vh) translateX(-30px) scale(1);
-    }
-    100%{
-        opacity:0;
-        transform:translateY(-100vh) translateX(0) scale(0);
-    }
-}
-
-/* ═══ CONTENT (فوق الخلفية) ═══ */
-
-.champ-draw-header,
-.champ-banner-stage{
-    position:relative;
-    z-index:10;
-}
-
 /* ═══ TITLE ═══ */
 
 .champ-draw-header{
@@ -212,6 +39,8 @@
     text-align:center;
     padding:20px 0 30px;
     flex-shrink:0;
+    position:relative;
+    z-index:10;
 }
 
 .champ-draw-title{
@@ -224,31 +53,12 @@
     text-shadow:
         0 0 20px rgba(212,183,122,.7),
         0 0 40px rgba(212,183,122,.3),
-        0 0 80px rgba(139,26,47,.3),
         0 2px 10px rgba(0,0,0,.9);
     font-family:'Cairo', 'Tajawal', sans-serif;
     direction:rtl;
-    animation:champTitleBreath 4s ease-in-out infinite;
 }
 
-@keyframes champTitleBreath{
-    0%, 100%{
-        text-shadow:
-            0 0 20px rgba(212,183,122,.7),
-            0 0 40px rgba(212,183,122,.3),
-            0 0 80px rgba(139,26,47,.3),
-            0 2px 10px rgba(0,0,0,.9);
-    }
-    50%{
-        text-shadow:
-            0 0 30px rgba(212,183,122,1),
-            0 0 60px rgba(212,183,122,.5),
-            0 0 100px rgba(139,26,47,.5),
-            0 2px 10px rgba(0,0,0,.9);
-    }
-}
-
-/* ═══ BANNER STAGE ═══ */
+/* ═══ BANNER ═══ */
 
 .champ-banner-stage{
     width:100%;
@@ -257,6 +67,8 @@
     flex-direction:column;
     align-items:center;
     flex-shrink:0;
+    position:relative;
+    z-index:10;
 }
 
 .champ-banner-original{
@@ -266,36 +78,11 @@
     border-radius:24px;
     overflow:hidden;
     box-shadow:
-        0 20px 80px rgba(212,183,122,.5),
-        0 0 60px rgba(139,26,47,.4),
-        inset 0 0 40px rgba(212,183,122,.2);
-    border:3px solid #D4B77A;
+        0 20px 80px rgba(212,183,122,.4),
+        0 0 60px rgba(139,26,47,.3);
+    border:2px solid #D4B77A;
     margin:0 auto;
     position:relative;
-    animation:champBannerFloat 6s ease-in-out infinite;
-}
-
-@keyframes champBannerFloat{
-    0%, 100%{transform:translateY(0);}
-    50%{transform:translateY(-6px);}
-}
-
-.champ-banner-original::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:linear-gradient(120deg,
-        transparent 30%,
-        rgba(255,255,255,.15) 50%,
-        transparent 70%);
-    animation:champBannerShimmer 4s ease-in-out infinite;
-    pointer-events:none;
-    z-index:2;
-}
-
-@keyframes champBannerShimmer{
-    0%{transform:translateX(-100%);}
-    50%, 100%{transform:translateX(100%);}
 }
 
 .champ-banner-original img{
@@ -336,73 +123,49 @@
     border-radius:22px;
 }
 
-/* ⭐ الإطار الذهبي الدوّار */
+/* ⭐ الإطار — ماسي (Diamond Sweep) */
 .champ-card::before{
     content:'';
     position:absolute;
     inset:-3px;
     border-radius:24px;
-    padding:3px;
-    background:conic-gradient(
-        from 0deg,
-        #D4B77A 0deg,
-        #4A0A15 45deg,
-        #8B1A2F 90deg,
-        #D4B77A 135deg,
-        #4A0A15 180deg,
-        #8B1A2F 225deg,
-        #D4B77A 270deg,
-        #4A0A15 315deg,
-        #D4B77A 360deg
-    );
     z-index:-1;
-    animation:champCardBorderRotate 8s linear infinite;
-    filter:blur(0.6px);
+    background:
+        conic-gradient(
+            from 45deg at 50% 50%,
+            #D4B77A 0deg,
+            #8B1A2F 90deg,
+            #D4B77A 180deg,
+            #8B1A2F 270deg,
+            #D4B77A 360deg
+        );
+    opacity:0.85;
+    animation:champDiamondSweep 6s linear infinite;
 }
 
-/* ⭐ هالة إضافية ذهبية */
+/* ⭐ توهج خفيف */
 .champ-card::after{
     content:'';
     position:absolute;
     inset:-6px;
     border-radius:28px;
+    z-index:-2;
     background:conic-gradient(
-        from 0deg,
+        from 45deg at 50% 50%,
         rgba(212,183,122,0) 0deg,
-        rgba(212,183,122,0.6) 90deg,
-        rgba(139,26,47,0.6) 180deg,
-        rgba(212,183,122,0.6) 270deg,
+        rgba(212,183,122,0.5) 90deg,
+        rgba(139,26,47,0.5) 180deg,
+        rgba(212,183,122,0.5) 270deg,
         rgba(212,183,122,0) 360deg
     );
-    z-index:-2;
-    animation:champCardBorderRotate 8s linear infinite reverse;
-    filter:blur(8px);
-    opacity:0.7;
+    filter:blur(10px);
+    opacity:0.6;
+    animation:champDiamondSweep 6s linear infinite reverse;
 }
 
-@keyframes champCardBorderRotate{
+@keyframes champDiamondSweep{
     0%{transform:rotate(0deg);}
     100%{transform:rotate(360deg);}
-}
-
-/* ⭐ Shimmer يمر على البطاقة */
-.champ-card .champ-card-inner::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    border-radius:22px;
-    background:linear-gradient(120deg,
-        transparent 30%,
-        rgba(255,255,255,.15) 50%,
-        transparent 70%);
-    z-index:10;
-    pointer-events:none;
-    animation:champCardShimmer 4s ease-in-out infinite;
-}
-
-@keyframes champCardShimmer{
-    0%{transform:translateX(-150%);}
-    50%, 100%{transform:translateX(150%);}
 }
 
 .champ-card-inner{
@@ -427,7 +190,7 @@
     align-items:center;
     justify-content:center;
     overflow:hidden;
-    border:1px solid rgba(212,183,122,.4);
+    border:1px solid rgba(212,183,122,.3);
     box-shadow:
         0 20px 60px rgba(0,0,0,.8),
         inset 0 0 40px rgba(0,0,0,.5);
@@ -441,19 +204,9 @@
 
 .champ-card-back{
     transform:rotateY(180deg);
-    background:linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 50%, #4A0A15 100%);
+    background:linear-gradient(135deg, #2A2A2A 0%, #1A1A1A 60%, #4A0A15 100%);
     border-color:#D4B77A;
     position:relative;
-}
-
-.champ-card-back::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:radial-gradient(ellipse at center,
-        rgba(212,183,122,.15) 0%,
-        transparent 60%);
-    pointer-events:none;
 }
 
 .champ-card-back-team{
@@ -474,8 +227,6 @@
     width:clamp(55px, 9vw, 90px);
     height:clamp(55px, 9vw, 90px);
     object-fit:contain;
-    filter:brightness(1.15) contrast(1.1);
-    /* ❌ بدون drop-shadow ذهبي */
 }
 
 .champ-card-back-team span{
@@ -484,9 +235,7 @@
     color:#FAF6F0;
     letter-spacing:2px;
     text-transform:uppercase;
-    text-shadow:
-        0 0 15px rgba(212,183,122,.5),
-        0 2px 6px rgba(0,0,0,.8);
+    text-shadow:0 2px 8px rgba(0,0,0,.9);
     line-height:1.2;
 }
 
@@ -513,25 +262,13 @@
     background:linear-gradient(180deg,
         rgba(42,42,42,.9) 0%,
         rgba(26,26,26,.95) 100%);
-    border:2px solid rgba(212,183,122,.5);
+    border:2px solid rgba(212,183,122,.4);
     border-radius:20px;
     padding:16px 12px;
     transition:all .3s ease;
     position:relative;
     overflow:hidden;
     will-change:transform, box-shadow;
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-}
-
-.champ-group-target::before{
-    content:'';
-    position:absolute;
-    inset:0;
-    background:radial-gradient(ellipse at center,
-        rgba(212,183,122,.05) 0%,
-        transparent 70%);
-    pointer-events:none;
 }
 
 .champ-group-target-label{
@@ -543,7 +280,7 @@
     padding-bottom:12px;
     margin-bottom:12px;
     border-bottom:2px solid rgba(212,183,122,.3);
-    text-shadow:0 0 15px rgba(212,183,122,.7);
+    text-shadow:0 0 12px rgba(212,183,122,.5);
     position:relative;
     z-index:2;
 }
@@ -563,13 +300,11 @@
     gap:10px;
     padding:8px 12px;
     background:linear-gradient(135deg,
-        rgba(212,183,122,.18) 0%,
-        rgba(139,26,47,.18) 100%);
-    border:1.5px solid rgba(212,183,122,.4);
+        rgba(212,183,122,.15) 0%,
+        rgba(139,26,47,.15) 100%);
+    border:1.5px solid rgba(212,183,122,.35);
     border-radius:12px;
-    transition:all .3s ease;
     will-change:transform, opacity;
-    box-shadow:0 2px 8px rgba(0,0,0,.3);
 }
 
 .champ-group-team-item img{
@@ -577,7 +312,6 @@
     height:26px;
     object-fit:contain;
     flex-shrink:0;
-    filter:brightness(1.1);
 }
 
 .champ-group-team-item span{
@@ -593,6 +327,7 @@
     white-space:nowrap;
     text-shadow:0 1px 3px rgba(0,0,0,.5);
 }
+
 /* ═══ DRAW ACTIONS ═══ */
 
 .champ-draw-actions{
@@ -635,38 +370,16 @@
     min-width:180px;
 }
 
-.champ-btn-save::before,
-.champ-btn-reset::before{
-    content:'';
-    position:absolute;
-    top:0;left:-100%;
-    width:100%;height:100%;
-    background:linear-gradient(90deg,
-        transparent 0%,
-        rgba(255,255,255,.3) 50%,
-        transparent 100%);
-    animation:champBtnShine 3s ease-in-out infinite;
-}
-
-@keyframes champBtnShine{
-    0%{left:-100%;}
-    50%, 100%{left:100%;}
-}
-
 .champ-btn-save{
     background:linear-gradient(135deg, #D4B77A 0%, #8B7340 100%);
     color:#1A1A1A;
     border-color:#FAF6F0;
-    box-shadow:
-        0 8px 24px rgba(212,183,122,.5),
-        inset 0 1px 0 rgba(255,255,255,.3);
+    box-shadow:0 8px 24px rgba(212,183,122,.5);
 }
 
 .champ-btn-save:hover:not(:disabled){
     transform:translateY(-2px);
-    box-shadow:
-        0 12px 32px rgba(212,183,122,.7),
-        inset 0 1px 0 rgba(255,255,255,.4);
+    box-shadow:0 12px 32px rgba(212,183,122,.7);
 }
 
 .champ-btn-save:disabled{
@@ -678,16 +391,12 @@
     background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
     color:#FAF6F0;
     border-color:#D4B77A;
-    box-shadow:
-        0 8px 24px rgba(139,26,47,.5),
-        inset 0 1px 0 rgba(255,255,255,.15);
+    box-shadow:0 8px 24px rgba(139,26,47,.5);
 }
 
 .champ-btn-reset:hover{
     transform:translateY(-2px);
-    box-shadow:
-        0 12px 32px rgba(139,26,47,.7),
-        inset 0 1px 0 rgba(255,255,255,.2);
+    box-shadow:0 12px 32px rgba(139,26,47,.7);
 }
 
 .champ-btn-save:active,
@@ -700,7 +409,7 @@
     font-size:20px;
 }
 
-/* ═══ LED ═══ */
+/* ═══ LED (Flying Team) ═══ */
 
 .champ-led{
     display:flex;
@@ -714,43 +423,16 @@
     border-radius:20px;
     box-shadow:
         0 0 60px rgba(212,183,122,.9),
-        0 0 120px rgba(212,183,122,.4),
-        0 20px 60px rgba(0,0,0,.8),
-        inset 0 0 30px rgba(212,183,122,.2);
+        0 20px 60px rgba(0,0,0,.8);
     will-change:transform, opacity;
     min-width:130px;
     transform-origin:center center;
-    position:relative;
-}
-
-.champ-led::before{
-    content:'';
-    position:absolute;
-    inset:-8px;
-    border-radius:24px;
-    background:conic-gradient(
-        from 0deg,
-        rgba(212,183,122,0) 0deg,
-        rgba(212,183,122,.8) 90deg,
-        rgba(139,26,47,.8) 180deg,
-        rgba(212,183,122,.8) 270deg,
-        rgba(212,183,122,0) 360deg
-    );
-    z-index:-1;
-    filter:blur(12px);
-    animation:champLedRotate 3s linear infinite;
-}
-
-@keyframes champLedRotate{
-    0%{transform:rotate(0deg);}
-    100%{transform:rotate(360deg);}
 }
 
 .champ-led img{
     width:48px;
     height:48px;
     object-fit:contain;
-    filter:brightness(1.2) contrast(1.1);
 }
 
 .champ-led span{
@@ -765,12 +447,12 @@
     white-space:nowrap;
 }
 
-/* ═══ EFFECTS ═══ */
+/* ═══ EFFECTS (بسيطة) ═══ */
 
 .champ-trail-particle{
     position:fixed;
-    width:16px;
-    height:16px;
+    width:14px;
+    height:14px;
     border-radius:50%;
     background:radial-gradient(circle,
         #E5D4A5 0%,
@@ -780,81 +462,27 @@
     z-index:9999998;
     transform:translate(-50%,-50%);
     box-shadow:
-        0 0 16px #D4B77A,
-        0 0 32px rgba(212,183,122,.6),
-        0 0 48px rgba(139,26,47,.4);
+        0 0 14px #D4B77A,
+        0 0 28px rgba(212,183,122,.5);
 }
 
 .champ-shockwave{
     position:fixed;
-    width:120px;
-    height:120px;
+    width:100px;
+    height:100px;
     border-radius:50%;
-    border:5px solid #D4B77A;
+    border:4px solid #D4B77A;
     background:radial-gradient(circle,
-        rgba(212,183,122,.5) 0%,
+        rgba(212,183,122,.4) 0%,
         transparent 70%);
     pointer-events:none;
     z-index:9999998;
     transform:translate(-50%,-50%);
     box-shadow:
-        0 0 60px #D4B77A,
-        0 0 120px rgba(212,183,122,.5),
-        inset 0 0 50px rgba(212,183,122,.6);
+        0 0 50px #D4B77A,
+        inset 0 0 40px rgba(212,183,122,.5);
 }
 
-.champ-shockwave.shockwave-2{
-    border-color:#8B1A2F;
-    background:radial-gradient(circle,
-        rgba(139,26,47,.5) 0%,
-        transparent 70%);
-    box-shadow:
-        0 0 60px #8B1A2F,
-        0 0 120px rgba(139,26,47,.5),
-        inset 0 0 50px rgba(139,26,47,.6);
-}
-
-.champ-confetti{
-    position:fixed;
-    border-radius:2px;
-    pointer-events:none;
-    z-index:9999999;
-    will-change:transform;
-    box-shadow:0 0 10px rgba(212,183,122,.6);
-}
-
-/* ⭐ Lightning */
-.champ-lightning{
-    position:fixed;
-    pointer-events:none;
-    z-index:9999998;
-    background:linear-gradient(180deg,
-        transparent 0%,
-        #D4B77A 20%,
-        #FAF6F0 50%,
-        #D4B77A 80%,
-        transparent 100%);
-    filter:blur(1px);
-    transform-origin:top center;
-}
-
-/* ⭐ Burst Particles */
-.champ-burst{
-    position:fixed;
-    width:10px;
-    height:10px;
-    border-radius:50%;
-    background:radial-gradient(circle,
-        #E5D4A5 0%,
-        #D4B77A 50%,
-        transparent 100%);
-    pointer-events:none;
-    z-index:9999999;
-    transform:translate(-50%,-50%);
-    box-shadow:0 0 15px #D4B77A;
-}
-
-/* ⭐ Flash */
 .champ-flash{
     position:fixed;
     inset:0;
@@ -864,22 +492,15 @@
     opacity:0;
 }
 
-/* ⭐ Ring */
-.champ-ring{
+.champ-confetti{
     position:fixed;
-    width:80px;
-    height:80px;
-    border-radius:50%;
-    border:3px solid #D4B77A;
+    border-radius:2px;
     pointer-events:none;
-    z-index:9999998;
-    transform:translate(-50%,-50%);
-    box-shadow:
-        0 0 30px #D4B77A,
-        inset 0 0 20px rgba(212,183,122,.5);
+    z-index:9999999;
+    will-change:transform;
 }
 
-/* ═══ INTRO OVERLAY ═══ */
+/* ═══ INTRO ═══ */
 
 .champ-intro{
     position:absolute;
@@ -888,9 +509,7 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    background:radial-gradient(ellipse at center,
-        rgba(0,0,0,0.8) 0%,
-        #000 100%);
+    background:#000;
     pointer-events:none;
 }
 
@@ -906,7 +525,6 @@
     text-shadow:
         0 0 30px #D4B77A,
         0 0 80px rgba(212,183,122,.6),
-        0 0 140px rgba(139,26,47,.5),
         0 4px 20px rgba(0,0,0,.9);
     will-change:transform, opacity, filter;
 }
@@ -916,41 +534,20 @@
     text-shadow:
         0 0 30px #8B1A2F,
         0 0 80px rgba(139,26,47,.8),
-        0 0 140px rgba(212,183,122,.6),
         0 4px 20px rgba(0,0,0,.9);
 }
 
 /* ═══ MOBILE ═══ */
 
 @media(max-width:768px){
-
     .champ-cards-stage{
         gap:12px;
         margin:25px auto 35px;
-        perspective:1000px;
     }
 
     .champ-card{
         min-width:75px;
         max-width:125px;
-        border-radius:16px;
-    }
-
-    .champ-card::before{
-        inset:-2px;
-        border-radius:18px;
-        padding:2px;
-    }
-
-    .champ-card::after{
-        inset:-4px;
-        border-radius:20px;
-        filter:blur(6px);
-    }
-
-    .champ-card-front,
-    .champ-card-back{
-        border-radius:16px;
     }
 
     .champ-card-back-team{
@@ -971,25 +568,16 @@
         min-width:70px;
         min-height:200px;
         padding:10px 6px;
-        border-radius:14px;
     }
 
     .champ-group-target-label{
         font-size:16px;
         letter-spacing:3px;
-        padding-bottom:8px;
-        margin-bottom:8px;
-    }
-
-    .champ-group-target-teams{
-        gap:5px;
-        min-height:140px;
     }
 
     .champ-group-team-item{
         padding:5px 6px;
         gap:4px;
-        border-radius:8px;
     }
 
     .champ-group-team-item img{
@@ -999,12 +587,10 @@
 
     .champ-group-team-item span{
         font-size:8px;
-        letter-spacing:0;
     }
 
     .champ-draw-title{
         font-size:20px;
-        letter-spacing:1.5px;
     }
 
     .champ-led{
@@ -1024,7 +610,6 @@
 
     .champ-draw-actions{
         gap:10px;
-        margin:20px auto 0;
     }
 
     .champ-btn-save,
@@ -1034,15 +619,9 @@
         font-size:12px;
         min-width:140px;
     }
-
-    .champ-btn-save i,
-    .champ-btn-reset i{
-        font-size:17px;
-    }
 }
 
 @media(max-width:480px){
-
     .champions-draw-screen{
         padding:14px 8px 30px;
     }
@@ -1053,7 +632,6 @@
 
     .champ-draw-title{
         font-size:17px;
-        letter-spacing:1px;
     }
 
     .champ-cards-stage{
@@ -1064,24 +642,6 @@
     .champ-card{
         min-width:60px;
         max-width:95px;
-        border-radius:14px;
-    }
-
-    .champ-card::before{
-        inset:-2px;
-        border-radius:16px;
-        padding:2px;
-    }
-
-    .champ-card::after{
-        inset:-4px;
-        border-radius:18px;
-        filter:blur(5px);
-    }
-
-    .champ-card-front,
-    .champ-card-back{
-        border-radius:14px;
     }
 
     .champ-card-back-team img{
@@ -1102,7 +662,6 @@
         min-width:60px;
         min-height:170px;
         padding:8px 4px;
-        border-radius:12px;
     }
 
     .champ-group-target-label{
@@ -1134,19 +693,9 @@
 /* ═══ REDUCED MOTION ═══ */
 
 @media (prefers-reduced-motion: reduce){
-    .champ-wave,
-    .champ-bg-pattern,
-    .champ-bg-glow,
-    .champ-particle-bg,
     .champ-card::before,
-    .champ-card::after,
-    .champ-card-inner::before,
-    .champ-banner-original,
-    .champ-banner-original::before,
-    .champ-led::before,
-    .champ-draw-title{
+    .champ-card::after{
         animation:none !important;
-        transition:none !important;
     }
 }
 
