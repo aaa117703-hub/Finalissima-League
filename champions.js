@@ -1,6 +1,6 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=11)
-   المنطق الكامل + 3 Tabs (بدون أنيميشن)
+   champions.js — FINALISSIMA LEAGUE CHAT (v=12)
+   🔐 منطق الأدمن + sessionStorage
 ========================================================= */
 
 const CHAMP_PIN = '024680';
@@ -10,7 +10,34 @@ const CHAMP_POT_SIZE = 4;
 let champData = { meta: null, draw: [], matches: [], pendingDraw: null };
 let champLoaded = false;
 let champDrawAnimating = false;
-let champCurrentView = 'matches'; // ⭐ 'matches' أو 'standings'
+let champCurrentView = 'matches';
+
+/* =========================================================
+   🔐 Admin Logic
+========================================================= */
+
+function isChampAdmin() {
+    try {
+        return sessionStorage.getItem('champ_admin') === 'true';
+    } catch (e) {
+        return false;
+    }
+}
+
+function setChampAdmin() {
+    try {
+        sessionStorage.setItem('champ_admin', 'true');
+    } catch (e) {}
+}
+
+function clearChampAdmin() {
+    try {
+        sessionStorage.removeItem('champ_admin');
+    } catch (e) {}
+}
+
+window.isChampAdmin = isChampAdmin;
+window.clearChampAdmin = clearChampAdmin;
 
 /* =========================================================
    Helpers
@@ -101,10 +128,10 @@ async function loadChampionsMatches() {
     } catch (e) { return []; }
 }
 
-async function saveChampionsMeta(updates) {
-    if (!window.sbClient) return false;
-    try {
-        const payload = Object.assign({ id: 1, updated_at: new Date().toISOString() }, updates);
+async function saveCh }ampionsMeta(updates) {
+    catch if (!window.sbClient) return false;
+ (    try {
+        const payload = Object.assign({e id: 1, updated_at:) new Date().toISOString() { }, updates);
         const { error } = await window.sbClient
             .from('champions_meta').upsert(payload, { onConflict: 'id' });
         if (error) throw error;
@@ -120,9 +147,9 @@ async function saveChampionsDraw(rows) {
         const { error } = await window.sbClient.from('champions_draw').insert(rows);
         if (error) throw error;
         return true;
-    } catch (e) { 
+    } catch (e) {
         console.error('[Champions] saveDraw error:', e);
-        return false; 
+        return false;
     }
 }
 window.saveChampionsDraw = saveChampionsDraw;
@@ -183,7 +210,7 @@ async function fetchTeamScoresForRound(gw) {
             if (!isNaN(as)) map[row.away_team] = as;
         });
         return map;
-    } catch (e) { return {}; }
+    return {}; }
 }
 
 /* =========================================================
@@ -308,6 +335,7 @@ function buildRoundRobin(groups) {
     return matches;
 }
 window.buildRoundRobin = buildRoundRobin;
+
 /* =========================================================
    Sync Results
 ========================================================= */
@@ -560,7 +588,7 @@ async function buildKnockoutStage(startGw) {
 }
 
 /* =========================================================
-   ⭐ 3 TABS (Matches / Standings)
+   Tabs — 2 only (no settings button)
 ========================================================= */
 
 function champSwitchView(view) {
@@ -575,29 +603,6 @@ function champSwitchView(view) {
 }
 window.champSwitchView = champSwitchView;
 
-/* ⭐ زر الإعدادات */
-function champShowSettingsMenu() {
-    const pin = prompt('أدخل رمز الإعدادات:');
-    if (pin === null) return;
-    if (pin !== CHAMP_PIN) { 
-        if (typeof showToast === 'function') showToast('رمز خطأ', false, 2500);
-        return; 
-    }
-
-    const choice = prompt(
-        'إعدادات البطولة:\n' +
-        '1 - إعادة القرعة\n' +
-        '2 - تحديث النتائج\n' +
-        '3 - بدء الإقصائيات\n' +
-        '0 - إلغاء'
-    );
-
-    if (choice === '1') champRequestReset();
-    else if (choice === '2') champSyncNow();
-    else if (choice === '3') champStartKnockout();
-}
-window.champShowSettingsMenu = champShowSettingsMenu;
-
 /* =========================================================
    Render Main
 ========================================================= */
@@ -609,55 +614,81 @@ function renderChampionsMain() {
     const meta = champData.meta || {};
     const draw = champData.draw || [];
     const matches = champData.matches || [];
+    const isAdmin = isChampAdmin();
 
     let html = '';
 
-    if (!meta.started) {
-        if (draw.length === 0) {
-            html += '<div class="champions-start-area">';
-            html += '<button class="champions-start-btn" onclick="champPerformDraw()">';
-            html += xIcon('shuffle', 'bold') + ' <span>Start Draw</span>';
-            html += '</button>';
-            html += '<div class="champions-status-text">Press to start the draw</div>';
-            html += '</div>';
-        } else {
-            html += '<div class="champions-start-area">';
-            html += '<button class="champions-start-btn" onclick="champStartTournament()">';
-            html += xIcon('play-circle', 'fill') + ' <span>Start Tournament</span>';
-            html += '</button>';
-            html += '<div class="champions-status-text">Starts from the <strong>next round</strong></div>';
+    /* ⭐ للأدمن فقط */
+    if (isAdmin) {
+        /* Status Line */
+        if (meta.started) {
+            let stageText = '';
+            if (meta.current_stage === 'groups') stageText = 'Group Stage';
+            else if (meta.current_stage === 'qf') stageText = 'Quarter Finals';
+            else if (meta.current_stage === 'sf') stageText = 'Semi Finals';
+            else if (meta.current_stage === 'final') stageText = 'Final';
+            else if (meta.current_stage === 'done') stageText = 'Finished';
+
+            html += '<div class="champions-status-text">';
+            html += xIcon('trophy', 'fill') + ' ' + stageText + ' - GW<strong>' + meta.start_gw + '</strong>';
             html += '</div>';
         }
-    } else {
-        let stageText = '';
-        if (meta.current_stage === 'groups') stageText = 'Group Stage';
-        else if (meta.current_stage === 'qf') stageText = 'Quarter Finals';
-        else if (meta.current_stage === 'sf') stageText = 'Semi Finals';
-        else if (meta.current_stage === 'final') stageText = 'Final';
-        else if (meta.current_stage === 'done') stageText = 'Finished';
 
-        html += '<div class="champions-start-area">';
-        html += '<div class="champions-status-text">';
-        html += xIcon('trophy', 'fill') + ' ' + stageText + ' - GW<strong>' + meta.start_gw + '</strong>';
-        html += '</div></div>';
+        /* Admin Actions */
+        if (!meta.started || draw.length === 0) {
+            html += '<div class="champ-admin-actions">';
+
+            if (draw.length === 0) {
+                html += '<button class="champ-admin-btn champ-admin-start" onclick="champPerformDraw()">';
+                html += xIcon('shuffle', 'bold') + ' <span>ابدأ القرعة</span>';
+                html += '</button>';
+            } else {
+                html += '<button class="champ-admin-btn champ-admin-reset" onclick="champRequestReset()">';
+                html += xIcon('arrows-clockwise', 'bold') + ' <span>إعادة القرعة</span>';
+                html += '</button>';
+            }
+
+            html += '</div>';
+        }
     }
 
-    if (draw.length > 0 && meta.started) {
-        /* ⭐ 3 Tabs */
+    /* ⭐ إذا ما فيه قرعة */
+    if (draw.length === 0) {
+        if (isAdmin) {
+            html += '<div class="champions-empty">';
+            html += xIcon('trophy', 'duotone');
+            html += '<div>لا توجد قرعة — اضغط "ابدأ القرعة"</div>';
+            html += '</div>';
+        } else {
+            html += '<div class="champions-empty">';
+            html += xIcon('hourglass', 'duotone');
+            html += '<div>القرعة لم تُسحب بعد</div>';
+            html += '</div>';
+        }
+
+        container.innerHTML = html;
+        attachChampHiddenBtns();
+        return;
+    }
+
+    /* ⭐ 2 Tabs */
+    if (draw.length > 0) {
         html += '<div class="champ-view-tabs">';
-        html += '<button class="champ-view-btn ' + (champCurrentView === 'matches' ? 'active' : '') + '" data-view="matches" onclick="champSwitchView(\'matches\')">';
+
+        html += '<button class="champ-view-btn ' + (champCurrentView === 'matches' ? 'active' : '') + '" ';
+        html += 'data-view="matches" onclick="champSwitchView(\'matches\')">';
         html += xIcon('soccer-ball', 'bold') + ' <span>المواجهات</span>';
         html += '</button>';
-        html += '<button class="champ-view-btn ' + (champCurrentView === 'standings' ? 'active' : '') + '" data-view="standings" onclick="champSwitchView(\'standings\')">';
+
+        html += '<button class="champ-view-btn ' + (champCurrentView === 'standings' ? 'active' : '') + '" ';
+        html += 'data-view="standings" onclick="champSwitchView(\'standings\')">';
         html += xIcon('chart-bar', 'bold') + ' <span>الترتيب</span>';
         html += '</button>';
-        html += '<button class="champ-view-btn champ-view-settings" onclick="champShowSettingsMenu()" title="إعدادات البطولة">';
-        html += xIcon('gear-six', 'fill');
-        html += '</button>';
+
         html += '</div>';
 
-        /* Panel 1: Matches */
-        if (meta.current_stage === 'groups') {
+        /* Panel: Matches */
+        if (meta.current_stage === 'groups' || !meta.started) {
             html += '<div class="champ-view-panel" data-panel="matches" style="display:' + (champCurrentView === 'matches' ? 'block' : 'none') + ';">';
             html += renderGroupsMatches(matches, meta);
             html += '</div>';
@@ -667,17 +698,18 @@ function renderChampionsMain() {
             html += '</div>';
         }
 
-        /* Panel 2: Standings */
+        /* Panel: Standings */
         html += '<div class="champ-view-panel" data-panel="standings" style="display:' + (champCurrentView === 'standings' ? 'block' : 'none') + ';">';
         html += renderGroupsSection(draw, matches, meta);
         html += '</div>';
+    }
 
-    } else if (draw.length > 0 && !meta.started) {
-        html += renderGroupsSection(draw, matches, meta);
-    } else {
-        html += '<div class="champions-empty">';
-        html += xIcon('trophy', 'duotone');
-        html += '<div>Ready to Start</div>';
+    /* ⭐ للأدمن — زر Sync في الأسفل */
+    if (isAdmin && meta.started) {
+        html += '<div class="champ-admin-footer">';
+        html += '<button class="champ-admin-btn-small" onclick="champSyncNow()">';
+        html += xIcon('arrows-clockwise', 'bold') + ' <span>تحديث النتائج</span>';
+        html += '</button>';
         html += '</div>';
     }
 
@@ -736,7 +768,7 @@ function renderGroupsSection(draw, matches, meta) {
 }
 
 /* =========================================================
-   Render Matches (بدون GW)
+   Render Matches
 ========================================================= */
 
 function renderGroupsMatches(matches, meta) {
@@ -857,11 +889,14 @@ function renderMatchRow(m) {
         '</div>' +
     '</div>';
 }
+
 /* =========================================================
-   Start Tournament
+   Start Tournament (Admin)
 ========================================================= */
 
 async function champStartTournament() {
+    if (!isChampAdmin()) return;
+
     if (typeof currentRound === 'undefined') {
         if (typeof showToast === 'function') showToast('currentRound not available', false);
         return;
@@ -880,65 +915,87 @@ async function champStartTournament() {
         if (typeof showToast === 'function') showToast('Tournament started from GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
-    } else {
-        if (typeof showToast === 'function') showToast('Failed to start', false);
     }
 }
 window.champStartTournament = champStartTournament;
 
 /* =========================================================
-   Admin Menu (الزر المخفي)
+   🔐 Hidden Admin Button — على "Aqeel Al Rowai"
 ========================================================= */
 
 function attachChampHiddenBtns() {
-    const banner = document.querySelector('.text-slide[data-tab="champions"]');
-    if (!banner) return;
-    if (banner.dataset.champAdminAttached === '1') return;
-    banner.dataset.champAdminAttached = '1';
+    const btns = [
+        document.getElementById('hiddenEditBtn'),
+        document.getElementById('hiddenEditBtn2')
+    ];
 
-    banner.style.cursor = 'pointer';
-    banner.style.userSelect = 'none';
-    banner.style.webkitUserSelect = 'none';
-    banner.style.webkitTouchCallout = 'none';
+    btns.forEach(function(btn) {
+        if (!btn) return;
+        if (btn.dataset.champAdminAttached === '1') return;
+        btn.dataset.champAdminAttached = '1';
 
-    let pressTimer = null;
+        let pressTimer = null;
+        const DURATION = 5000;
 
-    const startPress = function() {
-        pressTimer = setTimeout(function() { champShowAdminMenu(); }, 1500);
-    };
-    const cancelPress = function() {
-        if (pressTimer) clearTimeout(pressTimer);
-        pressTimer = null;
-    };
+        const startPress = function() {
+            if (pressTimer) clearTimeout(pressTimer);
+            pressTimer = setTimeout(function() {
+                champPromptAdmin();
+            }, DURATION);
+        };
 
-    banner.addEventListener('touchstart', startPress, { passive: true });
-    banner.addEventListener('touchend', cancelPress);
-    banner.addEventListener('touchcancel', cancelPress);
-    banner.addEventListener('mousedown', startPress);
-    banner.addEventListener('mouseup', cancelPress);
-    banner.addEventListener('mouseleave', cancelPress);
-    banner.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+        const cancelPress = function() {
+            if (pressTimer) clearTimeout(pressTimer);
+            pressTimer = null;
+        };
+
+        btn.addEventListener('touchstart', startPress, { passive: true });
+        btn.addEventListener('touchend', cancelPress);
+        btn.addEventListener('touchcancel', cancelPress);
+        btn.addEventListener('mousedown', startPress);
+        btn.addEventListener('mouseup', cancelPress);
+        btn.addEventListener('mouseleave', cancelPress);
+        btn.addEventListener('contextmenu', function(e) { e.preventDefault(); });
+    });
 }
 
-function champShowAdminMenu() {
-    const pin = prompt('Enter PIN:');
+function champPromptAdmin() {
+    const pin = prompt('أدخل الرمز:');
     if (pin === null) return;
-    if (pin !== CHAMP_PIN) { alert('Wrong PIN'); return; }
 
-    const choice = prompt(
-        'Choose action:\n' +
-        '1 - Sync Results\n' +
-        '2 - Start Knockout\n' +
-        '3 - Reset Draw\n' +
-        '0 - Cancel'
-    );
+    if (pin !== CHAMP_PIN) {
+        if (typeof showToast === 'function') showToast('الرمز خطأ', false, 2500);
+        return;
+    }
 
-    if (choice === '1') champSyncNow();
-    else if (choice === '2') champStartKnockout();
-    else if (choice === '3') champRequestReset();
+    const confirmMsg = isChampAdmin()
+        ? 'هل تريد الخروج من وضع الأدمن؟'
+        : 'هل تريد الدخول كأدمن؟';
+
+    const yes = confirm(confirmMsg);
+
+    if (yes) {
+        if (isChampAdmin()) {
+            clearChampAdmin();
+            if (typeof showToast === 'function') showToast('تم الخروج من وضع الأدمن', true, 2500);
+        } else {
+            setChampAdmin();
+            if (typeof showToast === 'function') showToast('مرحباً بك كأدمن ✅', true, 2500);
+        }
+
+        champLoaded = false;
+        loadChampions();
+    }
 }
+window.champPromptAdmin = champPromptAdmin;
+
+/* =========================================================
+   Admin Sync
+========================================================= */
 
 async function champSyncNow() {
+    if (!isChampAdmin()) return;
+
     if (typeof showToast === 'function') showToast('جاري التحديث...', false);
 
     const meta = champData.meta || {};
@@ -959,6 +1016,8 @@ async function champSyncNow() {
 window.champSyncNow = champSyncNow;
 
 async function champStartKnockout() {
+    if (!isChampAdmin()) return;
+
     const meta = champData.meta || {};
     if (!meta.started) { alert('Tournament not started'); return; }
     if (meta.current_stage !== 'groups') { alert('Knockout already started'); return; }
@@ -975,14 +1034,14 @@ async function champStartKnockout() {
         if (typeof showToast === 'function') showToast('بدأ الإقصائيات من GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
-    } else {
-        alert('Failed to build knockout');
     }
 }
 window.champStartKnockout = champStartKnockout;
 
 function champRequestReset() {
+    if (!isChampAdmin()) return;
     if (!confirm('هل أنت متأكد؟ سيتم حذف القرعة والمباريات والبدء من جديد.')) return;
+
     resetChampions().then(function(ok) {
         if (ok) {
             if (typeof showToast === 'function') showToast('تم حذف القرعة', true, 2500);
@@ -997,7 +1056,7 @@ function champRequestReset() {
 window.champRequestReset = champRequestReset;
 
 /* =========================================================
-   ⭐ Save Draw (يستخدم من champions-draw.js)
+   Save Draw (يستخدم من draw.js)
 ========================================================= */
 
 async function champSaveDraw(drawRows) {
@@ -1050,24 +1109,21 @@ async function loadChampions() {
 }
 window.loadChampions = loadChampions;
 
-window.champLoaded = champLoaded;
-
-/* =========================================================
-   Window Export
-========================================================= */
-
-window.champGoToTab = champGoToTab;
-window.champSwitchView = champSwitchView;
-window.champShowSettingsMenu = champShowSettingsMenu;
-window.champShowAdminMenu = champShowAdminMenu;
-window.champSyncNow = champSyncNow;
-window.champStartKnockout = champStartKnockout;
-window.champRequestReset = champRequestReset;
-window.champStartTournament = champStartTournament;
-window.champSaveDraw = champSaveDraw;
-window.loadChampions = loadChampions;
-
 window.championsReload = function() {
     champLoaded = false;
     loadChampions();
 };
+
+/* =========================================================
+   Window Exports
+========================================================= */
+
+window.champGoToTab = champGoToTab;
+window.champSwitchView = champSwitchView;
+window.champShowAdminMenu = champPromptAdmin;
+window.champStartKnockout = champStartKnockout;
+window.champRequestReset = champRequestReset;
+window.champSyncNow = champSyncNow;
+window.champStartTournament = champStartTournament;
+
+console.log('[Champions] v=12 loaded ✅');
