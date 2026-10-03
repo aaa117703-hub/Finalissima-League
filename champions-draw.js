@@ -1,5 +1,5 @@
 /* =========================================================
-   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=5)
+   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=6)
    🎬 WORLD-CLASS CINEMATIC DRAW
 ========================================================= */
 
