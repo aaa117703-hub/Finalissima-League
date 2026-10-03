@@ -685,7 +685,7 @@ function renderChampionsMain() {
         html += '</div>';
 
         if (meta.current_stage === 'groups' || !meta.started) {
-            html += '<div class="champ-view-panel" data-panel="matches + (champCurrentView === 'matches' ? 'block' : 'none') + ';">';
+            html += '<div class="champ-view-panel" data-panel="matches" style="display:' + (champCurrentView === 'matches' ? 'block' : 'none') + ';">';
             html += renderGroupsMatches(matches, meta);
             html += '</div>';
         } else {
