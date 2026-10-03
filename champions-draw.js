@@ -1,6 +1,7 @@
 /* =========================================================
-   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=6)
+   champions-draw.js — FINALISSIMA LEAGUE CHAT (v=7)
    🎬 WORLD-CLASS CINEMATIC DRAW
+   🔇 الأصوات معطلة ما عدا Tick
 ========================================================= */
 
 /* =========================================================
@@ -37,115 +38,32 @@ function champInitAudio() {
     }
 }
 
-/* ⭐ Whoosh — هادي */
+/* ⭐ Whoosh — معطل */
 function champPlayWhoosh(duration) {
-    if (!champAudioCtx) return;
-    duration = duration || 0.35;
-
-    try {
-        const now = champAudioCtx.currentTime;
-        const osc = champAudioCtx.createOscillator();
-        const gain = champAudioCtx.createGain();
-        const filter = champAudioCtx.createBiquadFilter();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.exponentialRampToValueAtTime(90, now + duration);
-
-        filter.type = 'lowpass';
-        filter.frequency.value = 600;
-
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.02, now + 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(champAudioCtx.destination);
-
-        osc.start(now);
-        osc.stop(now + duration + 0.05);
-    } catch (e) {}
+    return;
 }
 
-/* ⭐ Chime — نغمة واحدة هادية */
+/* ⭐ Chime — معطل */
 function champPlayChime() {
-    if (!champAudioCtx) return;
-
-    try {
-        const now = champAudioCtx.currentTime;
-        const osc = champAudioCtx.createOscillator();
-        const gain = champAudioCtx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.value = 660;
-
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.025, now + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
-
-        osc.connect(gain);
-        gain.connect(champAudioCtx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.55);
-    } catch (e) {}
+    return;
 }
 
-/* ⭐ Impact — خفيف جداً */
+/* ⭐ Impact — معطل */
 function champPlayImpact() {
-    if (!champAudioCtx) return;
-
-    try {
-        const now = champAudioCtx.currentTime;
-        const osc = champAudioCtx.createOscillator();
-        const gain = champAudioCtx.createGain();
-
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(80, now);
-        osc.frequency.exponentialRampToValueAtTime(50, now + 0.25);
-
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.04, now + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-
-        osc.connect(gain);
-        gain.connect(champAudioCtx.destination);
-
-        osc.start(now);
-        osc.stop(now + 0.35);
-    } catch (e) {}
+    return;
 }
 
-/* ⭐ Cheer — نادر الاستخدام */
+/* ⭐ Cheer — معطل */
 function champPlayCheer() {
-    if (!champAudioCtx) return;
-
-    try {
-        const now = champAudioCtx.currentTime;
-        const notes = [523, 659];
-
-        notes.forEach(function(freq, idx) {
-            const osc = champAudioCtx.createOscillator();
-            const gain = champAudioCtx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.value = freq;
-
-            gain.gain.setValueAtTime(0.0001, now + idx * 0.15);
-            gain.gain.exponentialRampToValueAtTime(0.02, now + idx * 0.15 + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.15 + 0.6);
-
-            osc.connect(gain);
-            gain.connect(champAudioCtx.destination);
-
-            osc.start(now + idx * 0.15);
-            osc.stop(now + idx * 0.15 + 0.7);
-        });
-    } catch (e) {}
+    return;
 }
 
-/* ⭐ Tick — يبقى كما هو (الي عجبك) */
+/* ⭐ Success — معطل */
+function champPlaySuccess() {
+    return;
+}
+
+/* ⭐ Tick — يبقى (الي عجبك) */
 function champPlayTick() {
     if (!champAudioCtx) return;
 
@@ -166,34 +84,6 @@ function champPlayTick() {
 
         osc.start(now);
         osc.stop(now + 0.08);
-    } catch (e) {}
-}
-
-/* ⭐ Success — 3 نغمات هادية */
-function champPlaySuccess() {
-    if (!champAudioCtx) return;
-
-    try {
-        const now = champAudioCtx.currentTime;
-        const notes = [523, 659, 784];
-
-        notes.forEach(function(freq, idx) {
-            const osc = champAudioCtx.createOscillator();
-            const gain = champAudioCtx.createGain();
-
-            osc.type = 'sine';
-            osc.frequency.value = freq;
-
-            gain.gain.setValueAtTime(0.0001, now + idx * 0.15);
-            gain.gain.exponentialRampToValueAtTime(0.03, now + idx * 0.15 + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.15 + 0.5);
-
-            osc.connect(gain);
-            gain.connect(champAudioCtx.destination);
-
-            osc.start(now + idx * 0.15);
-            osc.stop(now + idx * 0.15 + 0.6);
-        });
     } catch (e) {}
 }
 
@@ -595,8 +485,6 @@ async function champStageIntro() {
     const line1 = textEl.querySelector('.champ-intro-line');
     gsap.set(line1, { opacity: 0, y: 120, scale: 0.5, filter: 'blur(30px)' });
 
-    champPlayWhoosh(1.0);
-
     await new Promise(function(resolve) {
         gsap.to(line1, {
             opacity: 1,
@@ -621,8 +509,6 @@ async function champStageIntro() {
             onComplete: resolve
         });
     });
-
-    champPlayImpact();
 
     textEl.innerHTML = '<div class="champ-intro-line champ-intro-cup">CUP</div>';
     const line2 = textEl.querySelector('.champ-intro-line');
@@ -650,8 +536,6 @@ async function champStageIntro() {
     gsap.set([subline, year], { opacity: 0, y: 20 });
     gsap.to(subline, { opacity: 1, y: 0, duration: 0.6, delay: 0.1 });
     gsap.to(year, { opacity: 1, y: 0, duration: 0.6, delay: 0.3 });
-
-    champPlayChime();
 
     await champWait(1400);
 
@@ -690,8 +574,6 @@ async function champStageTrophy() {
         });
     });
 
-    champPlayWhoosh(0.8);
-
     await new Promise(function(resolve) {
         gsap.timeline({ onComplete: resolve })
             .to(trophy, {
@@ -707,7 +589,6 @@ async function champStageTrophy() {
             }, '-=0.4');
     });
 
-    champPlayChime();
     champVibrate([30, 20, 30]);
 
     await champWait(600);
@@ -774,7 +655,6 @@ async function champStagePotsEntry() {
             });
         });
 
-        champPlayWhoosh(0.3);
         await champWait(120);
     }
 
@@ -793,8 +673,6 @@ async function champStagePotsEntry() {
             onComplete: resolve
         });
     });
-
-    champPlayChime();
 
     await champWait(300);
 
@@ -837,7 +715,6 @@ async function champStagePotHighlight(potNum) {
             }, '-=0.3');
     });
 
-    champPlayChime();
     await champWait(400);
 }
 
@@ -932,7 +809,6 @@ async function champStagePickTeam(row, potNum) {
         ease: 'power2.out'
     });
 
-    champPlayChime();
     champVibrate([20, 10, 20]);
 
     await champWait(600);
@@ -967,7 +843,7 @@ async function champStagePickTeam(row, potNum) {
     flyer.style.position = 'fixed';
     flyer.style.left = '0';
     flyer.style.top = '0';
-    flyer.style.zIndex = '9999999';
+    flyer.style.zIndex = '2147483200';
     flyer.style.pointerEvents = 'none';
     flyer.style.transform = 'translate(' + (startX - 80) + 'px, ' + (startY - 35) + 'px) scale(0.2)';
     flyer.style.opacity = '0';
@@ -994,14 +870,11 @@ async function champStagePickTeam(row, potNum) {
         });
     });
 
-    champPlayWhoosh(0.5);
-
     await champWait(200);
 
     await champAnimateFlight(flyer, startX, startY, endX, endY, cardRect);
 
     flyer.remove();
-    champPlayImpact();
     champVibrate([40, 20, 40]);
 
     champScreenShake();
@@ -1296,7 +1169,6 @@ function champSpawnBurst(x, y, count) {
 
 async function champStageFinale() {
     champSpawnConfetti(120);
-    champPlaySuccess();
     champVibrate([100, 50, 100]);
 
     const titleEl = document.getElementById('champDrawTitle');
@@ -1432,8 +1304,6 @@ async function champSaveAndClose() {
         if (typeof showToast === 'function') {
             showToast('تم حفظ القرعة — بدأ دور المجموعات ✅', true, 3000);
         }
-
-        champPlaySuccess();
 
         const screen = document.getElementById('champDrawScreen');
         if (screen) {
@@ -1627,6 +1497,6 @@ window.champSpawnConfetti = champSpawnConfetti;
    Init Log
 ========================================================= */
 
-console.log('%c[Champions Draw] v=5 WORLD-CLASS ✨',
+console.log('%c[Champions Draw] v=7 WORLD-CLASS ✨',
     'background: linear-gradient(135deg, #D4B77A, #8B1A2F); color: #fff; padding: 4px 12px; border-radius: 4px; font-weight: bold;');
-console.log('[Champ] Components: Audio ✓ | Particles ✓ | Preloader ✓ | Cinematic ✓');
+console.log('[Champ] Audio: Tick only ✓ | Particles ✓ | Preloader ✓ | Cinematic ✓');
