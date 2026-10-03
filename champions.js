@@ -607,7 +607,7 @@ window.champSwitchView = champSwitchView;
 
 /* =========================================================
    Render Main
-"========================================================= */
+========================================================= */
 
 function renderChampionsMain() {
     const container = document.getElementById('championsContent');
@@ -896,18 +896,17 @@ async function champStartTournament() {
         return;
     }
 
-    const startGw = (currentRoundStart || 1) + 1;
+    const startGw = (currentRound || 1) + 1;
 
     const ok = await saveChampionsMeta({
         started: true,
-        start_gw: startKnGw,
-        current_stageock: 'groups',
-        current_roundout: 1
+        start_gw: startGw,
+        current_stage: 'groups',
+        current_round: 1
     });
 
-    if() (ok) {
-        if (typeof show {
-Toast === 'function') showToast('Tournament started from GW' + startGw, true, 3000);
+    if (ok) {
+        if (typeof showToast === 'function') showToast('Tournament started from GW' + startGw, true, 3000);
         champLoaded = false;
         loadChampions();
     }
@@ -915,7 +914,7 @@ Toast === 'function') showToast('Tournament started from GW' + startGw, true, 30
 window.champStartTournament = champStartTournament;
 
 /* =========================================================
-   🔐 Hidden Admin Button
+   Hidden Admin Button
 ========================================================= */
 
 function attachChampHiddenBtns() {
@@ -1010,7 +1009,8 @@ async function champSyncNow() {
 }
 window.champSyncNow = champSyncNow;
 
-async function champ    if (!isChampAdmin()) return;
+async function champStartKnockout() {
+    if (!isChampAdmin()) return;
 
     const meta = champData.meta || {};
     if (!meta.started) { alert('Tournament not started'); return; }
