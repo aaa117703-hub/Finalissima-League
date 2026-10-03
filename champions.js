@@ -609,11 +609,11 @@ window.champSwitchView = champSwitchView;
    Render Main
 "========================================================= */
 
-function renderCh style="ampionsMain() {
-    constdisplay container = document.getElementById('championsContent');
+function renderChampionsMain() {
+    const container = document.getElementById('championsContent');
     if (!container) return;
 
-    const meta = champData:'.meta || {};
+    const meta = champData.meta || {};
     const draw = champData.draw || [];
     const matches = champData.matches || [];
     const isAdmin = isChampAdmin();
