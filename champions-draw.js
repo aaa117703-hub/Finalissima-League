@@ -37,9 +37,10 @@ function champInitAudio() {
     }
 }
 
+/* ⭐ Whoosh — هادي */
 function champPlayWhoosh(duration) {
     if (!champAudioCtx) return;
-    duration = duration || 0.4;
+    duration = duration || 0.35;
 
     try {
         const now = champAudioCtx.currentTime;
@@ -47,17 +48,15 @@ function champPlayWhoosh(duration) {
         const gain = champAudioCtx.createGain();
         const filter = champAudioCtx.createBiquadFilter();
 
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(150, now);
-        osc.frequency.exponentialRampToValueAtTime(600, now + duration * 0.5);
-        osc.frequency.exponentialRampToValueAtTime(80, now + duration);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(180, now);
+        osc.frequency.exponentialRampToValueAtTime(90, now + duration);
 
         filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(2000, now);
-        filter.frequency.exponentialRampToValueAtTime(400, now + duration);
+        filter.frequency.value = 600;
 
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.08, now + 0.05);
+        gain.gain.exponentialRampToValueAtTime(0.02, now + 0.1);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
         osc.connect(filter);
@@ -69,33 +68,31 @@ function champPlayWhoosh(duration) {
     } catch (e) {}
 }
 
+/* ⭐ Chime — نغمة واحدة هادية */
 function champPlayChime() {
     if (!champAudioCtx) return;
 
     try {
         const now = champAudioCtx.currentTime;
-        const notes = [880, 1108, 1318];
+        const osc = champAudioCtx.createOscillator();
+        const gain = champAudioCtx.createGain();
 
-        notes.forEach(function(freq, idx) {
-            const osc = champAudioCtx.createOscillator();
-            const gain = champAudioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = 660;
 
-            osc.type = 'sine';
-            osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.exponentialRampToValueAtTime(0.025, now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
 
-            gain.gain.setValueAtTime(0.0001, now + idx * 0.08);
-            gain.gain.exponentialRampToValueAtTime(0.06, now + idx * 0.08 + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.08 + 0.8);
+        osc.connect(gain);
+        gain.connect(champAudioCtx.destination);
 
-            osc.connect(gain);
-            gain.connect(champAudioCtx.destination);
-
-            osc.start(now + idx * 0.08);
-            osc.stop(now + idx * 0.08 + 0.9);
-        });
+        osc.start(now);
+        osc.stop(now + 0.55);
     } catch (e) {}
 }
 
+/* ⭐ Impact — خفيف جداً */
 function champPlayImpact() {
     if (!champAudioCtx) return;
 
@@ -105,48 +102,50 @@ function champPlayImpact() {
         const gain = champAudioCtx.createGain();
 
         osc.type = 'sine';
-        osc.frequency.setValueAtTime(120, now);
-        osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+        osc.frequency.setValueAtTime(80, now);
+        osc.frequency.exponentialRampToValueAtTime(50, now + 0.25);
 
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.exponentialRampToValueAtTime(0.15, now + 0.01);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.4);
+        gain.gain.exponentialRampToValueAtTime(0.04, now + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
 
         osc.connect(gain);
         gain.connect(champAudioCtx.destination);
 
         osc.start(now);
-        osc.stop(now + 0.45);
+        osc.stop(now + 0.35);
     } catch (e) {}
 }
 
+/* ⭐ Cheer — نادر الاستخدام */
 function champPlayCheer() {
     if (!champAudioCtx) return;
 
     try {
         const now = champAudioCtx.currentTime;
-        const notes = [523, 659, 784, 1047];
+        const notes = [523, 659];
 
         notes.forEach(function(freq, idx) {
             const osc = champAudioCtx.createOscillator();
             const gain = champAudioCtx.createGain();
 
-            osc.type = 'triangle';
+            osc.type = 'sine';
             osc.frequency.value = freq;
 
-            gain.gain.setValueAtTime(0.0001, now + idx * 0.12);
-            gain.gain.exponentialRampToValueAtTime(0.08, now + idx * 0.12 + 0.03);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.12 + 1.2);
+            gain.gain.setValueAtTime(0.0001, now + idx * 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.02, now + idx * 0.15 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.15 + 0.6);
 
             osc.connect(gain);
             gain.connect(champAudioCtx.destination);
 
-            osc.start(now + idx * 0.12);
-            osc.stop(now + idx * 0.12 + 1.3);
+            osc.start(now + idx * 0.15);
+            osc.stop(now + idx * 0.15 + 0.7);
         });
     } catch (e) {}
 }
 
+/* ⭐ Tick — يبقى كما هو (الي عجبك) */
 function champPlayTick() {
     if (!champAudioCtx) return;
 
@@ -170,12 +169,13 @@ function champPlayTick() {
     } catch (e) {}
 }
 
+/* ⭐ Success — 3 نغمات هادية */
 function champPlaySuccess() {
     if (!champAudioCtx) return;
 
     try {
         const now = champAudioCtx.currentTime;
-        const notes = [523, 659, 784, 1047, 1319];
+        const notes = [523, 659, 784];
 
         notes.forEach(function(freq, idx) {
             const osc = champAudioCtx.createOscillator();
@@ -184,15 +184,15 @@ function champPlaySuccess() {
             osc.type = 'sine';
             osc.frequency.value = freq;
 
-            gain.gain.setValueAtTime(0.0001, now + idx * 0.1);
-            gain.gain.exponentialRampToValueAtTime(0.07, now + idx * 0.1 + 0.02);
-            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.1 + 0.6);
+            gain.gain.setValueAtTime(0.0001, now + idx * 0.15);
+            gain.gain.exponentialRampToValueAtTime(0.03, now + idx * 0.15 + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.15 + 0.5);
 
             osc.connect(gain);
             gain.connect(champAudioCtx.destination);
 
-            osc.start(now + idx * 0.1);
-            osc.stop(now + idx * 0.1 + 0.7);
+            osc.start(now + idx * 0.15);
+            osc.stop(now + idx * 0.15 + 0.6);
         });
     } catch (e) {}
 }
@@ -580,7 +580,7 @@ async function champStagePreloader() {
 }
 
 /* =========================================================
-   STAGE 1: Intro
+   STAGE 1: Intro Cinematic
 ========================================================= */
 
 async function champStageIntro() {
@@ -668,7 +668,7 @@ async function champStageIntro() {
 }
 
 /* =========================================================
-   STAGE 2: Trophy
+   STAGE 2: Trophy Reveal
 ========================================================= */
 
 async function champStageTrophy() {
@@ -1216,7 +1216,7 @@ function champFlashScreen() {
 }
 
 /* =========================================================
-   Effects
+   Spawn Effects
 ========================================================= */
 
 function champSpawnTrail(x, y) {
