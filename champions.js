@@ -1,6 +1,6 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=12)
-   🔐 منطق الأدمن + sessionStorage
+   champions.js — FINALISSIMA LEAGUE CHAT (v=13)
+   🔐 منطق الأدمن + sessionStorage + توقيع القسم
 ========================================================= */
 
 const CHAMP_PIN = '024680';
@@ -13,7 +13,7 @@ let champDrawAnimating = false;
 let champCurrentView = 'matches';
 
 /* =========================================================
-   🔐 Admin Logic
+   Admin Logic
 ========================================================= */
 
 function isChampAdmin() {
@@ -656,11 +656,13 @@ function renderChampionsMain() {
             html += '<div class="champions-empty">';
             html += xIcon('trophy', 'duotone');
             html += '<div>لا توجد قرعة — اضغط "ابدأ القرعة"</div>';
+            html += '<div class="champ-admin-signature" id="champAdminSignature">Aqeel Al Rowai</div>';
             html += '</div>';
         } else {
             html += '<div class="champions-empty">';
             html += xIcon('hourglass', 'duotone');
             html += '<div>القرعة لم تُسحب بعد</div>';
+            html += '<div class="champ-admin-signature" id="champAdminSignature">Aqeel Al Rowai</div>';
             html += '</div>';
         }
 
@@ -706,6 +708,8 @@ function renderChampionsMain() {
         html += '</button>';
         html += '</div>';
     }
+
+    html += '<div class="champ-admin-signature" id="champAdminSignature">Aqeel Al Rowai</div>';
 
     container.innerHTML = html;
     attachChampHiddenBtns();
@@ -914,13 +918,14 @@ async function champStartTournament() {
 window.champStartTournament = champStartTournament;
 
 /* =========================================================
-   Hidden Admin Button
+   Hidden Admin Button — 5 ثواني
 ========================================================= */
 
 function attachChampHiddenBtns() {
     const btns = [
         document.getElementById('hiddenEditBtn'),
-        document.getElementById('hiddenEditBtn2')
+        document.getElementById('hiddenEditBtn2'),
+        document.getElementById('champAdminSignature')
     ];
 
     btns.forEach(function(btn) {
@@ -974,7 +979,7 @@ function champPromptAdmin() {
             if (typeof showToast === 'function') showToast('تم الخروج من وضع الأدمن', true, 2500);
         } else {
             setChampAdmin();
-            if (typeof showToast === 'function') showToast('مرحباً بك كأدمن ✅', true, 2500);
+            if (typeof showToast === 'function') showToast('مرحباً بك كأدمن', true, 2500);
         }
 
         champLoaded = false;
@@ -1120,4 +1125,4 @@ window.champRequestReset = champRequestReset;
 window.champSyncNow = champSyncNow;
 window.champStartTournament = champStartTournament;
 
-console.log('[Champions] v=12 loaded ✅');
+console.log('[Champions] v=13 loaded ✅');
