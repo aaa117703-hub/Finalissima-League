@@ -1,6 +1,6 @@
 /* =========================================================
-   champions.js — FINALISSIMA LEAGUE CHAT (v=13)
-   🔐 منطق الأدمن + sessionStorage + توقيع القسم
+   champions.js — FINALISSIMA LEAGUE CHAT (v=14)
+   🔐 منطق الأدمن + الإعدادات
 ========================================================= */
 
 const CHAMP_PIN = '024680';
@@ -38,6 +38,34 @@ function clearChampAdmin() {
 
 window.isChampAdmin = isChampAdmin;
 window.clearChampAdmin = clearChampAdmin;
+
+/* ⭐ تبديل الأدمن من الإعدادات */
+function champSettingsToggleAdmin() {
+    if (isChampAdmin()) {
+        clearChampAdmin();
+        if (typeof showToast === 'function') {
+            showToast('تم الخروج من وضع الأدمن', true, 2500);
+        }
+    } else {
+        setChampAdmin();
+        if (typeof showToast === 'function') {
+            showToast('مرحباً بك كأدمن', true, 2500);
+        }
+    }
+
+    /* تحديث قائمة الإعدادات */
+    if (typeof openSettingsMain === 'function') {
+        openSettingsMain();
+    }
+
+    /* إعادة تحميل قسم Champions إذا مفتوح */
+    champLoaded = false;
+    if (typeof loadChampions === 'function') {
+        const container = document.getElementById('championsContent');
+        if (container) loadChampions();
+    }
+}
+window.champSettingsToggleAdmin = champSettingsToggleAdmin;
 
 /* =========================================================
    Helpers
@@ -656,13 +684,11 @@ function renderChampionsMain() {
             html += '<div class="champions-empty">';
             html += xIcon('trophy', 'duotone');
             html += '<div>لا توجد قرعة — اضغط "ابدأ القرعة"</div>';
-            html += '<div class="champ-admin-signature" id="champAdminSignature">Aqeel Al Rowai</div>';
             html += '</div>';
         } else {
             html += '<div class="champions-empty">';
             html += xIcon('hourglass', 'duotone');
             html += '<div>القرعة لم تُسحب بعد</div>';
-            html += '<div class="champ-admin-signature" id="champAdminSignature">Aqeel Al Rowai</div>';
             html += '</div>';
         }
 
@@ -708,8 +734,6 @@ function renderChampionsMain() {
         html += '</button>';
         html += '</div>';
     }
-
-    html += '<div class="champ-admin-signature" id="champAdminSignature">Aqeel Al Rowai</div>';
 
     container.innerHTML = html;
     attachChampHiddenBtns();
@@ -918,75 +942,12 @@ async function champStartTournament() {
 window.champStartTournament = champStartTournament;
 
 /* =========================================================
-   Hidden Admin Button — 5 ثواني
+   Hidden Admin Buttons (للتوافق فقط — بدون توقيع)
 ========================================================= */
 
 function attachChampHiddenBtns() {
-    const btns = [
-        document.getElementById('hiddenEditBtn'),
-        document.getElementById('hiddenEditBtn2'),
-        document.getElementById('champAdminSignature')
-    ];
-
-    btns.forEach(function(btn) {
-        if (!btn) return;
-        if (btn.dataset.champAdminAttached === '1') return;
-        btn.dataset.champAdminAttached = '1';
-
-        let pressTimer = null;
-        const DURATION = 5000;
-
-        const startPress = function() {
-            if (pressTimer) clearTimeout(pressTimer);
-            pressTimer = setTimeout(function() {
-                champPromptAdmin();
-            }, DURATION);
-        };
-
-        const cancelPress = function() {
-            if (pressTimer) clearTimeout(pressTimer);
-            pressTimer = null;
-        };
-
-        btn.addEventListener('touchstart', startPress, { passive: true });
-        btn.addEventListener('touchend', cancelPress);
-        btn.addEventListener('touchcancel', cancelPress);
-        btn.addEventListener('mousedown', startPress);
-        btn.addEventListener('mouseup', cancelPress);
-        btn.addEventListener('mouseleave', cancelPress);
-        btn.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-    });
+    /* ما فيه شي هسه — الإدارة عن طريق الإعدادات */
 }
-
-function champPromptAdmin() {
-    const pin = prompt('أدخل الرمز:');
-    if (pin === null) return;
-
-    if (pin !== CHAMP_PIN) {
-        if (typeof showToast === 'function') showToast('الرمز خطأ', false, 2500);
-        return;
-    }
-
-    const confirmMsg = isChampAdmin()
-        ? 'هل تريد الخروج من وضع الأدمن؟'
-        : 'هل تريد الدخول كأدمن؟';
-
-    const yes = confirm(confirmMsg);
-
-    if (yes) {
-        if (isChampAdmin()) {
-            clearChampAdmin();
-            if (typeof showToast === 'function') showToast('تم الخروج من وضع الأدمن', true, 2500);
-        } else {
-            setChampAdmin();
-            if (typeof showToast === 'function') showToast('مرحباً بك كأدمن', true, 2500);
-        }
-
-        champLoaded = false;
-        loadChampions();
-    }
-}
-window.champPromptAdmin = champPromptAdmin;
 
 /* =========================================================
    Admin Sync
@@ -1119,10 +1080,10 @@ window.championsReload = function() {
 
 window.champGoToTab = champGoToTab;
 window.champSwitchView = champSwitchView;
-window.champShowAdminMenu = champPromptAdmin;
 window.champStartKnockout = champStartKnockout;
 window.champRequestReset = champRequestReset;
 window.champSyncNow = champSyncNow;
 window.champStartTournament = champStartTournament;
+window.champSettingsToggleAdmin = champSettingsToggleAdmin;
 
-console.log('[Champions] v=13 loaded ✅');
+console.log('[Champions] v=14 loaded ✅');
