@@ -1,6 +1,6 @@
 /* =========================================================
-   locks.js — FINALISSIMA LEAGUE CHAT (v=6)
-   Phosphor Icons + قسم "month" + Champions Cup
+   locks.js — FINALISSIMA LEAGUE CHAT (v=7)
+   Phosphor Icons + قسم "month" + Champions Cup Admin
 ========================================================= */
 
 window.sectionLocks = {
@@ -230,6 +230,12 @@ function openSettingsMain() {
     const body = document.getElementById('settingsBody');
     if (!body) return;
 
+    /* ⭐ حالة أدمن Champions */
+    const champAdmin = (typeof isChampAdmin === 'function') ? isChampAdmin() : false;
+    const champLabel = champAdmin ? 'الخروج من وضع أدمن Champions' : 'الدخول كأدمن Champions';
+    const champIcon = champAdmin ? 'sign-out' : 'trophy';
+    const champClass = champAdmin ? 'settings-champ-admin settings-champ-logout' : 'settings-champ-admin';
+
     body.innerHTML =
         '<button class="settings-item" onclick="openSettingsManagers()">' +
             '<span class="si-icon">' + phIcon('users', 'fill') + '</span>' +
@@ -246,6 +252,11 @@ function openSettingsMain() {
         '<button class="settings-item" onclick="openSettingsMonth()">' +
             '<span class="si-icon">' + phIcon('trophy', 'fill') + '</span>' +
             '<span class="si-label">تشكيلة الشهر</span>' +
+        '</button>' +
+        /* ⭐ Champions Admin */
+        '<button class="settings-item ' + champClass + '" onclick="champSettingsToggleAdmin()">' +
+            '<span class="si-icon">' + phIcon(champIcon, 'fill') + '</span>' +
+            '<span class="si-label">' + champLabel + '</span>' +
         '</button>' +
         '<button class="settings-item" onclick="openSettingsLocks()">' +
             '<span class="si-icon">' + phIcon('lock-key', 'fill') + '</span>' +
