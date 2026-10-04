@@ -868,3 +868,45 @@
     user-select:none;
     pointer-events:none;
 }
+/* =========================================================
+   13) SETTINGS — زر أدمن Champions
+========================================================= */
+
+.settings-item.settings-champ-admin{
+    background:linear-gradient(135deg, #8B1A2F 0%, #6B0F1F 100%);
+    border:2px solid #D4B77A;
+    color:#D4B77A;
+}
+
+.settings-item.settings-champ-admin .si-icon i{
+    color:#D4B77A;
+}
+
+.settings-item.settings-champ-admin .si-label{
+    color:#D4B77A;
+    font-weight:900;
+    letter-spacing:0.5px;
+}
+
+.settings-item.settings-champ-admin:hover{
+    background:linear-gradient(135deg, #A02038 0%, #7B1024 100%);
+    border-color:#F5E6D3;
+    transform:translateY(-1px);
+    box-shadow:0 4px 14px rgba(212,183,122,.4);
+}
+
+.settings-item.settings-champ-admin.settings-champ-logout{
+    background:linear-gradient(135deg, #FAF6F0 0%, #FFFFFF 100%);
+    border-color:#8B1A2F;
+    color:#8B1A2F;
+}
+
+.settings-item.settings-champ-admin.settings-champ-logout .si-icon i,
+.settings-item.settings-champ-admin.settings-champ-logout .si-label{
+    color:#8B1A2F;
+}
+
+.settings-item.settings-champ-admin.settings-champ-logout:hover{
+    background:#FAF6F0;
+    border-color:#6B0F1F;
+}
